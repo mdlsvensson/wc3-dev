@@ -8,6 +8,7 @@ New to the framework? Follow these guides in order:
 1. [Install and run the template](/framework/docs/installation/).
 2. [Bring in your World Editor map](/framework/docs/custom-maps/), or keep the template while learning.
 3. [Create a custom unit and gameplay code](/framework/docs/map-making/).
+4. [Import models, textures, icons, and sounds](/framework/docs/assets/) from folders.
 
 Keep these references nearby:
 

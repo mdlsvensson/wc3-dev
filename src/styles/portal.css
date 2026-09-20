@@ -9,7 +9,7 @@
   h1,h2,h3,p { margin: 0; }
   p { line-height: 1.7; color: var(--muted); }
   svg { flex-shrink: 0; }
-  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  html { scroll-behavior: smooth; scroll-padding-top: 8rem; }
   ::selection { background: var(--accent); color: var(--bg); }
 }
 @layer layout {
@@ -89,7 +89,7 @@
   .code-panel .panel-label { padding: 16px 20px; border-bottom: 1px solid #40474e; }
   pre.astro-code { padding: 24px; margin: 0; overflow-x: auto; font-size: .85rem; line-height: 1.85; border-radius: 4px; }
   .getting-started > pre { min-width: 0; border: 1px solid var(--line); }
-  .skip-link { position: absolute; left: 20px; top: -100px; background: var(--accent); color: var(--bg); padding: 12px; z-index: 10; }
+  .skip-link { position: fixed; left: 20px; top: -100px; background: var(--accent); color: var(--bg); padding: 12px; z-index: 100; }
   .skip-link:focus { top: 10px; }
 }
 @media (max-width: 900px) {
@@ -178,3 +178,18 @@ body { background: radial-gradient(ellipse at 85% 8%, #29352b70, transparent 38%
   .field-notes > a > svg { display: block; }
 }
 
+/* Compact shared application navigation. */
+body { background: var(--bg); }
+.navigation-shell { position: sticky; top: 0; z-index: 50; background: #101a20f5; border-bottom: 1px solid #685a2a; backdrop-filter: blur(12px); }
+.site-header { min-height: 70px; border: 0; gap: 28px; }
+.site-header .brand img { width: 42px; height: 42px; }
+.site-header .brand { font-size: 1.35rem; }
+.site-header nav { gap: 28px; }
+.site-header nav a { min-height: 42px; }
+.site-footer { padding-block: 20px; gap: 16px; color: var(--muted); font-size: .85rem; }
+@media (max-width: 620px) {
+  .site-header { padding-block: 8px; gap: 4px 16px; }
+  .site-header nav { gap: 16px; }
+  .site-header .brand img { width: 36px; height: 36px; }
+  .site-footer { gap: 4px; }
+}

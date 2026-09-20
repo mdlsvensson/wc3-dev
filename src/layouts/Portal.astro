@@ -20,7 +20,7 @@ const isFramework = Astro.url.pathname.startsWith('/framework');
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <header class="site-header wrap">
+    <div class="navigation-shell"><header class="site-header wrap">
       <a class="brand" href="/" aria-label="wc3.dev home"><img src="/brand/wc3-crest.png" alt="" width="56" height="56" /><span>wc3<span class="brand-dot">.</span>dev</span></a>
       <nav aria-label="Main navigation">
         <a href="/#resources" aria-current={!isFramework && Astro.url.pathname === '/' ? 'page' : undefined}>Resources</a>
@@ -28,8 +28,8 @@ const isFramework = Astro.url.pathname.startsWith('/framework');
         <a href="/framework/docs/">Docs <ArrowUpRight size={14} /></a>
       </nav>
       <a class="source-link" href="https://github.com/mdlsvensson/w3ts-framework" aria-label="Framework source on GitHub"><Github size={20} /></a>
-    </header>
+    </header></div>
     <main id="main"><slot /></main>
-    <footer class="wrap site-footer"><a class="brand" href="/" aria-label="wc3.dev home"><img src="/brand/wc3-crest.png" alt="" width="48" height="48" /><span>wc3<span class="brand-dot">.</span>dev</span></a><p>An independent resource for Warcraft III creators.</p><a href="https://www.hiveworkshop.com/">Find the community <ArrowUpRight size={15} /></a></footer>
+    <footer class="wrap site-footer"><span>wc3.dev</span><p>Independent Warcraft III modding resource.</p></footer>
   </body>
 </html>

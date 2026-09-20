@@ -26,6 +26,7 @@ export default defineConfig({
         { label: 'Installation', slug: 'framework/docs/installation' },
         { label: 'Use your own map', slug: 'framework/docs/custom-maps' },
         { label: 'Make your first map', slug: 'framework/docs/map-making' },
+        { label: 'Import assets', slug: 'framework/docs/assets' },
       ] },
       { label: 'Reference', items: [
         { label: 'Pkl object data', slug: 'framework/docs/object-data' },
