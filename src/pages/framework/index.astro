@@ -1,0 +1,21 @@
+---
+import { ArrowRight, Github, CodeXml, Boxes, Terminal } from 'lucide-astro';
+import { Code } from 'astro:components';
+import Portal from '../../layouts/Portal.astro';
+const example = `import { MapPlayer, Unit } from "w3ts";
+import { addScriptHook, W3TS_HOOK } from "w3ts/hooks";
+
+addScriptHook(W3TS_HOOK.MAIN_AFTER, () => {
+  const footman = new Unit(
+    MapPlayer.fromIndex(0),
+    FourCC("hfoo"), 0, 0, 270,
+  );
+  footman.name = "Vanguard";
+});`;
+---
+<Portal title="The w3ts framework" description="Build Warcraft III maps with TypeScript gameplay, declarative Pkl object data, and a Deno build pipeline.">
+  <section class="hero wrap framework-hero"><div class="eyebrow">W3TS FRAMEWORK <span class="badge">ALPHA</span></div><div class="hero-grid"><div><h1>From typed code<br />to <span>living worlds.</span></h1><p class="hero-copy">A TypeScript-first framework built on w3ts. Bring your World Editor map, define your objects, and build something worth playing.</p><div class="actions"><a class="button primary" href="/framework/docs/installation/">Start building <ArrowRight size={18} /></a><a class="button secondary" href="https://github.com/mdlsvensson/w3ts-framework"><Github size={18} /> Source code</a></div></div><div class="code-panel"><div class="panel-label">src/main.ts <span>TYPESCRIPT → LUA</span></div><Code code={example} lang="ts" theme="github-dark" /></div></div></section>
+  <section class="wrap framework-pillars" aria-label="Framework capabilities"><article><CodeXml /><h2>Typed gameplay</h2><p>Use w3ts wrappers and Warcraft native typings. TypeScriptToLua compiles your gameplay into the map’s Lua script.</p></article><article><Boxes /><h2>Declarative objects</h2><p>Author units, abilities, items, and more in Pkl, with inheritance, base-object constants, and rawcode validation.</p></article><article><Terminal /><h2>A Deno toolchain</h2><p>Build, launch, generate declarations, and validate your project through a consistent set of Deno tasks.</p></article></section>
+  <section class="wrap getting-started"><div><div class="eyebrow">THE FIRST BUILD</div><h2>A familiar starting point.</h2><p>Install Deno, Pkl, and Git. You’ll need a Lua-capable Warcraft III World Editor to edit and play your maps.</p><a class="text-link" href="/framework/docs/installation/">Full installation guide <ArrowRight size={18} /></a></div><Code code={`git clone https://github.com/mdlsvensson/w3ts-framework.git\ncd w3ts-framework\ndeno install --frozen\ndeno task build`} lang="powershell" theme="github-dark" /></section>
+  <section class="wrap docs-callout"><div><h2>Learn the workflow.</h2><p>Installation, your first custom unit, object authoring, and the complete command reference.</p></div><a class="button secondary" href="/framework/docs/">Open the docs <ArrowRight size={18} /></a></section>
+</Portal>

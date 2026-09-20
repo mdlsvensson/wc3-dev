@@ -1,0 +1,35 @@
+---
+import { Github, ArrowUpRight } from 'lucide-astro';
+import '../styles/portal.css';
+interface Props { title: string; description: string; }
+const { title, description } = Astro.props;
+const isFramework = Astro.url.pathname.startsWith('/framework');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · wc3.dev</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:title" content={`${title} · wc3.dev`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/png" href="/brand/wc3-crest.png" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header wrap">
+      <a class="brand" href="/" aria-label="wc3.dev home"><img src="/brand/wc3-crest.png" alt="" width="56" height="56" /><span>wc3<span class="brand-dot">.</span>dev</span></a>
+      <nav aria-label="Main navigation">
+        <a href="/#resources" aria-current={!isFramework && Astro.url.pathname === '/' ? 'page' : undefined}>Resources</a>
+        <a href="/framework/" aria-current={isFramework ? 'page' : undefined}>Framework</a>
+        <a href="/framework/docs/">Docs <ArrowUpRight size={14} /></a>
+      </nav>
+      <a class="source-link" href="https://github.com/mdlsvensson/w3ts-framework" aria-label="Framework source on GitHub"><Github size={20} /></a>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="wrap site-footer"><a class="brand" href="/" aria-label="wc3.dev home"><img src="/brand/wc3-crest.png" alt="" width="48" height="48" /><span>wc3<span class="brand-dot">.</span>dev</span></a><p>An independent resource for Warcraft III creators.</p><a href="https://www.hiveworkshop.com/">Find the community <ArrowUpRight size={15} /></a></footer>
+  </body>
+</html>

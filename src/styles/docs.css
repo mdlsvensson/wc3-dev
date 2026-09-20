@@ -1,0 +1,19 @@
+:root {
+  color-scheme: dark;
+  --sl-color-accent-low: #3b341b;
+  --sl-color-accent: #caa600;
+  --sl-color-accent-high: #ffed72;
+  --sl-color-bg: #101a20;
+  --sl-color-bg-nav: #19262e;
+  --sl-color-bg-sidebar: #142129;
+  --sl-color-hairline-light: #35434b;
+  --sl-color-hairline: #35434b;
+  --sl-font: 'Segoe UI', sans-serif;
+}
+.site-title { letter-spacing: -.04em; gap: .6rem; }
+.site-title img { width: 44px; height: 44px; object-fit: contain; }
+header.header { border-bottom: 1px solid #a38c3b66; }
+@media (max-width: 420px) {
+  .site-title { font-size: 1rem; gap: .3rem; }
+  .site-title img { width: 34px; height: 34px; }
+}

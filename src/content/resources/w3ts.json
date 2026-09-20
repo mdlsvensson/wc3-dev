@@ -1,0 +1,8 @@
+{
+  "description": "Object-oriented TypeScript wrappers around Warcraft III natives. A foundation for typed map scripting.",
+  "category": "Scripting",
+  "order": 2,
+  "title": "w3ts",
+  "url": "https://github.com/cipherxof/w3ts",
+  "label": "TypeScript / Lua"
+}

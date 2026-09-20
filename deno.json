@@ -1,0 +1,11 @@
+{
+  "nodeModulesDir": "auto",
+  "tasks": {
+    "dev": "deno run -A npm:astro dev --host 127.0.0.1",
+    "check": "deno run -A npm:astro check",
+    "build": "deno run -A npm:astro build",
+    "preview": "deno run -A npm:astro preview --host 127.0.0.1",
+    "test": "deno test -A scripts/site_test.ts"
+  },
+  "fmt": { "exclude": ["node_modules", "dist", ".astro", "deno.lock"] }
+}

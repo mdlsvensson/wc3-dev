@@ -1,0 +1,8 @@
+{
+  "description": "Write typed, declarative object definitions with reusable defaults, inheritance, and validation.",
+  "category": "Tooling",
+  "order": 6,
+  "title": "Pkl",
+  "url": "https://pkl-lang.org/",
+  "label": "Configuration / Object data"
+}
