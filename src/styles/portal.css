@@ -1,6 +1,6 @@
 @layer base, layout, components;
 @layer base {
-  :root { color-scheme: dark; --bg: #101a20; --panel: #1b2931; --ink: #f6f5eb; --muted: #aebbc1; --line: #35434b; --accent: #f5d518; font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--ink); }
+  :root { color-scheme: dark; --bg: #101a20; --panel: #1b2931; --ink: #f6f5eb; --muted: #aebbc1; --line: #35434b; --accent: #f5d518; font-family: var(--font-text); background: var(--bg); color: var(--ink); }
   * { box-sizing: border-box; }
   body { margin: 0; }
   a { color: inherit; text-decoration: none; }
@@ -59,14 +59,14 @@
   .secondary { border-color: var(--line); background: var(--panel); }
   .secondary:hover { border-color: var(--accent); }
   .field-notes { border-top: 1px solid var(--line); }
-  .panel-label { display: flex; justify-content: space-between; gap: 1rem; padding-block: 16px; color: var(--muted); font: .75rem/1.5 Consolas, monospace; letter-spacing: .04em; }
+  .panel-label { display: flex; justify-content: space-between; gap: 1rem; padding-block: 16px; color: var(--muted); font: .75rem/1.5 var(--font-text); letter-spacing: .04em; }
   .field-notes > a { display: flex; align-items: center; gap: 20px; border-top: 1px solid var(--line); padding-block: 23px; }
   .field-notes > a:last-child { border-bottom: 1px solid var(--line); }
   .field-notes > a > svg { margin-left: auto; color: var(--muted); }
   .field-notes h2 { font-size: 1.13rem; font-weight: 600; }
   .field-notes p { font-size: .88rem; margin-top: 5px; }
   .field-notes a:hover h2 { color: var(--accent); }
-  .note-number { color: var(--accent); font: .82rem Consolas, monospace; align-self: flex-start; padding-top: 4px; }
+  .note-number { color: var(--accent); font: .82rem var(--font-text); align-self: flex-start; padding-top: 4px; }
   .resource-card { padding: 26px; background: var(--panel); border: 1px solid var(--line); display: flex; flex-direction: column; border-radius: 4px; transition: border-color .15s, background .15s; }
   .resource-card:hover { border-color: #c8a92b; background: #24343d; }
   .card-top { display: flex; align-items: center; gap: 11px; color: var(--accent); }
@@ -74,11 +74,11 @@
   .card-top > svg:last-child { margin-left: auto; color: var(--muted); }
   .resource-card h3 { margin-block: 26px 9px; font-size: 1.22rem; font-weight: 600; letter-spacing: -.02em; }
   .resource-card p { font-size: .94rem; margin-bottom: 25px; }
-  .card-label { margin-top: auto; font: .77rem Consolas, monospace; color: var(--muted); }
+  .card-label { margin-top: auto; font: .77rem var(--font-text); color: var(--muted); }
   .text-link { display: inline-flex; align-items: center; gap: .65rem; color: var(--accent); font-weight: 600; font-size: .95rem; }
   .text-link:hover { text-decoration: underline; }
   .workflow > div { display: grid; grid-template-columns: 30px 1fr; gap: 4px 16px; border-bottom: 1px solid #414b48; padding-block: 16px; }
-  .workflow > div > span { grid-row: span 2; font: .8rem Consolas, monospace; color: var(--accent); padding-top: 4px; }
+  .workflow > div > span { grid-row: span 2; font: .8rem var(--font-text); color: var(--accent); padding-top: 4px; }
   .workflow strong { font-weight: 600; }
   .workflow small { color: var(--muted); font-size: .87rem; }
   .workflow > a { display: flex; align-items: center; gap: 10px; font-size: .88rem; padding-top: 24px; }
@@ -142,7 +142,7 @@ body { background: radial-gradient(ellipse at 85% 8%, #29352b70, transparent 38%
 .hero h1 span { background: linear-gradient(110deg, #ffff82, #f2c900 85%); background-clip: text; color: transparent; }
 .hero-emblem { display: flex; flex-direction: column; align-items: center; position: relative; }
 .hero-emblem img { display: block; width: min(100%, 410px); height: auto; filter: drop-shadow(0 16px 38px #0008); }
-.hero-emblem > span { color: #c5c3a7; font: .75rem/1.5 Consolas, monospace; letter-spacing: .22em; margin-top: 6px; }
+.hero-emblem > span { color: #c5c3a7; font: .75rem/1.5 var(--font-text); letter-spacing: .22em; margin-top: 6px; }
 .hero .hero-grid { margin-top: 12px; }
 .field-notes { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 42px; border: 1px solid var(--line); background: #19262dc9; }
 .field-notes > a { padding: 22px; gap: 14px; border: 0; }

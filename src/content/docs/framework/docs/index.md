@@ -9,6 +9,7 @@ New to the framework? Follow these guides in order:
 2. [Bring in your World Editor map](/framework/docs/custom-maps/), or keep the template while learning.
 3. [Create a custom unit and gameplay code](/framework/docs/map-making/).
 4. [Import models, textures, icons, and sounds](/framework/docs/assets/) from folders.
+5. [Configure map settings](/framework/docs/map-settings/) with Pkl.
 
 Keep these references nearby:
 

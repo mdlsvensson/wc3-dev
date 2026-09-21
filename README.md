@@ -34,6 +34,8 @@ deno task preview
 
 The tests require a fresh build. They check required routes, all generated local
 links and anchors, asset references, the search bundle, and syntax tokenization.
+The build clears Astro's content cache so theme changes cannot leave generated
+code blocks referencing old stylesheets. Code-block styles are inlined with the content.
 `dist/` is a static website, suitable for any static host. Serve the generated
 `404.html` for missing pages. Production hosting and DNS are not configured.
 `astro.config.ts` sets the canonical origin to `https://wc3.dev`.
@@ -59,6 +61,10 @@ TypeScript and Lua use Shiki's built-in grammars. JASS is registered in both
 Astro's Markdown renderer and Starlight's Expressive Code renderer. Use fenced
 code blocks labeled `typescript`, `lua`, or `jass`. JASS highlighting is lexical;
 it is not a compiler or validator.
+
+Mona Sans is the site text font; Monaspace Argon 1.400 is used for code. Both are
+self-hosted under `public/fonts/`, with their licenses and sources included there.
+Shared font definitions live in `src/styles/fonts.css`.
 
 ## Documentation migration
 

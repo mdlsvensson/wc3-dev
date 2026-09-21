@@ -16,6 +16,7 @@ remain easy to review in Git.
 | `src/war3map.d.ts` | Generated types for editor-created Lua globals |
 | `objects/definitions/` | Handwritten Pkl custom objects |
 | `assets/`, `assets.pkl` | Resource files with optional Pkl path mappings and exclusions |
+| `map-settings.pkl`, `map-settings-schema.pkl` | Internal map-setting overrides and their authoring schema |
 | `.asset-state/<mapFolder>.json` | Generated source-map import ownership; commit with synced map files |
 | `objects/schema.pkl`, `objects/schema/` | Public authoring types and generated property schemas |
 | `objects/bases.pkl` | Generated built-in object IDs and friendly constants |
@@ -36,6 +37,8 @@ maps/<mapFolder> -> dist/<mapFolder> (fresh copy)
                   |
 assets/ + assets.pkl -> staged resources + war3map.imp
                   |
+map-settings.pkl -> staged w3i, Misc.txt, Skin.txt overrides
+                  |
 src/main.ts -> TypeScriptToLua + war3-transformer
                   |
            inject object tables
@@ -52,11 +55,15 @@ src/main.ts -> TypeScriptToLua + war3-transformer
 2. `compileMap()` checks for source `war3map.lua` and `war3map.w3i` files. This is
    an early completeness check, not validation of every map binary format.
    It also evaluates optional `assets.pkl` and preflights resource paths and ownership.
+   Optional `map-settings.pkl` is evaluated and its planned internal-file changes
+   are validated before staging is replaced.
 3. Pkl evaluates `objects/objects.pkl` to JSON. A failed evaluation stops the build.
 4. The selected staging directory is replaced by a complete source-map copy. The
    previous Lua bundle is removed. Other staged maps and archives are not cleared.
    Resources are copied into staging, stale managed imports are removed, and the
    import index is merged. Neither the source map nor its asset ownership state is changed.
+   Map settings then patch the staged `war3map.w3i` and merge overrides into
+   `war3mapMisc.txt` and `war3mapSkin.txt`.
 5. A temporary root-level `tsconfig.build.<pid>.json` contains absolute transformer
    map/entry/output paths. The tracked `tsconfig.json` remains portable and unchanged.
 6. The pinned TypeScript-to-Lua CLI runs as a Deno subprocess. `war3-transformer`
@@ -98,6 +105,7 @@ editor initialization. The editor's Lua script remains part of the final map.
 | `config.ts` | Reads base/local JSON, merges top-level settings, validates types and map names |
 | `assets.ts` | Evaluates asset Pkl, validates import plans, applies staged/source sync with ownership and rollback |
 | `asset-imports.ts` | Reads and writes the version 1 World Editor import index |
+| `map-settings.ts` | Evaluates settings Pkl, validates overrides, patches map-info fields, and merges text settings |
 | `build.ts` | Build command, archive packaging, modern map-info preservation |
 | `compile.ts` | Source validation, staging, temporary compiler config, compilation, injection, Lua merge |
 | `evaluate-objects.ts` | Runs the Pkl executable and reports missing CLI/setup errors |
@@ -106,7 +114,7 @@ editor initialization. The editor's Lua script remains part of the final map.
 | `warcraft-library.ts` | Adapts CommonJS constructor exports from the pinned Warcraft parsing library |
 | `test.ts` | Compiles and launches Warcraft III, with optional Wine settings |
 | `dev.ts` | Parses source-map Lua globals into `src/war3map.d.ts` |
-| `watch.ts` | Debounces file events and serializes Pkl/declaration regeneration |
+| `watch.ts` | Debounces file events and serializes Pkl/declaration regeneration and map-settings validation |
 | `generate-pkl-bases.ts` | Generates built-in ID types, collision sets, and named constants |
 | `generate-pkl-schema.ts` | Converts metadata fields to nullable Pkl properties using shared aliases |
 | `validate-json.ts` | Checks configuration JSON syntax and merged project configuration |

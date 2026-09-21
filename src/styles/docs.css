@@ -8,11 +8,25 @@
   --sl-color-bg-sidebar: #142129;
   --sl-color-hairline-light: #35434b;
   --sl-color-hairline: #35434b;
-  --sl-font: 'Segoe UI', sans-serif;
 }
 .site-title { letter-spacing: -.04em; gap: .6rem; }
 .site-title img { width: 44px; height: 44px; object-fit: contain; }
 header.header { border-bottom: 1px solid #a38c3b66; }
+
+/* Keep clipboard controls visible, with the SVG fitted to the icon box. */
+.expressive-code .copy button { opacity: .8; }
+.expressive-code .copy button:hover,
+.expressive-code .copy button:focus-visible { opacity: 1; }
+.expressive-code .copy button::after {
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+.expressive-code .copy button:focus-visible {
+  outline: 2px solid var(--sl-color-accent-high);
+  outline-offset: 3px;
+}
 @media (max-width: 420px) {
   .site-title { font-size: 1rem; gap: .3rem; }
   .site-title img { width: 34px; height: 34px; }

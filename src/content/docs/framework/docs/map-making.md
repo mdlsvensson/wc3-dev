@@ -150,8 +150,10 @@ In one terminal:
 deno task dev
 ```
 
-Edit Pkl files to regenerate the manifest, or save the source map to regenerate
-Lua-global declarations. The watcher does not build the archive, watch TypeScript,
+Edit object Pkl files to regenerate the manifest, or save the source map to regenerate
+Lua-global declarations. Edits to the existing map-settings Pkl files run validation;
+see [Map settings](/framework/docs/map-settings/) for available overrides.
+The watcher does not build the archive, watch TypeScript,
 or reload a running game. It performs no initial generation, so run `objects:eval`
 and `build:defs` once if their outputs are stale. Use another terminal for `build`
 or `test` after generation finishes. Stop the watcher with Ctrl+C.

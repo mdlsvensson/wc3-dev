@@ -1,72 +1,73 @@
 ---
-title: "Installation"
-description: "Installation for the Warcraft III TypeScript framework."
+title: Installation
+description: Set up the tools, build the template, and play your first map.
 ---
 
-You need a Warcraft III: Reforged installation with a Lua-capable World Editor for editing and playing. Older
-JASS-only versions will not work. The pinned native typings are for Warcraft III 1.33.0; this is not a promise that every game version supports every declared native.
+You'll need **Warcraft III: Reforged** with a Lua-capable World Editor to edit and
+play maps. Run the commands below in PowerShell.
 
-## 1. Prerequisites
+## 1. Install the tools
 
-Install [Deno](https://deno.com/), [Pkl](https://pkl-lang.org) and [git](https://git-scm.com/).
+Install [Deno](https://deno.com/), [Pkl](https://pkl-lang.org), and
+[Git](https://git-scm.com/), then verify they're available:
 
-Run to verify:
-```powershell
+```powershell title="Check your tools"
 deno --version
-git --version
 pkl --version
-```
-If Pkl is missing from PATH run:
-
-```powershell
-$env:PKL_EXECUTABLE = 'path\to\pkl.exe'
+git --version
 ```
 
-## 2. Clone this repo
+<details>
+<summary>Pkl isn't on PATH?</summary>
+
+Set its executable path for this terminal session:
 
 ```powershell
+$env:PKL_EXECUTABLE = 'C:\path\to\pkl.exe'
+```
+
+</details>
+
+## 2. Clone the repository and install dependencies
+
+```powershell title="Get the framework"
 git clone https://github.com/mdlsvensson/w3ts-framework.git
 cd w3ts-framework
-```
-
-## 3. Install project dependencies
-
-```powershell
 deno install --frozen
 ```
 
-Deno downloads the locked dependencies and manages `node_modules/`. An internet
-connection is needed for uncached packages. Do not run `npm install` or maintain a
-second package-manager lockfile. `package.json` declares npm dependencies;
-`deno.lock` locks the actual resolution. Build tools use Deno's Node compatibility
-layer without requiring a standalone Node installation.
+Deno downloads the locked dependencies and manages `node_modules/`. No separate
+Node.js installation is needed.
 
-## 4. Configure the game executable
+## 4. Set your game path
 
-Open `config.json` in your editor and set the path to your `Warcraft III.exe`:
+Update `gameExecutable` in `config.json`, keeping the other settings:
 
-```json
+```json title="config.json · gameExecutable"
 {
   "gameExecutable": "C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe"
 }
 ```
 
-* If there are multiple editors on the same project, create a local config and set your personal path by copying `config.json` --> `config.local.json`. Leave shared map settings in `config.json` so collaborators build the same map.
-* Use double backslashes in JSON strings, or forward slashes. Point to the game executable, not the World Editor or Battle.net launcher.
-* See [configuration](/framework/docs/reference/#configuration) for all options.
+Use double backslashes or forward slashes. Select the game executable, not World
+Editor or the Battle.net launcher.
 
-## 5. Check the setup and build
+:::tip[Working with others?]
+Copy `config.json` to `config.local.json` and set your personal path there. Keep
+shared settings in `config.json`. See [all configuration options](/framework/docs/reference/#configuration).
+:::
 
-```powershell
+## 5. Check and build
+
+```powershell title="Validate and package"
 deno task typecheck
 deno task lint
 deno task test:unit
 deno task build
 ```
 
-Each command should finish successfully. The build evaluates Pkl, compiles the
-gameplay code into Lua, applies object data, and packages `dist/bin/map.w3x`.
-The intermediate `dist/map.w3x/` is a directory; the file inside `dist/bin/` is the distributable map file.
+Each command should succeed. Your distributable map is **`dist/bin/map.w3x`**;
+`dist/map.w3x/` holds the intermediate files, do not edit this map. The editable map is the map folder `maps/map.w3x`. To use your own map, see [custom maps](/framework/docs/custom-maps/).
 
 ## 6. Play the sample
 
@@ -74,16 +75,14 @@ The intermediate `dist/map.w3x/` is a directory; the file inside `dist/bin/` is 
 deno task test
 ```
 
-This rebuilds and launches `dist/map.w3x/` with Warcraft III. Expect printed build
+This rebuilds and launches the staged map in Warcraft III. Look for build
 information and a Footman at the map origin that changes color every second.
 
-## 7. Set up Visual Studio Code
+## 7. Set up VS Code
 
-Open the repository folder in Visual Studio Code and install the recommended Deno extension.
-The checked-in settings enable Deno for `scripts/` only. `src/` uses the gameplay
-`tsconfig.json` and TypeScript-to-Lua types.
+Open the repository in Visual Studio Code and install the recommended **Deno**
+extension. The included settings enable Deno for `scripts/`; `src/` uses the
+gameplay TypeScript configuration.
 
-[Pkl language support](https://pkl-lang.org/vscode/current/index.html) is optional but useful for schema completion. Generated schemas and base constants are already included; no regeneration is required for a normal installation.
-
-Next: [use your own map](/framework/docs/custom-maps/) or [write your first gameplay code](/framework/docs/map-making/).
-
+[Pkl language support](https://pkl-lang.org/vscode/current/index.html) adds schema
+completion. Generated schemas and base constants are already included.

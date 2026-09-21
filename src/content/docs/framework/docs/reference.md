@@ -12,11 +12,13 @@ installer and runner.
 | Command | Effect | Requirements beyond Deno/dependencies |
 | --- | --- | --- |
 | `deno install --frozen` | Install dependencies using `deno.lock` | Registry access for uncached packages |
-| `deno task build` | Evaluate objects, compile, inject, package the selected map | Pkl, source map |
+| `deno task build` | Evaluate Pkl, apply map settings, compile, inject objects, package the selected map | Pkl, source map |
 | `deno task build -minify` | Same build with Lua minification enabled | Pkl, source map |
 | `deno task test` | Compile and launch the staged map directory | Pkl, source map, Warcraft III |
 | `deno task test:unit` | Automated regression suite | No Pkl or game required |
 | `deno task test:assets:pkl` | Real Pkl configuration and asset CLI integration test | Pkl; no game required |
+| `deno task test:settings:pkl` | Real Pkl map-settings schema integration test | Pkl; no game required |
+| `deno task settings:check` | Validate map settings without writing map files | Source map; Pkl when `map-settings.pkl` exists |
 | `deno task assets:check` | Validate asset paths, ownership, and planned changes | Source map; Pkl when `assets.pkl` exists |
 | `deno task assets:sync` | Sync imports into the source map | Same as check; close the map in World Editor first |
 | `deno task typecheck` | Check tools and gameplay types | Current generated gameplay inputs |
@@ -24,7 +26,7 @@ installer and runner.
 | `deno task lint:json` | JSON/config validation only | No Pkl or game required |
 | `deno task objects:eval` | Regenerate `src/generated/objects.json` | Pkl |
 | `deno task build:defs` | Regenerate editor-global TypeScript declarations | Source-map Lua |
-| `deno task dev` | Watch Pkl and map Lua changes; regenerate their outputs | Pkl for object edits, source map |
+| `deno task dev` | Watch object Pkl and map Lua changes; regenerate outputs and validate map-settings edits | Pkl for Pkl edits, source map |
 | `deno task schema:gen` | Regenerate Pkl property schemas | Installed object-data metadata |
 | `deno task bases:gen` | Regenerate Pkl base constants, then property schemas | Installed object-data metadata |
 
@@ -37,6 +39,9 @@ Warcraft III. Restart it after changing `mapFolder`.
 
 See [Import assets](/framework/docs/assets/) for the separate `assets.pkl` schema,
 folder layout, and editor synchronization workflow.
+See [Map settings](/framework/docs/map-settings/) for `map-settings.pkl`, which
+overrides metadata, loading screens, gameplay constants, and interface settings
+in the staged map during build and playtest.
 
 `config.json` supplies shared defaults. An optional ignored `config.local.json`
 replaces any supplied top-level values. This is a shallow merge: `launchArgs`
