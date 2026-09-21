@@ -12,8 +12,9 @@ export default defineConfig({
     description: 'TypeScript gameplay, Pkl object data, and Deno tooling for Warcraft III.',
     favicon: '/brand/wc3-crest.png',
     logo: { src: './public/brand/wc3-crest.png', alt: '', replacesTitle: false },
-    customCss: ['./src/styles/fonts.css', './src/styles/docs.css'],
+    customCss: ['./src/styles/fonts.css', './src/styles/app-shell.css', './src/styles/docs.css'],
     components: {
+      PageFrame: './src/components/docs/PageFrame.astro',
       ThemeProvider: './src/components/docs/ThemeProvider.astro',
       ThemeSelect: './src/components/docs/ThemeSelect.astro',
     },

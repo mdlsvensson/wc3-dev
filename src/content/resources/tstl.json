@@ -1,8 +1,0 @@
-{
-  "description": "Take TypeScript into a Lua runtime. Explore the compiler, supported language features, and Lua interop.",
-  "category": "Scripting",
-  "order": 3,
-  "title": "TypeScriptToLua",
-  "url": "https://typescripttolua.github.io/",
-  "label": "Compiler / Documentation"
-}

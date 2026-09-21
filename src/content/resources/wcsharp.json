@@ -1,0 +1,8 @@
+{
+  "description": "Simplify the process of programming maps for WarCraft 3 in C#.",
+  "category": "Scripting",
+  "order": 5,
+  "title": "WCSharp",
+  "url": "https://github.com/Orden4/WCSharp",
+  "label": "C#"
+}

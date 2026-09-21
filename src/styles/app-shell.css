@@ -1,0 +1,20 @@
+:root { --app-footer-height: 2rem; }
+html, body { height: 100%; overflow: hidden; }
+
+.app-scroll {
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scroll-padding-block: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: #53636c transparent;
+}
+
+@media (max-width: 620px) {
+  :root { --app-footer-height: 3.5rem; }
+}
+@media print {
+  html, body { height: auto; overflow: visible; }
+  .app-scroll { overflow: visible; }
+}

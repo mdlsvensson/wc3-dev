@@ -1,0 +1,13 @@
+---
+import PageFrame from '@astrojs/starlight/components/PageFrame.astro';
+import AppFooter from '../AppFooter.astro';
+---
+
+<div class="docs-app">
+  <PageFrame>
+    <slot name="header" slot="header" />
+    <slot name="sidebar" slot="sidebar" />
+    <slot />
+  </PageFrame>
+  <AppFooter />
+</div>

@@ -1,8 +1,0 @@
-{
-  "description": "Run framework build tools, manage dependencies, and automate your local development workflow.",
-  "category": "Tooling",
-  "order": 5,
-  "title": "Deno",
-  "url": "https://docs.deno.com/",
-  "label": "Runtime / Toolchain"
-}

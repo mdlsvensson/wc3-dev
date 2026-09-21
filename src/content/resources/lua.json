@@ -1,8 +1,8 @@
 {
-  "description": "Look up language syntax, tables, functions, and metatables in the official Lua 5.3 reference manual.",
+  "description": "The official Lua 5.3 reference manual. Look up language syntax, tables, functions, and metatables.",
   "category": "Scripting",
-  "order": 4,
-  "title": "Lua reference",
+  "order": 2,
+  "title": "Lua Reference",
   "url": "https://www.lua.org/manual/5.3/",
-  "label": "Language reference"
+  "label": "LUA"
 }
