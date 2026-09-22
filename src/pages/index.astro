@@ -1,11 +1,11 @@
 ---
-import { getCollection } from 'astro:content';
 import { ArrowUpRight, BookOpen, FileCode } from 'lucide-astro';
 import Shell from '../layouts/Shell.astro';
 import GuideNav from '../components/GuideNav.astro';
 import ResourceDirectory from '../components/ResourceDirectory.astro';
+import { getLinks } from '../lib/resources';
 import '../styles/home.css';
-const resources = (await getCollection('resources')).sort((a, b) => a.data.order - b.data.order);
+const resources = await getLinks();
 ---
 <Shell title="Modding resources" description="Warcraft III modding resources, scripting tools, and framework documentation.">
   <GuideNav slot="side" />
