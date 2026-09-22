@@ -1,6 +1,6 @@
 ---
 title: Map settings
-description: Configure map metadata, loading screens, gameplay constants, and interface settings in Pkl.
+description: Configure map metadata, players, forces, environment, and gameplay in Pkl.
 ---
 
 Edit `map-settings.pkl` in your **framework repository** to override settings
@@ -25,10 +25,8 @@ loadingScreen {
   text = "Work together to win."
 }
 
-gameplayConstants {
-  ["Misc"] {
-    ["HeroMaxLevel"] = "25"
-  }
+gameplay {
+  heroMaxLevel = 25
 }
 ```
 
@@ -39,7 +37,8 @@ source-map value on the next build.
 
 ## Metadata and loading screens
 
-Both groups update `war3map.w3i`.
+Both groups update `war3map.w3i`. Map name and description also update the
+editor-generated `config()` function in Lua.
 
 | Field | Value |
 | --- | --- |
@@ -76,7 +75,74 @@ Unchanged metadata, including existing `TRIGSTR` references, is preserved. An
 overridden text field receives the supplied text directly; it does not rewrite
 shared entries in `war3map.wts`.
 
+## Players, forces, and environment
+
+These groups update both map metadata and editor-generated Lua. Player keys are
+existing **zero-based slot IDs**; force keys are existing **zero-based force
+indices**. Quote the keys because Pkl renders them as JSON object keys.
+
+```pkl
+players {
+  ["0"] {
+    controller = "user"
+    race = "human"
+    fixedStart = true
+    x = 128.0
+    y = -896.0
+  }
+}
+forces {
+  ["0"] {
+    name = "Allies"
+    allied = true
+    alliedVictory = true
+    sharedVision = true
+  }
+}
+environment {
+  waterColor = new {
+    80
+    120
+    180
+    255
+  }
+  fog {
+    enabled = true
+    start = 1000.0
+    end = 5000.0
+    density = 0.5
+  }
+}
+```
+
+| Group | Supported fields |
+| --- | --- |
+| Player | `name`, `controller`, `race`, `fixedStart`, `x`, `y` |
+| Force | `name`, `allied`, `alliedVictory`, `sharedVision`, `sharedControl`, `sharedAdvancedControl` |
+| Environment | `soundEnvironment`, `waterColor`, `fog` |
+| Fog | `enabled`, `style`, `start`, `end`, `density`, `color` |
+
+Controllers: `"user"`, `"computer"`, `"neutral"`, `"rescuable"`.
+Races: `"selectable"`, `"human"`, `"orc"`, `"undead"`, `"nightelf"`.
+Colours contain four integers (red, green, blue, alpha), each from 0 to 255.
+Fog styles are 0 (linear), 1 (exponential), or 2 (exponential squared); density
+ranges from 0 to 1. Set `enabled = true` to enable fog; other fog fields inherit
+unless explicitly overridden. Water colour overrides enable custom water tint.
+An empty sound environment selects the game's default sound environment.
+
+Omitted or null fields inherit the source. Slot counts, force membership and
+start-location priorities remain inherited. Enable custom forces in World Editor
+before overriding force flags. Missing slots or forces, inconsistent start/team
+assignments, and unsupported Lua initialization shapes fail validation.
+
 ## Gameplay constants and interface settings
+
+Use `gameplay.heroMaxLevel` (1–10000) and `gameplay.foodLimit` (0–300) for
+typed overrides of `[Misc] HeroMaxLevel` and `FoodCeiling`. Raw mappings remain
+available for other constants. Conflicting typed and raw values are rejected.
+These limits validate the configuration; they do not make custom progression
+systems or every game version support every possible value.
+
 
 | Group | Internal file | Purpose |
 | --- | --- | --- |
@@ -85,7 +151,7 @@ shared entries in `war3map.wts`.
 
 Both groups map section names to field/value mappings. Use the exact section and
 field names from the game's data or a source map saved with the corresponding
-World Editor setting. For example, the `HeroMaxLevel` override above writes
+World Editor setting. For example, the typed `heroMaxLevel` override above writes
 `HeroMaxLevel=25` in the `[Misc]` section of `war3mapMisc.txt`.
 
 Values are **strings in Warcraft's raw text format**, including numbers and
@@ -136,7 +202,16 @@ Version 18 cannot set a custom loading-screen model. Unsupported versions fail
 when a metadata or loading-screen override is requested. Unrelated binary data,
 including newer fields, is preserved rather than reserialized.
 
-Terrain, players, forces, and environment settings remain authored in World Editor.
-These Pkl overrides do not regenerate editor Lua or change runtime initialization.
-Unknown Pkl properties, invalid values, and malformed metadata prefixes report
-errors before the build replaces staging.
+Player, force and environment overrides require a Lua map with map-info version
+28 or later and recognizable editor-generated initialization. The writer patches
+specific calls while preserving unrelated triggers and unit placement code.
+Terrain geometry, slot creation/removal, force membership, weather, lighting,
+and HD water parameters remain editor-authored. This is an override layer for
+supported settings, not a replacement for the World Editor.
+
+Version 39 is regression-tested against a frozen World Editor 3.0.0.24268 map,
+including its extra loading-screen and player fields. Older metadata formats
+have synthetic compatibility tests. Binary, Lua, Pkl, and archive tests do not
+replace an in-game playtest; game acceptance has not been verified automatically.
+Unknown properties, invalid values, truncated records, and incompatible Lua
+report errors before the build replaces staging.
