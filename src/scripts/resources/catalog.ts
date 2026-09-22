@@ -5,7 +5,7 @@ const VIEW_KEY = 'wc3.resources.view';
 function facts(card: HTMLElement): CardFacts {
   return {
     tags: card.dataset.tags ? card.dataset.tags.split(' ') : [],
-    authors: card.dataset.authors ? card.dataset.authors.split('|') : [],
+    authors: card.dataset.authors ? JSON.parse(card.dataset.authors) : [],
     sd: card.dataset.sd === 'true',
     hd: card.dataset.hd === 'true',
   };
