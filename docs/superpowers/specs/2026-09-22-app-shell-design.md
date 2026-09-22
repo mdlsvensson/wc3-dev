@@ -35,9 +35,12 @@ angular edges) is preserved; only layout and navigation change.
 
 Static Astro pages plus Astro's `ClientRouter` (`astro:transitions`). Each
 route is prerendered HTML. The router swaps only the workspace between
-navigations; shell regions marked `transition:persist` (rail, side panel
-container, tab strip, status bar) stay mounted, so shell state and later a
-live WebGL viewer survive navigation. Without JavaScript every URL still loads
+navigations. Regions holding client-only state (the tab strip now, a live
+WebGL viewer later) are marked `transition:persist` and stay mounted; Astro
+keeps persisted elements verbatim, so regions whose content depends on the page
+(rail active state, side panel contents, title bar, status bar) are re-rendered
+from the server on every navigation, and the panel width is re-applied from
+storage after each swap. Without JavaScript every URL still loads
 as a normal page.
 
 Rejected: a client-side SPA with a single `index.html` (loses indexable routes,
@@ -71,9 +74,9 @@ client-only views (complexity without benefit).
 - **Tab strip**: navigating to a page flagged `tab` (resource details and
   tutorials, later) opens or focuses a tab labelled with the page title. The
   section landing pages (`/`, `/resources/`, `/learn/`, `/framework/`) never
-  create tabs. Tabs can be closed (× button, middle-click, Ctrl+W on the active
-  tab — closing the active tab navigates to its neighbour, or the section home
-  when none remain). Tabs persist in `localStorage`, capped at 12 (oldest
+  create tabs. Tabs can be closed (× button, middle-click, or Alt+W on the
+  active tab, since browsers reserve Ctrl+W) — closing the active tab
+  navigates to its neighbour, or the section home when none remain). Tabs persist in `localStorage`, capped at 12 (oldest
   inactive tab drops). The strip is hidden when empty.
 - **Workspace**: the page's default slot, the only scroll container
   (`.app-scroll`, reused from the current shell).
@@ -115,14 +118,18 @@ client-only views (complexity without benefit).
 | `src/components/shell/StatusBar.astro` | Replaces `AppFooter.astro` |
 | `src/components/shell/TabStrip.astro` | Empty persisted container, filled by `tabs.ts` |
 | `src/components/shell/CommandPalette.astro` | Dialog markup |
-| `src/scripts/shell/tabs.ts` | Tab state: pure reducer (`open`, `close`, `focus`) plus DOM rendering and `localStorage` sync |
+| `src/scripts/shell/tabs-state.ts` | Pure tab reducer (`openTab`, `blurTabs`, `closeTab`, `parseTabs`) |
+| `src/scripts/shell/tabs.ts` | Tab DOM rendering and `localStorage` sync |
+| `src/scripts/shell/panel-state.ts` | Pure panel width clamping |
 | `src/scripts/shell/panel.ts` | Resize, collapse, persistence |
 | `src/scripts/shell/palette.ts` | Pagefind loading, results, keyboard handling |
-| `src/scripts/shell/keys.ts` | Global shortcuts; ignored while focus is in a text field |
+| `src/scripts/shell/keys.ts` | Shortcut matching (pure) |
+| `src/scripts/shell/index.ts` | Wires modules to `astro:page-load` / `astro:after-swap` and global keys; shortcuts ignored while focus is in a text field |
 | `src/styles/shell.css` | Shell grid and regions (merges `app-shell.css`) |
 
-Scripts re-bind after each navigation via the `astro:page-load` event and keep
-their state in module scope, so persisted regions are never re-created.
+Scripts re-bind to freshly rendered elements after each navigation via the
+`astro:page-load` event and keep their state in module scope; only the tab
+strip is persisted.
 
 ## Accessibility
 
@@ -130,7 +137,7 @@ Landmarks (`header`, `nav` for rail, `aside` for the panel, `main` for the
 workspace, `footer` for the status bar); skip link retained; tabs use
 `role="tablist"`/`role="tab"`; the palette is a `<dialog>` with focus
 trapped and restored; all shortcuts have visible, clickable equivalents;
-focus moves to the workspace heading after navigation.
+focus moves to the workspace after client-side navigation.
 
 ## Testing
 
@@ -138,7 +145,7 @@ focus moves to the workspace heading after navigation.
   cap eviction) and shortcut matching.
 - **Build tests** (`scripts/site_test.ts`): extend the required-route list with
   `/resources/` and `/learn/`; assert every shell page contains the rail, the
-  `transition:persist` regions, and `data-pagefind-body`; keep the existing
+  persisted tab strip, and `data-pagefind-body`; keep the existing
   link, anchor, and asset checks.
 - **Manual**: verify in the browser pane at desktop, tablet, and mobile widths
   that navigation keeps tabs and panel width, the palette finds a docs page,
@@ -148,6 +155,7 @@ focus moves to the workspace heading after navigation.
 
 - `ClientRouter` re-runs inline scripts differently from full loads; all shell
   scripts are modules bound through `astro:page-load` to stay idempotent.
-- Pagefind indexing of non-Starlight pages depends on Starlight's Pagefind
-  step covering the whole `dist/`; if it does not, add a post-build
-  `pagefind --site dist` step to the `build` task.
+- Pagefind: Starlight's Pagefind step indexes the whole `dist/` directory, so
+  shell pages marked `data-pagefind-body` are indexed with no extra build step.
+  The index only exists after a production build; in `astro dev` the palette
+  shows its unavailable state.
