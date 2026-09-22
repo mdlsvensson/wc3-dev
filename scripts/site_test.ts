@@ -121,7 +121,7 @@ Deno.test('every hosted fixture has a detail page, with an icon when it has no p
 
 Deno.test('the resource browser lists hosted fixtures, filters, and curated links', async () => {
   const html = await Deno.readTextFile(new URL('resources/index.html', root));
-  assert.equal(html.match(/data-resource-card/g)?.length, 5);
+  assert.equal(html.match(/<a class="catalog-card"/g)?.length, 5);
   assert.match(html, /data-filter-form/);
   assert.match(html, /Hive Workshop/);
   assert.match(html, /Jassbot/);
@@ -132,7 +132,7 @@ Deno.test('type pages list only their type', async () => {
   const expected = { models: 'fixture-footman', icons: 'fixture-sword-icon', textures: 'fixture-grass-tile', audio: 'fixture-horn', scripts: 'fixture-damage-lib' };
   for (const [segment, slug] of Object.entries(expected)) {
     const html = await Deno.readTextFile(new URL(`resources/${segment}/index.html`, root));
-    assert.equal(html.match(/data-resource-card/g)?.length, 1, `/resources/${segment}/ should list one card`);
+    assert.equal(html.match(/<a class="catalog-card"/g)?.length, 1, `/resources/${segment}/ should list one card`);
     assert(html.includes(`/resources/${segment}/${slug}/`), `/resources/${segment}/ should link ${slug}`);
   }
 });
