@@ -18,7 +18,12 @@ document.addEventListener('astro:page-load', () => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') return closePanelOverlay();
+  if (event.key === 'Escape') {
+    // The dialog closes itself on Escape; don't also collapse the tablet overlay underneath it.
+    const palette = document.getElementById('command-palette') as HTMLDialogElement | null;
+    if (palette?.open) return;
+    return closePanelOverlay();
+  }
   if (isTypingTarget(event.target as HTMLElement | null)) return;
   if (matches(event, SHORTCUTS.palette)) {
     event.preventDefault();

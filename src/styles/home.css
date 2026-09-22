@@ -24,20 +24,16 @@
 .reference-description { padding: 18px 18px 14px; font-size: .9rem; line-height: 1.55; }
 .reference-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 18px 20px; }
 .reference-actions .button { padding: 9px 12px; font-size: .85rem; gap: 7px; }
-.guide-list { border-top: 1px solid var(--line); padding: 8px; }
-.guide-list a { padding: 10px; display: flex; align-items: center; justify-content: space-between; font-size: .9rem; border-radius: 2px; }
-.guide-list a:hover { background: #263640; color: var(--accent); }
-.guide-list a span { color: var(--muted); }
 .reference-source { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 15px 18px; border-top: 1px solid var(--line); font-size: .85rem; color: var(--muted); }
 .reference-source:hover { color: var(--accent); }
-@media (max-width: 960px) {
+@container (max-width: 960px) {
   .workspace-columns { grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; }
   .directory-columns { display: none; }
   .directory-row { grid-template-columns: minmax(0, 1fr) 18px; gap: 12px; padding: 18px; }
   .resource-category { grid-column: 1; padding-left: 35px; }
   .resource-external { grid-column: 2; grid-row: 1; }
 }
-@media (max-width: 720px) {
+@container (max-width: 720px) {
   .workspace-columns { grid-template-columns: minmax(0, 1fr); }
   .portal-workspace { padding-top: 24px; }
   .workspace-heading { margin-bottom: 22px; }

@@ -16,7 +16,8 @@ html, body { height: 100%; overflow: hidden; }
   scrollbar-width: thin;
   scrollbar-color: #53636c transparent;
 }
-main.app-scroll:focus { outline: none; }
+main.app-scroll:focus:not(:focus-visible) { outline: none; }
+main.app-scroll:focus-visible { outline: 1px solid var(--line); outline-offset: -1px; }
 
 body.shell {
   display: grid;
@@ -56,13 +57,13 @@ html[data-panel="collapsed"] .side-panel { visibility: hidden; }
 .panel-nav a { display: flex; align-items: center; justify-content: space-between; padding: 7px 8px; border-radius: 2px; color: var(--muted); font-size: .88rem; }
 .panel-nav a:hover { background: #1f2e37; color: var(--ink); }
 
-.workspace { grid-area: work; display: grid; grid-template-rows: auto minmax(0, 1fr); min-width: 0; min-height: 0; }
+.workspace { grid-area: work; display: grid; grid-template-rows: auto minmax(0, 1fr); min-width: 0; min-height: 0; container-type: inline-size; }
 .tab-strip { display: flex; overflow-x: auto; background: #0f191f; border-bottom: 1px solid var(--line); scrollbar-width: none; }
 .tab-strip[hidden] { display: none; }
-.tab { display: flex; align-items: center; max-width: 220px; border-right: 1px solid var(--line); }
-.tab:has(a[aria-selected="true"]) { background: var(--bg); box-shadow: inset 0 2px 0 var(--accent); }
-.tab a { padding: 9px 4px 9px 14px; overflow: hidden; color: var(--muted); font-size: .82rem; text-overflow: ellipsis; white-space: nowrap; }
-.tab a[aria-selected="true"] { color: var(--ink); }
+.shell-tab { display: flex; align-items: center; max-width: 220px; border-right: 1px solid var(--line); }
+.shell-tab:has(a[aria-selected="true"]) { background: var(--bg); box-shadow: inset 0 2px 0 var(--accent); }
+.shell-tab a { padding: 9px 4px 9px 14px; overflow: hidden; color: var(--muted); font-size: .82rem; text-overflow: ellipsis; white-space: nowrap; }
+.shell-tab a[aria-selected="true"] { color: var(--ink); }
 .tab-close { width: 24px; height: 24px; margin-right: 6px; border: 0; border-radius: 3px; background: none; color: var(--muted); font-size: 1rem; line-height: 1; cursor: pointer; }
 .tab-close:hover { background: #24343d; color: var(--ink); }
 
@@ -81,6 +82,8 @@ html[data-panel="collapsed"] .side-panel { visibility: hidden; }
 
 /* Tablet: the side panel floats over the workspace when opened. */
 @media (max-width: 900px) {
+  /* The status bar wraps its notices below 900px (see StatusBar.astro), so the footer track needs the extra row height here too. */
+  :root { --app-footer-height: 3.5rem; }
   body.shell, html[data-panel="collapsed"] body.shell { grid-template-columns: var(--rail-width) 0 minmax(0, 1fr); }
   .side-panel { position: fixed; z-index: 20; top: var(--titlebar-height); bottom: var(--app-footer-height); left: var(--rail-width); width: min(var(--panel-width), 80vw); visibility: hidden; box-shadow: 12px 0 32px #0008; }
   html[data-panel="open"] .side-panel { visibility: visible; }
@@ -89,7 +92,7 @@ html[data-panel="collapsed"] .side-panel { visibility: hidden; }
 
 /* Phone: the rail becomes a bottom bar and the side panel a drawer. */
 @media (max-width: 620px) {
-  :root { --app-footer-height: 3.5rem; --rail-height: 58px; }
+  :root { --rail-height: 58px; }
   body.shell, html[data-panel="collapsed"] body.shell, body.shell.no-side {
     grid-template-areas: "title" "work" "rail" "status";
     grid-template-columns: minmax(0, 1fr);
