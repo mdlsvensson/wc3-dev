@@ -1,5 +1,7 @@
 .panel-nav a[aria-current] { background: #1f2e37; color: var(--accent); }
 .panel-nav a span { font-size: .75rem; }
+.panel-nav-empty { display: flex; align-items: center; justify-content: space-between; padding: 7px 8px; color: var(--muted); font-size: .88rem; opacity: .55; }
+.panel-nav-empty span { font-size: .75rem; }
 
 .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
 .catalog-card { display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 3px; background: #16232b; transition: border-color .15s; }

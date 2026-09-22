@@ -8,11 +8,14 @@ import '../../styles/home.css';
 import '../../styles/resources.css';
 const all = (await getResources()).filter(isHosted);
 const links = await getLinks();
+const intro = all.length > 0
+  ? 'Models, icons, textures, audio, and scripts from the Warcraft III modding community. Each links to where it was originally published.'
+  : 'A full catalog of models, icons, audio, and tools is on its way. Until then, these are the essentials.';
 ---
 <Shell title="Resources" description="Warcraft III models, icons, textures, audio, and scripts, each linked to where it was originally published.">
   <CatalogFilters slot="side" entries={all} all={all} />
   <div class="portal-workspace wrap">
-    <ResourceCatalog entries={all} title="Resources" intro="Models, icons, textures, audio, and scripts from the Warcraft III modding community. Each links to where it was originally published." />
+    <ResourceCatalog entries={all} title="Resources" intro={intro} />
     <div class="catalog-links">
       <ResourceDirectory resources={links} title="Community & tools" id="community-and-tools" />
     </div>

@@ -7,8 +7,12 @@ import { getResources, isHosted } from '../../../lib/resources';
 import '../../../styles/home.css';
 import '../../../styles/resources.css';
 
-export function getStaticPaths() {
-  return HOSTED_TYPES.map((type) => ({ params: { type: TYPE_SEGMENTS[type] }, props: { type } }));
+export async function getStaticPaths() {
+  const all = (await getResources()).filter(isHosted);
+  const counts = new Map<HostedType, number>();
+  for (const entry of all) counts.set(entry.data.type, (counts.get(entry.data.type) ?? 0) + 1);
+  // Until a type has a hosted resource, its page would be an empty grid; don't build or link it.
+  return HOSTED_TYPES.filter((type) => counts.get(type)).map((type) => ({ params: { type: TYPE_SEGMENTS[type] }, props: { type } }));
 }
 
 const INTROS: Record<HostedType, string> = {

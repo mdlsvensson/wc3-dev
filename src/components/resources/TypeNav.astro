@@ -7,9 +7,15 @@ const { all, activeType, exact = true } = Astro.props;
 <nav class="panel-nav" aria-label="Resource types">
   <h2 class="panel-title">Types</h2>
   <a href="/resources/" aria-current={activeType ? undefined : 'page'}>All resources<span>{all.length}</span></a>
-  {HOSTED_TYPES.map((type) => (
-    <a href={`/resources/${TYPE_SEGMENTS[type]}/`} aria-current={activeType === type ? (exact ? 'page' : 'true') : undefined}>
-      {TYPE_PLURALS[type]}<span>{all.filter((entry) => entry.data.type === type).length}</span>
-    </a>
-  ))}
+  {HOSTED_TYPES.map((type) => {
+    const count = all.filter((entry) => entry.data.type === type).length;
+    // A type page is only built once it has a hosted resource; don't link to it before then.
+    return count > 0
+      ? (
+        <a href={`/resources/${TYPE_SEGMENTS[type]}/`} aria-current={activeType === type ? (exact ? 'page' : 'true') : undefined}>
+          {TYPE_PLURALS[type]}<span>{count}</span>
+        </a>
+      )
+      : <span class="panel-nav-empty">{TYPE_PLURALS[type]}<span>{count}</span></span>;
+  })}
 </nav>
