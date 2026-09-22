@@ -105,6 +105,22 @@ Deno.test('validates every file before uploading any of them: nothing is uploade
   assert.deepEqual(puts, []);
 });
 
+Deno.test('refuses to add a resource whose slug already exists under a different type', async () => {
+  const ws = await workspace();
+  const store = localStore(ws.store);
+  const audioDir = await folder(ws.root, 'dual-type', { type: 'audio', title: 'Test', summary: 'A test.', usage: 'sfx', ...hosted }, { 'Horn.wav': makeWav(1) });
+  await addResource({ folder: audioDir, contentRoot: ws.content, store, today: '2026-09-01' });
+
+  const iconDir = join(ws.root, 'input2', 'dual-type');
+  await Deno.mkdir(iconDir, { recursive: true });
+  await Deno.writeTextFile(join(iconDir, 'resource.json'), JSON.stringify({ type: 'icon', title: 'Test', summary: 'A test.', variants: ['BTN'], ...hosted }));
+  await Deno.writeFile(join(iconDir, 'BTNTest.blp'), makeBlp());
+  await assert.rejects(
+    () => addResource({ folder: iconDir, contentRoot: ws.content, store, today: '2026-09-22', update: true }),
+    /"dual-type" already exists as a audio resource.*delete it before adding it as a icon resource/,
+  );
+});
+
 Deno.test('rejects bad slugs and link resources', async () => {
   const ws = await workspace();
   const badSlug = await folder(ws.root, 'Bad_Slug', { type: 'audio', title: 'x', summary: 'x', usage: 'sfx', ...hosted }, { 'Horn.wav': makeWav(1) });

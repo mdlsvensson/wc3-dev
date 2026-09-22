@@ -1,5 +1,5 @@
 import { basename, dirname, join } from 'jsr:@std/path@^1';
-import { authoredSchema, type HostedType, type Resource, resourceSchema } from '../../src/lib/resource-schema.ts';
+import { authoredSchema, HOSTED_TYPES, type HostedType, type Resource, resourceSchema } from '../../src/lib/resource-schema.ts';
 import { decodeTexture } from './images.ts';
 import { isSlug, sha256Hex, storeKey } from './keys.ts';
 import { readModelMeta } from './model-meta.ts';
@@ -44,13 +44,23 @@ export interface AddResult { path: string; resource: Resource; warnings: string[
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-async function readExisting(path: string): Promise<{ added?: string } | null> {
+async function readJson(path: string): Promise<{ added?: string } | null> {
   try {
     return JSON.parse(await Deno.readTextFile(path));
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) return null;
     throw error;
   }
+}
+
+/** Finds a resource with this slug under any type folder, since changing `type` must not silently write a second file. */
+async function readExisting(contentRoot: string, type: HostedType, slug: string): Promise<{ path: string; type: HostedType; added?: string } | null> {
+  for (const candidate of HOSTED_TYPES) {
+    const path = join(contentRoot, candidate, `${slug}.json`);
+    const data = await readJson(path);
+    if (data) return { path, type: candidate, added: data.added };
+  }
+  return null;
 }
 
 /** Validates, previews, uploads, and records one resource folder. */
@@ -63,7 +73,10 @@ export async function addResource(options: AddOptions): Promise<AddResult> {
   const type = authored.type;
 
   const path = join(contentRoot, type, `${slug}.json`);
-  const existing = await readExisting(path);
+  const existing = await readExisting(contentRoot, type, slug);
+  if (existing && existing.type !== type) {
+    throw new Error(`"${slug}" already exists as a ${existing.type} resource at ${existing.path}; delete it before adding it as a ${type} resource.`);
+  }
   if (existing && !update) throw new Error(`${path} already exists; pass --update to replace it.`);
 
   const warnings: string[] = [];
