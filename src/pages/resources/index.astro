@@ -1,21 +1,20 @@
 ---
 import Shell from '../../layouts/Shell.astro';
 import ResourceDirectory from '../../components/ResourceDirectory.astro';
-import { getLinks } from '../../lib/resources';
+import CatalogFilters from '../../components/resources/CatalogFilters.astro';
+import ResourceCatalog from '../../components/resources/ResourceCatalog.astro';
+import { getLinks, getResources, isHosted } from '../../lib/resources';
 import '../../styles/home.css';
-const resources = await getLinks();
-const categories = [...new Set(resources.map(({ data }) => data.category))];
-const inCategory = (category: string) => resources.filter(({ data }) => data.category === category);
+import '../../styles/resources.css';
+const all = (await getResources()).filter(isHosted);
+const links = await getLinks();
 ---
-<Shell title="Resources" description="Curated Warcraft III modding communities, tools, and scripting resources.">
-  <nav slot="side" class="panel-nav" aria-label="Resource categories">
-    <h2 class="panel-title">Categories</h2>
-    {categories.map((category) => <a href={`#${category.toLowerCase()}`}>{category}<span>{inCategory(category).length}</span></a>)}
-  </nav>
+<Shell title="Resources" description="Warcraft III models, icons, textures, audio, and scripts, each linked to where it was originally published.">
+  <CatalogFilters slot="side" entries={all} all={all} />
   <div class="portal-workspace wrap">
-    <div class="workspace-heading"><h1>Resources</h1><p>A full catalog of models, icons, audio, and tools is on its way. Until then, these are the essentials.</p></div>
-    <div class="directory-stack">
-      {categories.map((category) => <ResourceDirectory resources={inCategory(category)} title={category} id={category.toLowerCase()} />)}
+    <ResourceCatalog entries={all} title="Resources" intro="Models, icons, textures, audio, and scripts from the Warcraft III modding community. Each links to where it was originally published." />
+    <div class="catalog-links">
+      <ResourceDirectory resources={links} title="Community & tools" id="community-and-tools" />
     </div>
   </div>
 </Shell>

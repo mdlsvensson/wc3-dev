@@ -1,30 +1,32 @@
 ---
 import Shell from '../../../layouts/Shell.astro';
-import ResourceCard from '../../../components/resources/ResourceCard.astro';
-import TypeNav from '../../../components/resources/TypeNav.astro';
-import { HOSTED_TYPES, TYPE_PLURALS, TYPE_SEGMENTS, type HostedType } from '../../../lib/resource-schema';
-import { getResources, type HostedEntry, isHosted } from '../../../lib/resources';
+import CatalogFilters from '../../../components/resources/CatalogFilters.astro';
+import ResourceCatalog from '../../../components/resources/ResourceCatalog.astro';
+import { HOSTED_TYPES, type HostedType, TYPE_PLURALS, TYPE_SEGMENTS } from '../../../lib/resource-schema';
+import { getResources, isHosted } from '../../../lib/resources';
 import '../../../styles/home.css';
 import '../../../styles/resources.css';
 
-// Minimal type index so TypeNav's links resolve; Task 7 replaces this with the full filterable catalog.
-export async function getStaticPaths() {
-  const all = (await getResources()).filter(isHosted);
-  return HOSTED_TYPES.map((type) => ({
-    params: { type: TYPE_SEGMENTS[type] },
-    props: { type, all, entries: all.filter((entry) => entry.data.type === type) },
-  }));
+export function getStaticPaths() {
+  return HOSTED_TYPES.map((type) => ({ params: { type: TYPE_SEGMENTS[type] }, props: { type } }));
 }
 
-interface Props { type: HostedType; all: HostedEntry[]; entries: HostedEntry[] }
-const { type, all, entries } = Astro.props;
+const INTROS: Record<HostedType, string> = {
+  model: 'Units, buildings, doodads, effects, and portraits.',
+  icon: 'Command buttons, passives, and autocast icons.',
+  texture: 'Skins, tilesets, skies, loading screens, and UI textures.',
+  audio: 'Music, sound effects, voices, and ambience.',
+  script: 'JASS, vJASS, Lua, and TypeScript systems and libraries.',
+};
+
+interface Props { type: HostedType }
+const { type } = Astro.props;
+const all = (await getResources()).filter(isHosted);
+const entries = all.filter((entry) => entry.data.type === type);
 ---
-<Shell title={TYPE_PLURALS[type]} description={`Hosted ${TYPE_PLURALS[type].toLowerCase()} on wc3.dev.`}>
-  <TypeNav slot="side" all={all} activeType={type} />
+<Shell title={TYPE_PLURALS[type]} description={`Warcraft III ${TYPE_PLURALS[type].toLowerCase()}: ${INTROS[type]}`}>
+  <CatalogFilters slot="side" entries={entries} all={all} activeType={type} />
   <div class="portal-workspace wrap">
-    <div class="workspace-heading"><h1>{TYPE_PLURALS[type]}</h1></div>
-    {entries.length > 0
-      ? <div class="catalog-grid">{entries.map((entry) => <ResourceCard entry={entry} />)}</div>
-      : <p>No resources here yet.</p>}
+    <ResourceCatalog entries={entries} title={TYPE_PLURALS[type]} intro={INTROS[type]} />
   </div>
 </Shell>

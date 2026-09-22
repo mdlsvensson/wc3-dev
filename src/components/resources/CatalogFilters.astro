@@ -1,0 +1,28 @@
+---
+import type { HostedType } from '../../lib/resource-schema';
+import type { HostedEntry } from '../../lib/resources';
+import TypeNav from './TypeNav.astro';
+interface Props { entries: HostedEntry[]; all: HostedEntry[]; activeType?: HostedType }
+const { entries, all, activeType } = Astro.props;
+const tagCounts = new Map<string, number>();
+for (const entry of entries) for (const tag of entry.data.tags) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+const tags = [...tagCounts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 20);
+---
+<div class="catalog-filters">
+  <TypeNav all={all} activeType={activeType} />
+  <form class="filter-form" data-filter-form aria-label="Filter resources">
+    <fieldset>
+      <legend class="panel-title">Compatibility</legend>
+      <label><input type="checkbox" name="sd" value="1" /> SD</label>
+      <label><input type="checkbox" name="hd" value="1" /> HD</label>
+    </fieldset>
+    {tags.length > 0 && (
+      <fieldset>
+        <legend class="panel-title">Tags</legend>
+        {tags.map(([tag, count]) => <label><input type="checkbox" name="tag" value={tag} /> {tag} <span>{count}</span></label>)}
+      </fieldset>
+    )}
+    <label class="filter-author"><span class="panel-title">Author</span><input type="search" name="author" autocomplete="off" /></label>
+    <button type="reset" class="button secondary filter-clear">Clear filters</button>
+  </form>
+</div>

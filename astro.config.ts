@@ -6,6 +6,10 @@ export default defineConfig({
   site: 'https://wc3.dev',
   output: 'static',
   trailingSlash: 'always',
+  // Below Vite's default 4kb, page scripts get inlined into every page that uses them instead of
+  // shared as one external file; keep small client scripts (e.g. the resource catalog) as real
+  // files so their source never lands inside a page's rendered HTML.
+  vite: { build: { assetsInlineLimit: 0 } },
   env: {
     schema: {
       // Where resource files are served from (the asset store). Required for builds that render resource files.

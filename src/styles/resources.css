@@ -32,6 +32,30 @@
 .resource-credits p { margin-top: 6px; font-size: .9rem; }
 .resource-related .catalog-grid { margin-top: 14px; }
 
+.catalog-heading { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.catalog-heading h1 { font-size: clamp(1.65rem, 3vw, 2.15rem); font-weight: 650; letter-spacing: -.035em; }
+.catalog-heading p { max-width: 60ch; margin-top: 6px; font-size: .95rem; }
+.catalog-tools { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: .85rem; }
+.view-toggle { display: flex; overflow: hidden; border: 1px solid var(--line); border-radius: 3px; }
+.view-toggle button { display: grid; place-items: center; width: 32px; height: 30px; border: 0; background: #16232b; color: var(--muted); cursor: pointer; }
+.view-toggle button[aria-pressed="true"] { background: #24343d; color: var(--accent); }
+.view-toggle button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.catalog-grid[data-layout="list"] { grid-template-columns: minmax(0, 1fr); gap: 0; border: 1px solid var(--line); border-radius: 3px; }
+.catalog-grid[data-layout="list"] .catalog-card { flex-direction: row; align-items: center; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
+.catalog-grid[data-layout="list"] .catalog-card:last-child { border-bottom: 0; }
+.catalog-grid[data-layout="list"] .catalog-thumb { flex: 0 0 56px; border-right: 1px solid var(--line); border-bottom: 0; }
+.catalog-empty { padding: 24px 0; }
+.catalog-links { margin-top: 32px; }
+.filter-form { display: grid; gap: 16px; margin-top: 18px; }
+.filter-form fieldset { display: grid; gap: 4px; margin: 0; padding: 0; border: 0; }
+.filter-form label { display: flex; align-items: center; gap: 8px; padding: 3px 8px; color: var(--muted); font-size: .86rem; cursor: pointer; }
+.filter-form label > span:last-child:not(.panel-title) { margin-left: auto; font-size: .75rem; }
+.filter-form input[type="checkbox"] { accent-color: var(--accent); }
+.filter-form .filter-author { display: grid; gap: 6px; cursor: auto; }
+.filter-author input { height: 30px; padding: 0 8px; border: 1px solid var(--line); border-radius: 3px; background: #101a20; color: var(--ink); }
+.filter-author input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.filter-clear { justify-self: start; margin-left: 8px; padding: 7px 12px; font-size: .8rem; }
+
 @container (max-width: 560px) {
   .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
   .resource-facts dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
