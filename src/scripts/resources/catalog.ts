@@ -11,9 +11,11 @@ function facts(card: HTMLElement): CardFacts {
   };
 }
 
-function readForm(form: HTMLFormElement): FilterState {
+/** `extraTags` are URL tags with no matching checkbox (outside the rendered top-20 list); they keep filtering until cleared. */
+function readForm(form: HTMLFormElement, extraTags: string[] = []): FilterState {
   const params = new URLSearchParams();
   for (const [name, value] of new FormData(form)) if (typeof value === 'string' && value) params.append(name, value);
+  for (const tag of extraTags) params.append('tag', tag);
   return parseFilters(params.toString());
 }
 
@@ -64,20 +66,33 @@ function initCatalog(): void {
     if (count) count.textContent = `${shown} ${shown === 1 ? 'resource' : 'resources'}`;
     if (empty) empty.hidden = shown > 0;
   };
+  const initial = parseFilters(location.search);
+  const knownTags = new Set([...form.querySelectorAll<HTMLInputElement>('input[name="tag"]')].map((input) => input.value));
+  // Tags from the URL outside the rendered top-20 list have no checkbox; keep filtering by them until Clear filters.
+  let extraTags = initial.tags.filter((tag) => !knownTags.has(tag));
+
+  let historyTimer: ReturnType<typeof setTimeout> | undefined;
   const update = () => {
-    const state = readForm(form);
+    const state = readForm(form, extraTags);
     apply(state);
-    // Keep the router's own history state; only the query changes.
-    history.replaceState(history.state, '', location.pathname + serializeFilters(state) + location.hash);
+    // Filtering is immediate; the URL write is debounced so Safari doesn't throttle-and-throw
+    // on a replaceState call per keystroke in the author field.
+    clearTimeout(historyTimer);
+    historyTimer = setTimeout(() => {
+      // Keep the router's own history state; only the query changes.
+      history.replaceState(history.state, '', location.pathname + serializeFilters(state) + location.hash);
+    }, 200);
   };
 
-  const initial = parseFilters(location.search);
   writeForm(form, initial);
   apply(initial);
   form.addEventListener('input', update);
   form.addEventListener('submit', (event) => event.preventDefault());
   // The reset event fires before the fields are cleared.
-  form.addEventListener('reset', () => setTimeout(update));
+  form.addEventListener('reset', () => {
+    extraTags = [];
+    setTimeout(update);
+  });
 }
 
 document.addEventListener('astro:page-load', initCatalog);
