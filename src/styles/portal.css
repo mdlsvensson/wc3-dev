@@ -120,8 +120,6 @@
 body { background: radial-gradient(ellipse at 85% 8%, #29352b70, transparent 38%), var(--bg); }
 .brand { letter-spacing: -.045em; }
 .brand img { object-fit: contain; flex-shrink: 0; }
-.site-header .brand img { width: 56px; height: 56px; }
-.site-header nav a[aria-current] { color: var(--accent); }
 .hero h1 { font-weight: 750; letter-spacing: -.05em; }
 .hero h1 span { background: linear-gradient(110deg, #ffff82, #f2c900 85%); background-clip: text; color: transparent; }
 .hero-emblem { display: flex; flex-direction: column; align-items: center; position: relative; }
@@ -150,9 +148,6 @@ body { background: radial-gradient(ellipse at 85% 8%, #29352b70, transparent 38%
   .field-notes > a > svg { display: none; }
 }
 @media (max-width: 620px) {
-  .site-header .brand img { width: 42px; height: 42px; }
-  .site-header { gap: 12px; }
-  .site-header nav { gap: .9rem; }
   .hero-emblem img { width: min(75%, 270px); }
   .hero .hero-grid { gap: 24px; }
   .field-notes { grid-template-columns: 1fr; margin-top: 30px; }
@@ -161,21 +156,5 @@ body { background: radial-gradient(ellipse at 85% 8%, #29352b70, transparent 38%
   .field-notes > a > svg { display: block; }
 }
 
-/* Compact shared application navigation. */
+/* Shell pages reset to a flat background; the marketing gradient above is only for the home hero. */
 body { background: var(--bg); }
-.portal-app { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100dvh; }
-.navigation-shell { position: relative; z-index: 50; background: #101a20; border-bottom: 1px solid #685a2a; }
-.site-header { min-height: 70px; border: 0; gap: 28px; }
-.site-header .brand img { width: 42px; height: 42px; }
-.site-header .brand { font-size: 1.35rem; }
-.site-header nav { gap: 28px; }
-.site-header nav a { min-height: 42px; }
-@media (max-width: 620px) {
-  .site-header { padding-block: 8px; gap: 4px 16px; }
-  .site-header nav { gap: 16px; }
-  .site-header .brand img { width: 36px; height: 36px; }
-}
-
-@media print {
-  .portal-app { display: block; height: auto; }
-}

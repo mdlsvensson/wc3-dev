@@ -3,7 +3,12 @@ import { clampPanelWidth } from './panel-state.ts';
 const WIDTH_KEY = 'wc3.panel.width';
 const COLLAPSED_KEY = 'wc3.panel.collapsed';
 const root = document.documentElement;
-const isNarrow = () => matchMedia('(max-width: 900px)').matches;
+const narrowQuery = matchMedia('(max-width: 900px)');
+const isNarrow = () => narrowQuery.matches;
+
+// Crossing the tablet breakpoint changes whether the panel is an overlay; re-apply the stored state so
+// `data-panel` reflects it immediately instead of waiting for the next navigation.
+narrowQuery.addEventListener('change', applyPanel);
 
 function read(key: string): string | null {
   try { return localStorage.getItem(key); } catch { return null; }

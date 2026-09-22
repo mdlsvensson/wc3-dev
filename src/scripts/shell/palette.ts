@@ -69,10 +69,11 @@ async function search(ui: PaletteElements, term: string): Promise<void> {
   try {
     const response = await (await loadPagefind()).debouncedSearch(query, {}, 150);
     if (response === null) return; // Superseded by a newer keystroke.
+    if (ui.input.value.trim() !== query) return; // The query changed while this search was in flight.
     results = await Promise.all(response.results.slice(0, MAX_RESULTS).map((result) => result.data()));
     selected = 0;
     render(ui);
-    ui.status.textContent = results.length ? `${results.length} results` : `No results for “${query}”.`;
+    ui.status.textContent = results.length ? `${results.length} ${results.length === 1 ? 'result' : 'results'}` : `No results for “${query}”.`;
   } catch {
     results = [];
     render(ui);

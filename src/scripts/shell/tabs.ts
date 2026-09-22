@@ -24,11 +24,22 @@ export function closeActiveTab(): void {
 }
 
 function close(href: string): void {
+  const strip = document.getElementById('tab-strip');
+  const hadFocus = strip?.contains(document.activeElement) ?? false;
   const result = closeTab(state, href);
   state = result.state;
   save();
   render();
-  if (result.navigateTo) void navigate(result.navigateTo);
+  // Closing removes the focused × button; move focus somewhere still on the page instead of losing it to <body>.
+  if (hadFocus) focusAfterClose();
+  if (result.navigateTo) void navigate(result.navigateTo).catch(() => {}); // Superseded transitions reject with AbortError.
+}
+
+function focusAfterClose(): void {
+  const strip = document.getElementById('tab-strip');
+  const link = strip?.querySelector<HTMLElement>('a[aria-selected="true"]') ?? strip?.querySelector<HTMLElement>('a[role="tab"]');
+  if (link) link.focus();
+  else document.getElementById('main')?.focus({ preventScroll: true });
 }
 
 function render(): void {
@@ -40,7 +51,8 @@ function render(): void {
 
 function renderTab(tab: Tab): HTMLElement {
   const item = document.createElement('div');
-  item.className = 'tab';
+  item.className = 'shell-tab';
+  item.setAttribute('role', 'presentation');
   const link = document.createElement('a');
   link.href = tab.href;
   link.textContent = tab.title;
