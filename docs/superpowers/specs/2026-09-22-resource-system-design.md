@@ -51,12 +51,12 @@ a discriminated union on `type`.
 | `title` | string, 1–80 chars | |
 | `summary` | string, 1–280 chars | Card and meta description |
 | `tags` | string[] (lowercase kebab-case) | Free-form, filterable |
-| `authors` | `{ name: string; url?: url }[]`, ≥ 1 | Credited on the page |
+| `authors` | `{ name: string; url?: url }[]`, ≥ 1 | Credited on the page; optional for `link` (sites, not works) |
 | `source` | `{ site: 'hive' \| 'github' \| 'other'; url: url; label?: string }` | **Required** |
 | `permission` | string, optional | Short note on permission to display, e.g. "Author permission, 2026-09" |
 | `derivative` | boolean, default false | Built from Blizzard assets |
 | `compat` | `{ sd: boolean; hd: boolean; minPatch?: string }` | Not used by `link` |
-| `added` / `updated` | ISO date | `updated` defaults to `added` |
+| `added` / `updated` | ISO date (`YYYY-MM-DD`) | `updated` is optional; pages show `updated ?? added` |
 | `files` | `{ key: string; role: string; format: string; bytes: number }[]` | Store keys for previews; never rendered as links |
 | `preview` | `{ key: string; width: number; height: number }`, optional | Thumbnail/preview image store key |
 | `related` | slug[] , optional | Must reference existing resources |
@@ -86,8 +86,9 @@ Keys change whenever content changes, so the store can serve them with
 
 ### Browser — `/resources/`
 
-- **Side panel**: filters for type (with counts), tags, SD/HD compatibility,
-  and author; a "clear filters" action.
+- **Side panel**: type navigation (links to the type pages, with counts), then
+  client-side filters for tags, SD/HD compatibility, and author, and a "clear
+  filters" action.
 - **Workspace**: a heading with the result count, a grid/list toggle, and
   resource cards (preview thumbnail or type icon, title, first author, type
   badge, SD/HD badges). `link` resources render as the current directory rows
@@ -95,7 +96,7 @@ Keys change whenever content changes, so the store can serve them with
 - Every card is prerendered in the HTML so the page is indexable and works
   without JavaScript. A small client module filters by toggling visibility,
   using data attributes on each card; filter state is mirrored to the URL query
-  string (`?type=model&tag=orc&hd=1`) so views are shareable and survive
+  string (`?tag=orc&hd=1&author=name`) so views are shareable and survive
   reloads. Grid/list choice is remembered in `localStorage` (try/catch).
 - Adequate up to a few thousand resources; beyond that, switch to a generated
   JSON index with client rendering (out of scope).
@@ -105,6 +106,14 @@ Keys change whenever content changes, so the store can serve them with
 Prerendered browser pages pre-filtered to one type (`models`, `icons`,
 `textures`, `audio`, `scripts`), for linking and search indexing. The rail's
 Resources item stays active.
+
+### Test fixtures
+
+Fixture resources (one per hosted type) live in
+`src/content/resources/_fixtures/<type>/fixture-*.json` and are loaded only
+when `RESOURCE_FIXTURES=1`. `deno task build:test` sets it together with a
+placeholder `ASSET_BASE_URL`, and `deno task test` runs that build before the
+tests. Production builds (`deno task build`) never include fixtures.
 
 ### Detail — `/resources/<type>/<slug>/`
 
@@ -140,7 +149,7 @@ permission, derivative, compat, and type-specific authored fields such as
 
 1. Validates the authored fields against the schema (minus generated fields).
 2. Sniffs every file by magic bytes and rejects mismatches: MDX (`MDLX`),
-   MDL (text, `Version` block), BLP (`BLP1`/`BLP2`), DDS (`DDS `), TGA
+   MDL (text, `Version` block with `FormatVersion`), BLP (`BLP1`; Warcraft III never uses BLP2), DDS (`DDS `), TGA
    (by header shape), WAV (`RIFF`…`WAVE`), MP3 (ID3 or frame sync), OGG
    (`OggS`), FLAC (`fLaC`), and `.j`/`.lua`/`.ts` scripts as UTF-8 text.
 3. Extracts metadata: model sequences and texture paths via `mdx-m3-viewer`'s
