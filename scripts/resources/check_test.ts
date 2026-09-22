@@ -55,3 +55,15 @@ Deno.test('remote mode reports keys missing from the store', async () => {
   assert.deepEqual(requested, ['https://assets.example.test/resources/icon/sword/0123456789ab/BTNSword.blp']);
   assert.match(errors.join('\n'), /missing from the store: resources\/icon\/sword\/0123456789ab\/BTNSword\.blp \(404\)/);
 });
+
+Deno.test('remote mode resolves the same URL as the site for a base with a path segment and no trailing slash', async () => {
+  const requested: string[] = [];
+  const fetchFn = ((input: string | URL) => {
+    requested.push(String(input));
+    return Promise.resolve(new Response(null, { status: 200 }));
+  }) as typeof fetch;
+  const errors = await checkResources(await tree({ 'icon/sword.json': icon() }), { remoteBase: 'https://assets.example.test/store', fetchFn });
+  assert.deepEqual(errors, []);
+  // Matches assetUrl(): the base's last path segment is kept, not treated as a file to replace.
+  assert.deepEqual(requested, ['https://assets.example.test/store/resources/icon/sword/0123456789ab/BTNSword.blp']);
+});
