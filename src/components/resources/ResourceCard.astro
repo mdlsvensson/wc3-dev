@@ -12,7 +12,7 @@ const { data } = entry;
   href={resourceHref(entry)}
   data-resource-card
   data-tags={data.tags.join(' ')}
-  data-authors={data.authors.map((author) => author.name).join('|')}
+  data-authors={JSON.stringify(data.authors.map((author) => author.name))}
   data-sd={String(data.compat.sd)}
   data-hd={String(data.compat.hd)}
 >
