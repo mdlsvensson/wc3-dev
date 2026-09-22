@@ -1,0 +1,51 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/fonts.css';
+import '../styles/portal.css';
+import '../styles/shell.css';
+import ActivityRail from '../components/shell/ActivityRail.astro';
+import StatusBar from '../components/shell/StatusBar.astro';
+import TabStrip from '../components/shell/TabStrip.astro';
+import TitleBar from '../components/shell/TitleBar.astro';
+interface Props {
+  title: string;
+  description: string;
+  /** Open this page as a workspace tab (resource details and tutorials). */
+  tab?: boolean;
+}
+const { title, description, tab = false } = Astro.props;
+const hasSide = Astro.slots.has('side');
+---
+<!doctype html>
+<html lang="en" transition:animate="none">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · wc3.dev</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:title" content={`${title} · wc3.dev`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/png" href="/brand/wc3-crest.png" />
+    {tab && <meta name="wc3-tab" content={title} />}
+    <ClientRouter />
+  </head>
+  <body class:list={['shell', { 'no-side': !hasSide }]}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <TitleBar />
+    <ActivityRail />
+    {hasSide && (
+      <aside class="side-panel" id="side-panel" aria-label="Section panel">
+        <div class="side-panel-content"><slot name="side" /></div>
+        <div class="panel-resizer" role="separator" aria-orientation="vertical" aria-label="Resize side panel" aria-controls="side-panel" aria-valuemin="200" aria-valuemax="420" tabindex="0"></div>
+      </aside>
+    )}
+    <div class="workspace">
+      <TabStrip />
+      <main id="main" class="app-scroll" tabindex="0" data-pagefind-body transition:animate="fade"><slot /></main>
+    </div>
+    <StatusBar />
+    <script>import '../scripts/shell/index.ts';</script>
+  </body>
+</html>

@@ -14,7 +14,7 @@ async function htmlFiles(directory: URL): Promise<URL[]> {
 }
 
 Deno.test('portal, framework, and migrated documentation routes are built', async () => {
-  for (const route of ['', 'framework/', 'framework/docs/', ...[
+  for (const route of ['', 'resources/', 'learn/', 'framework/', 'framework/docs/', ...[
     'installation', 'custom-maps', 'map-making', 'object-data', 'architecture', 'reference', 'troubleshooting',
   ].map((slug) => `framework/docs/${slug}/`)]) {
     const html = await Deno.readTextFile(new URL(`${route}index.html`, root));
@@ -22,7 +22,7 @@ Deno.test('portal, framework, and migrated documentation routes are built', asyn
   }
   const homepage = await Deno.readTextFile(new URL('index.html', root));
   assert.match(homepage, /Hive Workshop/);
-  assert.match(homepage, /TypeScriptToLua/);
+  assert.match(homepage, /w3ts framework/);
   const search = await Deno.stat(new URL('pagefind/pagefind.js', root));
   assert(search.isFile, 'Search bundle must exist');
 });
@@ -63,4 +63,26 @@ Deno.test('TypeScript, Lua, and JASS produce distinct syntax tokens', async () =
       assert(colors.size >= 3, `${lang} must highlight more than plain text`);
     }
   } finally { highlighter.dispose(); }
+});
+
+Deno.test('shell pages share the application shell', async () => {
+  for (const route of ['', 'resources/', 'learn/', 'framework/']) {
+    const html = await Deno.readTextFile(new URL(`${route}index.html`, root));
+    assert.match(html, /class="activity-rail"/, `Missing activity rail at /${route}`);
+    assert.match(html, /data-astro-transition-persist="tabs"/, `Tab strip must persist at /${route}`);
+    assert.match(html, /data-pagefind-body/, `Workspace must be searchable at /${route}`);
+    assert.match(html, /name="astro-view-transitions-enabled"/, `Client router missing at /${route}`);
+    assert.match(html, /class="status-bar"/, `Missing status bar at /${route}`);
+  }
+  const docs = await Deno.readTextFile(new URL('framework/docs/index.html', root));
+  assert.match(docs, /class="status-bar"/, 'Docs must share the status bar');
+});
+
+Deno.test('the search index covers every page marked for indexing', async () => {
+  let marked = 0;
+  for (const file of await htmlFiles(root)) if ((await Deno.readTextFile(file)).includes('data-pagefind-body')) marked++;
+  const entry = JSON.parse(await Deno.readTextFile(new URL('pagefind/pagefind-entry.json', root)));
+  const indexed = Object.values(entry.languages as Record<string, { page_count: number }>)
+    .reduce((total, language) => total + language.page_count, 0);
+  assert.equal(indexed, marked);
 });

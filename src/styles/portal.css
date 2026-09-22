@@ -14,11 +14,6 @@
 }
 @layer layout {
   .wrap { width: min(1180px, calc(100% - 5rem)); margin-inline: auto; }
-  .site-header { min-height: 100px; display: flex; align-items: center; gap: 3rem; border-bottom: 1px solid var(--line); }
-  .site-header nav { display: flex; align-items: center; gap: 2.2rem; margin-left: auto; }
-  .site-header nav a { font-size: .94rem; color: var(--muted); display: flex; align-items: center; gap: .35rem; }
-  .site-header nav a:hover,.site-header nav a[aria-current] { color: var(--ink); }
-  .source-link { display: inline-flex; }
   .hero { padding-block: 66px 0; }
   .hero-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 5rem; align-items: center; margin-top: 26px; }
   .hero h1 { font-size: clamp(2.7rem, 5.3vw, 4.65rem); line-height: 1.08; letter-spacing: -.058em; font-weight: 650; }
@@ -99,10 +94,6 @@
 }
 @media (max-width: 620px) {
   .wrap { width: calc(100% - 2.5rem); }
-  .site-header { min-height: 84px; gap: 1rem; flex-wrap: wrap; padding-block: 18px; }
-  .site-header nav { gap: 1rem; }
-  .site-header nav a { font-size: .85rem; }
-  .source-link { display: none; }
   .brand { font-size: 1.3rem; gap: .35rem; }
   .brand svg { width: 22px; }
   .hero { padding-top: 38px; }
@@ -127,7 +118,6 @@
 
 /* The supplied crest sets the visual language: gold, steel, and angular edges. */
 body { background: radial-gradient(ellipse at 85% 8%, #29352b70, transparent 38%), var(--bg); }
-.site-header { border-bottom-color: #8c742c70; }
 .brand { letter-spacing: -.045em; }
 .brand img { object-fit: contain; flex-shrink: 0; }
 .site-header .brand img { width: 56px; height: 56px; }

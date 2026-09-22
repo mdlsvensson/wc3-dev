@@ -1,43 +1,24 @@
 ---
 import { getCollection } from 'astro:content';
-import { ArrowUpRight, BookOpen, FileCode, Terminal, Users, CodeXml } from 'lucide-astro';
-import Portal from '../layouts/Portal.astro';
+import { ArrowUpRight, BookOpen, FileCode } from 'lucide-astro';
+import Shell from '../layouts/Shell.astro';
+import GuideNav from '../components/GuideNav.astro';
+import ResourceDirectory from '../components/ResourceDirectory.astro';
 import '../styles/home.css';
 const resources = (await getCollection('resources')).sort((a, b) => a.data.order - b.data.order);
-const icons = { Community: Users, Tooling: Terminal, Scripting: CodeXml };
-const guides = [
-  ['Installation', 'installation'],
-  ['Use your own map', 'custom-maps'],
-  ['Gameplay', 'map-making'],
-  ['Import assets', 'assets'],
-  ['Object data', 'object-data'],
-  ['Commands & configuration', 'reference'],
-  ['Troubleshooting', 'troubleshooting'],
-];
 ---
-<Portal title="Modding resources" description="Warcraft III modding resources, scripting tools, and framework documentation.">
+<Shell title="Modding resources" description="Warcraft III modding resources, scripting tools, and framework documentation.">
+  <GuideNav slot="side" />
   <div class="portal-workspace wrap">
     <div class="workspace-heading"><h1>Old game. <span>New tricks.</span></h1><p>Warcraft III modding resources and documentation.</p></div>
     <div class="workspace-columns">
-      <section class="resource-directory" id="resources" aria-labelledby="directory-title">
-        <header class="workspace-panel-heading"><h2 id="directory-title">Resources</h2><span>{resources.length} resources</span></header>
-        <div class="directory-columns" aria-hidden="true"><span>Resource</span><span>Category</span><span></span></div>
-        <ul class="directory-list">
-          {resources.map(({ data }) => { const Icon = icons[data.category]; return (
-            <li><a class="directory-row" href={data.url}>
-              <div class="directory-resource"><Icon size={20} strokeWidth={1.6} /><div><h3>{data.title}</h3><p>{data.description}</p></div></div>
-              <span class="resource-category">{data.category}</span><ArrowUpRight class="resource-external" size={17} />
-            </a></li>
-          ); })}
-        </ul>
-      </section>
+      <ResourceDirectory resources={resources} title="Resources" id="resources" />
       <aside class="framework-reference" aria-labelledby="framework-title">
         <header class="workspace-panel-heading"><h2 id="framework-title"><FileCode size={18} /> w3ts framework</h2><span class="version-label">Alpha</span></header>
         <p class="reference-description">TypeScript gameplay, Pkl object data, and Deno build tools.</p>
-        <div class="reference-actions"><a class="button primary" href="/framework/docs/"><BookOpen size={16} /> Documentation</a><a class="button secondary" href="/framework/">Overview</a></div>
-        <nav class="guide-list" aria-label="Framework guides">{guides.map(([label, slug]) => <a href={`/framework/docs/${slug}/`}>{label}<span aria-hidden="true">›</span></a>)}</nav>
+        <div class="reference-actions"><a class="button primary" href="/framework/docs/" data-astro-reload><BookOpen size={16} /> Documentation</a><a class="button secondary" href="/framework/">Overview</a></div>
         <a class="reference-source" href="https://github.com/mdlsvensson/w3ts-framework">Source repository <ArrowUpRight size={16} /></a>
       </aside>
     </div>
   </div>
-</Portal>
+</Shell>
