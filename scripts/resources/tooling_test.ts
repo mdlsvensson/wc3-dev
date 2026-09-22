@@ -58,6 +58,17 @@ Deno.test('wavDurationSec reads PCM headers', () => {
   assert.equal(wavDurationSec(bytes('RIFF....WAVE')), null);
 });
 
+Deno.test('wavDurationSec returns null for a truncated fmt chunk instead of reading past the buffer', () => {
+  // RIFF/WAVE header (12 bytes) + an 'fmt ' chunk claiming 16 bytes of data, but only 4 are present.
+  const truncated = new Uint8Array(24);
+  const view = new DataView(truncated.buffer);
+  truncated.set(new TextEncoder().encode('RIFF'), 0);
+  truncated.set(new TextEncoder().encode('WAVE'), 8);
+  truncated.set(new TextEncoder().encode('fmt '), 12);
+  view.setUint32(16, 16, true);
+  assert.equal(wavDurationSec(truncated), null);
+});
+
 Deno.test('encodePng writes a valid PNG that round-trips the pixels', async () => {
   const rgba = new Uint8Array([255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 255, 255, 0]);
   const png = await encodePng(2, 2, rgba);
@@ -72,4 +83,9 @@ Deno.test('encodePng writes a valid PNG that round-trips the pixels', async () =
   const raw = new Uint8Array(await new Response(stream).arrayBuffer());
   assert.deepEqual([...raw], [0, ...rgba.subarray(0, 8), 0, ...rgba.subarray(8)]);
   assert.equal(new TextDecoder().decode(png.subarray(-8, -4)), 'IEND');
+});
+
+Deno.test('pngSize throws a descriptive error for a truncated PNG instead of reading past the buffer', () => {
+  const signatureOnly = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  assert.throws(() => pngSize(signatureOnly), /Truncated PNG/);
 });

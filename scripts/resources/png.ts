@@ -49,6 +49,7 @@ export async function encodePng(width: number, height: number, rgba: Uint8Array)
 }
 
 export function pngSize(bytes: Uint8Array): { width: number; height: number } {
+  if (bytes.length < 24) throw new Error('Truncated PNG: no IHDR chunk to read width and height from.');
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   return { width: view.getUint32(16), height: view.getUint32(20) };
 }
