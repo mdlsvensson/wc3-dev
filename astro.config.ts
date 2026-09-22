@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import { jass } from './src/syntax/jass';
 
@@ -6,6 +6,12 @@ export default defineConfig({
   site: 'https://wc3.dev',
   output: 'static',
   trailingSlash: 'always',
+  env: {
+    schema: {
+      // Where resource files are served from (the asset store). Required for builds that render resource files.
+      ASSET_BASE_URL: envField.string({ context: 'server', access: 'public', optional: true, url: true }),
+    },
+  },
   markdown: { shikiConfig: { langs: [jass], themes: { light: 'github-light', dark: 'github-dark' } } },
   integrations: [starlight({
     title: 'wc3.dev / framework',

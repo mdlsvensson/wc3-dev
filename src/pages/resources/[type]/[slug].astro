@@ -1,0 +1,78 @@
+---
+import { ArrowUpRight } from 'lucide-astro';
+import Shell from '../../../layouts/Shell.astro';
+import ResourceCard from '../../../components/resources/ResourceCard.astro';
+import TypeIcon from '../../../components/resources/TypeIcon.astro';
+import TypeNav from '../../../components/resources/TypeNav.astro';
+import { assetUrl } from '../../../lib/assets';
+import { TYPE_NAMES, TYPE_SEGMENTS } from '../../../lib/resource-schema';
+import { getResources, type HostedEntry, isHosted, sourceLabel, typeDetails } from '../../../lib/resources';
+import '../../../styles/home.css';
+import '../../../styles/resources.css';
+
+export async function getStaticPaths() {
+  const all = (await getResources()).filter(isHosted);
+  return all.map((entry) => ({
+    params: { type: TYPE_SEGMENTS[entry.data.type], slug: entry.id },
+    props: { entry, all, related: all.filter((other) => entry.data.related.includes(other.id)) },
+  }));
+}
+
+interface Props { entry: HostedEntry; all: HostedEntry[]; related: HostedEntry[] }
+const { entry, all, related } = Astro.props;
+const { data } = entry;
+// Store URLs for the sub-project 3 previewers; never rendered as links.
+const previewFiles = data.files.map((file) => ({ role: file.role, format: file.format, url: assetUrl(file.key) }));
+---
+<Shell title={data.title} description={data.summary} tab>
+  <TypeNav slot="side" all={all} activeType={data.type} exact={false} />
+  <article class="resource-detail wrap">
+    <header class="resource-header">
+      <p class="eyebrow"><TypeIcon type={data.type} size={14} /> {TYPE_NAMES[data.type].toUpperCase()}</p>
+      <h1>{data.title}</h1>
+      <p class="resource-summary">{data.summary}</p>
+      <p class="resource-byline">
+        by {data.authors.map((author, index) => (
+          <Fragment>{index > 0 && ', '}{author.url ? <a href={author.url} rel="noopener">{author.name}</a> : author.name}</Fragment>
+        ))}
+      </p>
+      <div class="catalog-badges">
+        {data.compat.sd && <span class="catalog-badge">SD</span>}
+        {data.compat.hd && <span class="catalog-badge">HD</span>}
+        {data.compat.minPatch && <span class="catalog-badge">{data.compat.minPatch}+</span>}
+      </div>
+      <a class="button primary" href={data.source.url} rel="noopener">{sourceLabel(data.source)} <ArrowUpRight size={16} /></a>
+    </header>
+
+    <section id="resource-preview" class="resource-preview" aria-label="Preview" data-type={data.type} data-files={JSON.stringify(previewFiles)}>
+      {data.preview
+        ? <img src={assetUrl(data.preview.key)} width={data.preview.width} height={data.preview.height} alt={`Preview of ${data.title}`} />
+        : <TypeIcon type={data.type} size={64} />}
+    </section>
+
+    <section class="resource-facts" aria-labelledby="details-title">
+      <h2 id="details-title">Details</h2>
+      <dl>
+        {typeDetails(data).map(([label, value]) => <Fragment><dt>{label}</dt><dd>{value}</dd></Fragment>)}
+        {data.tags.length > 0 && <Fragment><dt>Tags</dt><dd>{data.tags.join(', ')}</dd></Fragment>}
+        <dt>Added</dt><dd><time datetime={data.added}>{data.added}</time></dd>
+        {data.updated && <Fragment><dt>Updated</dt><dd><time datetime={data.updated}>{data.updated}</time></dd></Fragment>}
+      </dl>
+    </section>
+
+    <section class="resource-credits" aria-labelledby="credits-title">
+      <h2 id="credits-title">Credits</h2>
+      <ul>{data.authors.map((author) => <li>{author.url ? <a href={author.url} rel="noopener">{author.name}</a> : author.name}</li>)}</ul>
+      {data.permission && <p>{data.permission}</p>}
+      {data.derivative && <p>Derived from Blizzard Entertainment assets.</p>}
+      <p>wc3.dev only displays this resource. Get it from its <a href={data.source.url} rel="noopener">original source</a>.</p>
+    </section>
+
+    {related.length > 0 && (
+      <section class="resource-related" aria-labelledby="related-title">
+        <h2 id="related-title">Related</h2>
+        <div class="catalog-grid">{related.map((other) => <ResourceCard entry={other} />)}</div>
+      </section>
+    )}
+  </article>
+</Shell>

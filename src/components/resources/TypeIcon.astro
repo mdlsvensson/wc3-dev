@@ -1,0 +1,8 @@
+---
+import { AudioLines, Box, FileCode, Image, Layers } from 'lucide-astro';
+import type { HostedType } from '../../lib/resource-schema';
+interface Props { type: HostedType; size?: number }
+const { type, size = 24 } = Astro.props;
+const Icon = { model: Box, icon: Image, texture: Layers, audio: AudioLines, script: FileCode }[type];
+---
+<Icon size={size} strokeWidth={1.5} aria-hidden="true" />

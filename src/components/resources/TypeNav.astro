@@ -1,0 +1,15 @@
+---
+import { HOSTED_TYPES, TYPE_PLURALS, TYPE_SEGMENTS, type HostedType } from '../../lib/resource-schema';
+import type { HostedEntry } from '../../lib/resources';
+interface Props { all: HostedEntry[]; activeType?: HostedType; /** True on a type page itself, false on a resource inside it. */ exact?: boolean }
+const { all, activeType, exact = true } = Astro.props;
+---
+<nav class="panel-nav" aria-label="Resource types">
+  <h2 class="panel-title">Types</h2>
+  <a href="/resources/" aria-current={activeType ? undefined : 'page'}>All resources<span>{all.length}</span></a>
+  {HOSTED_TYPES.map((type) => (
+    <a href={`/resources/${TYPE_SEGMENTS[type]}/`} aria-current={activeType === type ? (exact ? 'page' : 'true') : undefined}>
+      {TYPE_PLURALS[type]}<span>{all.filter((entry) => entry.data.type === type).length}</span>
+    </a>
+  ))}
+</nav>
