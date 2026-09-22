@@ -1,0 +1,25 @@
+---
+import { LayoutGrid, List } from 'lucide-astro';
+import type { HostedEntry } from '../../lib/resources';
+import ResourceCard from './ResourceCard.astro';
+interface Props { entries: HostedEntry[]; title: string; intro: string }
+const { entries, title, intro } = Astro.props;
+const label = (n: number) => `${n} ${n === 1 ? 'resource' : 'resources'}`;
+---
+<section class="catalog" aria-labelledby="catalog-title">
+  <header class="catalog-heading">
+    <div><h1 id="catalog-title">{title}</h1><p>{intro}</p></div>
+    <div class="catalog-tools">
+      <span data-catalog-count aria-live="polite">{label(entries.length)}</span>
+      <div class="view-toggle" role="group" aria-label="Layout">
+        <button type="button" data-view="grid" aria-pressed="true" aria-label="Grid view"><LayoutGrid size={16} /></button>
+        <button type="button" data-view="list" aria-pressed="false" aria-label="List view"><List size={16} /></button>
+      </div>
+    </div>
+  </header>
+  {entries.length > 0
+    ? <div class="catalog-grid" data-catalog data-layout="grid">{entries.map((entry) => <ResourceCard entry={entry} />)}</div>
+    : <p class="catalog-empty">No resources here yet.</p>}
+  <p class="catalog-empty" data-catalog-empty hidden>No resources match these filters.</p>
+</section>
+<script>import '../../scripts/resources/catalog.ts';</script>
