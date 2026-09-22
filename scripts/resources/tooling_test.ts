@@ -3,28 +3,9 @@ import { sniff } from './sniff.ts';
 import { isSlug, sha256Hex, storeKey } from './keys.ts';
 import { wavDurationSec } from './wav.ts';
 import { encodePng, pngSize } from './png.ts';
+import { makeWav } from './testdata.ts';
 
 const bytes = (text: string, extra: number[] = []) => new Uint8Array([...new TextEncoder().encode(text), ...extra]);
-
-/** 16-bit mono PCM WAV of silence. */
-function wav(seconds: number, sampleRate = 8000): Uint8Array {
-  const dataSize = seconds * sampleRate * 2;
-  const buffer = new Uint8Array(44 + dataSize);
-  const view = new DataView(buffer.buffer);
-  buffer.set(new TextEncoder().encode('RIFF'), 0);
-  view.setUint32(4, 36 + dataSize, true);
-  buffer.set(new TextEncoder().encode('WAVEfmt '), 8);
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, 1, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * 2, true);
-  view.setUint16(32, 2, true);
-  view.setUint16(34, 16, true);
-  buffer.set(new TextEncoder().encode('data'), 36);
-  view.setUint32(40, dataSize, true);
-  return buffer;
-}
 
 Deno.test('sniff accepts files whose contents match their extension', () => {
   assert.equal(sniff('Footman.mdx', bytes('MDLX', [0, 0])), 'mdx');
@@ -32,7 +13,7 @@ Deno.test('sniff accepts files whose contents match their extension', () => {
   assert.equal(sniff('BTNSword.BLP', bytes('BLP1', [0, 0])), 'blp');
   assert.equal(sniff('Grass.dds', bytes('DDS ', [0])), 'dds');
   assert.equal(sniff('preview.png', new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])), 'png');
-  assert.equal(sniff('Horn.wav', wav(1)), 'wav');
+  assert.equal(sniff('Horn.wav', makeWav(1)), 'wav');
   assert.equal(sniff('Theme.mp3', bytes('ID3', [3, 0])), 'mp3');
   assert.equal(sniff('Theme.mp3', new Uint8Array([0xff, 0xfb, 0x90, 0x00])), 'mp3');
   assert.equal(sniff('Theme.ogg', bytes('OggS', [0])), 'ogg');
@@ -73,7 +54,7 @@ Deno.test('store keys follow the resource layout and refuse unsafe names', async
 });
 
 Deno.test('wavDurationSec reads PCM headers', () => {
-  assert.equal(wavDurationSec(wav(3)), 3);
+  assert.equal(wavDurationSec(makeWav(3)), 3);
   assert.equal(wavDurationSec(bytes('RIFF....WAVE')), null);
 });
 
