@@ -1,5 +1,6 @@
 import { basename, join, relative } from 'jsr:@std/path@^1';
 import { z } from 'astro/zod';
+import { assetUrlFrom } from '../../src/lib/asset-url.ts';
 import { resourceSchema } from '../../src/lib/resource-schema.ts';
 import { isSlug } from './keys.ts';
 
@@ -57,7 +58,7 @@ export async function checkResources(
   if (options.remoteBase) {
     const fetchFn = options.fetchFn ?? fetch;
     for (const key of keys) {
-      const response = await fetchFn(new URL(key, options.remoteBase).href, { method: 'HEAD' });
+      const response = await fetchFn(assetUrlFrom(options.remoteBase, key), { method: 'HEAD' });
       if (!response.ok) errors.push(`missing from the store: ${key} (${response.status})`);
     }
   }

@@ -1,4 +1,5 @@
 import { ASSET_BASE_URL } from 'astro:env/server';
+import { assetUrlFrom } from './asset-url';
 
 /** Matches `deno task assets:serve`. */
 const DEV_BASE = 'http://127.0.0.1:4322/';
@@ -7,5 +8,5 @@ const DEV_BASE = 'http://127.0.0.1:4322/';
 export function assetUrl(key: string): string {
   const base = ASSET_BASE_URL ?? (import.meta.env.DEV ? DEV_BASE : undefined);
   if (!base) throw new Error('Set ASSET_BASE_URL to build pages that show resource files.');
-  return new URL(key, base.endsWith('/') ? base : `${base}/`).href;
+  return assetUrlFrom(base, key);
 }
