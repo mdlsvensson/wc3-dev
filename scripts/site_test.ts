@@ -3,6 +3,7 @@ import { createHighlighter, type HighlighterGeneric } from 'shiki';
 import { jass } from '../src/syntax/jass.ts';
 
 const root = new URL('../dist/', import.meta.url);
+const ASSETS = 'https://assets.example.test/';
 async function htmlFiles(directory: URL): Promise<URL[]> {
   const files: URL[] = [];
   for await (const entry of Deno.readDir(directory)) {
@@ -28,10 +29,12 @@ Deno.test('portal, framework, and migrated documentation routes are built', asyn
   assert(search.isFile, 'Search bundle must exist');
 });
 
-Deno.test('built pages have no broken local links, anchors, or asset references', async () => {
+Deno.test('built pages have no broken local links, anchors, or asset references, and never link or download store files', async () => {
   for (const file of await htmlFiles(root)) {
     const html = await Deno.readTextFile(file);
     const pathname = file.href.slice(root.href.length).replace(/index\.html$/, '');
+    assert(!html.includes(`href="${ASSETS}`), `Store files must never be linked (${pathname})`);
+    assert(!/\sdownload(?=[\s=>])/.test(html), `No download attributes (${pathname})`);
     for (const [, reference] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
       const url = new URL(reference.replaceAll('&amp;', '&'), `https://wc3.dev/${pathname}`);
       if (url.origin !== 'https://wc3.dev') continue;
@@ -89,16 +92,12 @@ Deno.test('the search index covers every page marked for indexing', async () => 
   assert.equal(indexed, marked);
 });
 
-const ASSETS = 'https://assets.example.test/';
-
 Deno.test('resource detail pages credit and link the source without offering downloads', async () => {
   const html = await Deno.readTextFile(new URL('resources/models/fixture-footman/index.html', root));
   assert.match(html, /href="https:\/\/www\.hiveworkshop\.com\/threads\/fixture-footman\.1\/"[^>]*>\s*View on Hive Workshop/);
   assert.match(html, /id="resource-preview"/);
   assert.match(html, /name="wc3-tab"/);
   assert(html.includes(`src="${ASSETS}resources/model/fixture-footman/2123456789ab/preview.png"`), 'Preview image must load from the asset store');
-  assert(!html.includes(`href="${ASSETS}`), 'Store files must never be linked');
-  assert(!/\sdownload(?=[\s=>])/.test(html), 'No download attributes');
   // Store URLs are allowed only inside data-files (for the previewers); nothing visible may name a file.
   const visible = html.replace(/data-files="[^"]*"/, '');
   assert(!visible.includes('Footman.mdx'), 'File names must not be shown');
