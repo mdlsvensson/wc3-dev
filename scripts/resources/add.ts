@@ -104,7 +104,8 @@ export async function addResource(options: AddOptions): Promise<AddResult> {
     const bytes = await Deno.readFile(join(folder, name));
     const format = sniff(name, bytes);
     if (!format || !ALLOWED_FORMATS[type].includes(format)) {
-      throw new Error(`${name}: not a valid ${ALLOWED_FORMATS[type].join('/')} file for a ${type} resource.`);
+      const article = /^[aeiou]/i.test(type) ? 'an' : 'a';
+      throw new Error(`${name}: not a valid ${ALLOWED_FORMATS[type].join('/')} file for ${article} ${type} resource.`);
     }
     const role = roleFor(type, format, name);
     plannedFiles.push({ name, bytes, format, role });
