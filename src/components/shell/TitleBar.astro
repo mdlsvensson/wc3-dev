@@ -1,0 +1,11 @@
+---
+import { Github, PanelLeft, Search } from 'lucide-astro';
+---
+<header class="title-bar">
+  <button type="button" class="icon-button panel-toggle" data-panel-toggle aria-controls="side-panel" aria-label="Toggle side panel" title="Toggle side panel (Ctrl+B)"><PanelLeft size={18} /></button>
+  <a class="brand" href="/" aria-label="wc3.dev home"><img src="/brand/wc3-crest.png" alt="" width="30" height="30" /><span>wc3<span class="brand-dot">.</span>dev</span></a>
+  <button type="button" class="palette-trigger" data-palette-open aria-haspopup="dialog" aria-controls="command-palette">
+    <Search size={15} /><span>Search resources, tutorials, docs…</span><kbd>Ctrl K</kbd>
+  </button>
+  <a class="icon-button" href="https://github.com/mdlsvensson/w3ts-framework" aria-label="Framework source on GitHub"><Github size={18} /></a>
+</header>

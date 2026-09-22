@@ -1,0 +1,7 @@
+---
+import { guides } from '../data/guides';
+---
+<nav class="panel-nav" aria-label="Framework guides">
+  <h2 class="panel-title">Framework guides</h2>
+  {guides.map(({ label, slug }) => <a href={`/framework/docs/${slug}/`} data-astro-reload>{label}<span aria-hidden="true">›</span></a>)}
+</nav>

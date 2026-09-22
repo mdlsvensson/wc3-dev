@@ -42,3 +42,4 @@
   .portal-workspace { padding-top: 24px; }
   .workspace-heading { margin-bottom: 22px; }
 }
+.directory-stack { display: grid; gap: 24px; }

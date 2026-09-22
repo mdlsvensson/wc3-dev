@@ -1,0 +1,16 @@
+---
+import { BookOpen, FileCode, GraduationCap, House, LibraryBig } from 'lucide-astro';
+const section = Astro.url.pathname.split('/').filter(Boolean)[0] ?? '';
+const items = [
+  { id: '', href: '/', label: 'Home', Icon: House },
+  { id: 'resources', href: '/resources/', label: 'Resources', Icon: LibraryBig },
+  { id: 'learn', href: '/learn/', label: 'Learn', Icon: GraduationCap },
+  { id: 'framework', href: '/framework/', label: 'Framework', Icon: FileCode },
+];
+---
+<nav class="activity-rail" aria-label="Sections">
+  {items.map(({ id, href, label, Icon }) => (
+    <a class="rail-item" href={href} aria-current={section === id ? 'page' : undefined}><Icon size={21} strokeWidth={1.6} /><span>{label}</span></a>
+  ))}
+  <a class="rail-item rail-docs" href="/framework/docs/" data-astro-reload><BookOpen size={21} strokeWidth={1.6} /><span>Docs</span></a>
+</nav>

@@ -1,0 +1,14 @@
+---
+import { ArrowRight, ArrowUpRight } from 'lucide-astro';
+import Shell from '../../layouts/Shell.astro';
+import '../../styles/home.css';
+---
+<Shell title="Learn" description="Step-by-step tutorials for modding Warcraft III: Reforged.">
+  <div class="portal-workspace wrap">
+    <div class="workspace-heading"><h1>Learn to mod <span>Warcraft III.</span></h1><p>Step-by-step Reforged tutorials, from your first World Editor map to scripted systems, are being written.</p></div>
+    <div class="actions">
+      <a class="button primary" href="/framework/docs/installation/" data-astro-reload>Start with the w3ts framework <ArrowRight size={18} /></a>
+      <a class="button secondary" href="https://www.hiveworkshop.com/">Hive Workshop <ArrowUpRight size={18} /></a>
+    </div>
+  </div>
+</Shell>

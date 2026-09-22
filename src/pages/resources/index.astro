@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import Shell from '../../layouts/Shell.astro';
+import ResourceDirectory from '../../components/ResourceDirectory.astro';
+import '../../styles/home.css';
+const resources = (await getCollection('resources')).sort((a, b) => a.data.order - b.data.order);
+const categories = [...new Set(resources.map(({ data }) => data.category))];
+const inCategory = (category: string) => resources.filter(({ data }) => data.category === category);
+---
+<Shell title="Resources" description="Curated Warcraft III modding communities, tools, and scripting resources.">
+  <nav slot="side" class="panel-nav" aria-label="Resource categories">
+    <h2 class="panel-title">Categories</h2>
+    {categories.map((category) => <a href={`#${category.toLowerCase()}`}>{category}<span>{inCategory(category).length}</span></a>)}
+  </nav>
+  <div class="portal-workspace wrap">
+    <div class="workspace-heading"><h1>Resources</h1><p>A full catalog of models, icons, audio, and tools is on its way. Until then, these are the essentials.</p></div>
+    <div class="directory-stack">
+      {categories.map((category) => <ResourceDirectory resources={inCategory(category)} title={category} id={category.toLowerCase()} />)}
+    </div>
+  </div>
+</Shell>

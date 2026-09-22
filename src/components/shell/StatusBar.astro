@@ -1,0 +1,39 @@
+---
+import { ArrowUpRight } from 'lucide-astro';
+import pkg from '../../../package.json';
+const currentYear = new Date().getFullYear();
+---
+<footer class="status-bar">
+  <span class="status-item">wc3.dev v{pkg.version}</span>
+  <a class="status-item" href="https://www.hiveworkshop.com/">Hive Workshop <ArrowUpRight size={12} /></a>
+  <a class="status-item" href="https://github.com/mdlsvensson/w3ts-framework">Framework repo <ArrowUpRight size={12} /></a>
+  <span class="status-notice status-push">wc3.dev is an independent modding resource.</span>
+  <span class="status-notice">Warcraft III is &copy;{currentYear} Blizzard Entertainment, Inc.</span>
+</footer>
+
+<style is:global>
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    height: var(--app-footer-height);
+    padding: 0 1rem;
+    border-top: 1px solid #685a2a;
+    background: #101a20;
+    color: #aebbc1;
+    font-size: .7rem;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .status-item { display: inline-flex; align-items: center; gap: .25rem; color: inherit; text-decoration: none; }
+  a.status-item:hover { color: #f5d518; }
+  .status-push { margin-left: auto; }
+  @media (max-width: 620px) {
+    .status-bar { justify-content: space-between; white-space: normal; }
+    .status-item { display: none; }
+    .status-notice { max-width: 50%; margin: 0; }
+    .status-notice:last-child { text-align: right; }
+  }
+  @media print { .status-bar { height: auto; } }
+</style>
