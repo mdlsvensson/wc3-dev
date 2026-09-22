@@ -34,7 +34,9 @@ Deno.test('built pages have no broken local links, anchors, or asset references,
     const html = await Deno.readTextFile(file);
     const pathname = file.href.slice(root.href.length).replace(/index\.html$/, '');
     assert(!html.includes(`href="${ASSETS}`), `Store files must never be linked (${pathname})`);
-    assert(!/\sdownload(?=[\s=>])/.test(html), `No download attributes (${pathname})`);
+    // Scoped to inside an <a ...> tag: an unscoped \sdownload(?=[\s=>]) also matches the plain
+    // English word, which shows up legitimately in documentation prose (e.g. "package download fails").
+    assert(!/<a\s[^>]*\sdownload(?=[\s=>/])/.test(html), `No download attributes (${pathname})`);
     for (const [, reference] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
       const url = new URL(reference.replaceAll('&amp;', '&'), `https://wc3.dev/${pathname}`);
       if (url.origin !== 'https://wc3.dev') continue;
