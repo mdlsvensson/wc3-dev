@@ -92,9 +92,10 @@ client-only views (complexity without benefit).
 ## Responsive behaviour
 
 - ≥ 900px: full layout.
-- 620–900px: side panel starts collapsed and opens as an overlay.
-- < 620px: the rail moves to a bottom bar, the side panel becomes a drawer, the
-  tab strip is hidden, and the status bar is reduced to the notices.
+- 620–900px: side panel starts collapsed and opens as an overlay; the status
+  bar is reduced to the notices so they are never clipped.
+- < 620px: the rail moves to a bottom bar, the side panel becomes a drawer, and
+  the tab strip is hidden.
 - No horizontal page scroll at any width; `prefers-reduced-motion` disables
   view-transition animations.
 
