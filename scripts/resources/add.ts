@@ -67,21 +67,18 @@ export async function addResource(options: AddOptions): Promise<AddResult> {
   if (existing && !update) throw new Error(`${path} already exists; pass --update to replace it.`);
 
   const warnings: string[] = [];
-  const files: { key: string; role: string; format: string; bytes: number }[] = [];
-  let preview: { key: string; width: number; height: number } | undefined;
+  // Pass 1: read, sniff, and validate every file, and build the plan of what will be uploaded.
+  // Nothing is uploaded until every file here has passed validation.
+  type PlannedFile = { name: string; bytes: Uint8Array; format: FileFormat; role: string };
+  const plannedFiles: PlannedFile[] = [];
+  let plannedPreview: { name: string; bytes: Uint8Array; width: number; height: number } | undefined;
   let meta: { animations: string[]; textures: string[] } | undefined;
   let durationSec = authored.type === 'audio' ? authored.durationSec : undefined;
-
-  const upload = async (fileName: string, bytes: Uint8Array, format: FileFormat) => {
-    const key = storeKey(type, slug, await sha256Hex(bytes), fileName);
-    await store.put(key, bytes, CONTENT_TYPES[format]);
-    return key;
-  };
 
   const authoredPreview = await Deno.readFile(join(folder, 'preview.png')).catch(() => null);
   if (authoredPreview) {
     if (sniff('preview.png', authoredPreview) !== 'png') throw new Error('preview.png is not a PNG image.');
-    preview = { key: await upload('preview.png', authoredPreview, 'png'), ...pngSize(authoredPreview) };
+    plannedPreview = { name: 'preview.png', bytes: authoredPreview, ...pngSize(authoredPreview) };
   }
 
   const names: string[] = [];
@@ -97,7 +94,7 @@ export async function addResource(options: AddOptions): Promise<AddResult> {
       throw new Error(`${name}: not a valid ${ALLOWED_FORMATS[type].join('/')} file for a ${type} resource.`);
     }
     const role = roleFor(type, format, name);
-    files.push({ key: await upload(name, bytes, format), role, format, bytes: bytes.length });
+    plannedFiles.push({ name, bytes, format, role });
 
     if (role === 'model' && !meta) {
       try {
@@ -107,20 +104,35 @@ export async function addResource(options: AddOptions): Promise<AddResult> {
       }
     }
     if (format === 'wav' && durationSec === undefined) durationSec = wavDurationSec(bytes) ?? undefined;
-    if ((type === 'icon' || type === 'texture') && !preview && (format === 'blp' || format === 'dds')) {
+    if ((type === 'icon' || type === 'texture') && !plannedPreview && (format === 'blp' || format === 'dds')) {
       try {
         const image = decodeTexture(format, bytes);
         const png = await encodePng(image.width, image.height, image.data);
-        preview = { key: await upload('preview.png', png, 'png'), width: image.width, height: image.height };
+        plannedPreview = { name: 'preview.png', bytes: png, width: image.width, height: image.height };
       } catch (error) {
         warnings.push(`${name}: could not generate a preview (${message(error)}); add preview.png.`);
       }
     }
   }
 
-  if (files.length === 0) throw new Error('No resource files found next to resource.json.');
+  if (plannedFiles.length === 0) throw new Error('No resource files found next to resource.json.');
   if (type === 'audio' && durationSec === undefined) throw new Error('Set durationSec in resource.json; it can only be read from WAV files.');
-  if (!preview && type !== 'audio' && type !== 'script') warnings.push('No preview image: add preview.png to show a thumbnail.');
+  if (!plannedPreview && type !== 'audio' && type !== 'script') warnings.push('No preview image: add preview.png to show a thumbnail.');
+
+  // Pass 2: every file has passed validation, so it is now safe to upload.
+  const upload = async (fileName: string, bytes: Uint8Array, format: FileFormat) => {
+    const key = storeKey(type, slug, await sha256Hex(bytes), fileName);
+    await store.put(key, bytes, CONTENT_TYPES[format]);
+    return key;
+  };
+
+  const files: { key: string; role: string; format: string; bytes: number }[] = [];
+  for (const planned of plannedFiles) {
+    files.push({ key: await upload(planned.name, planned.bytes, planned.format), role: planned.role, format: planned.format, bytes: planned.bytes.length });
+  }
+  const preview = plannedPreview
+    ? { key: await upload(plannedPreview.name, plannedPreview.bytes, 'png'), width: plannedPreview.width, height: plannedPreview.height }
+    : undefined;
 
   const resource = resourceSchema.parse({
     ...authored,
