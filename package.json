@@ -8,6 +8,7 @@
     "astro": "7.3.3",
     "@astrojs/starlight": "0.42.2",
     "@astrojs/markdown-remark": "7.3.0",
+    "aws4fetch": "1.0.20",
     "lucide-astro": "0.556.0",
     "mdx-m3-viewer-th": "5.13.4",
     "shiki": "4.4.3"

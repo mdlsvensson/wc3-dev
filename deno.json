@@ -7,7 +7,9 @@
     "preview": "deno run -A npm:astro preview --host 127.0.0.1",
     "build:test": "RESOURCE_FIXTURES=1 ASSET_BASE_URL=https://assets.example.test/ deno task build",
     "test": "deno task build:test && deno test -A scripts/",
-    "test:unit": "deno test -A scripts/shell_test.ts scripts/resources/"
+    "test:unit": "deno test -A scripts/shell_test.ts scripts/resources/",
+    "resource:add": "deno run -A scripts/resources/add.ts",
+    "assets:serve": "mkdir -p .asset-store && deno run --allow-net --allow-read jsr:@std/http@^1/file-server .asset-store --host 127.0.0.1 --port 4322 --cors --no-dir-listing"
   },
   "fmt": { "exclude": ["node_modules", "dist", ".astro", "deno.lock"] }
 }
