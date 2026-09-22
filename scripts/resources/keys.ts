@@ -1,5 +1,5 @@
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const UNSAFE_NAME = /[/\\?#% -]/;
+const UNSAFE_NAME = /[/\\?#%\x00-\x1f]/;
 
 export const isSlug = (value: string): boolean => SLUG.test(value);
 
