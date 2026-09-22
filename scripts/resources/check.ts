@@ -25,6 +25,7 @@ export async function checkResources(
 ): Promise<string[]> {
   const errors: string[] = [];
   const slugs = new Map<string, string>();
+  const types = new Map<string, string>();
   const related: [string, string[]][] = [];
   const keys: string[] = [];
 
@@ -45,13 +46,16 @@ export async function checkResources(
     }
     const folder = file.split('/').at(-2);
     if (folder !== data.type) errors.push(`${file}: type "${data.type}" must live in an "${data.type}/" folder`);
+    types.set(slug, data.type);
     related.push([file, data.related]);
     if (data.type !== 'link') keys.push(...data.files.map((stored) => stored.key), ...(data.preview ? [data.preview.key] : []));
   }
 
   for (const [file, references] of related) {
     for (const reference of references) {
-      if (!slugs.has(reference)) errors.push(`${file}: related resource "${reference}" does not exist`);
+      const type = types.get(reference);
+      if (type === undefined) errors.push(`${file}: related resource "${reference}" does not exist`);
+      else if (type === 'link') errors.push(`${file}: related resource "${reference}" is a link, not a hosted resource, and cannot be shown`);
     }
   }
 

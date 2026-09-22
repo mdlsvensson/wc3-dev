@@ -15,6 +15,16 @@ const icon = (related: string[] = []) => ({
   related,
 });
 
+const link = () => ({
+  type: 'link',
+  title: 'Hive Workshop',
+  summary: 'The main community hub.',
+  source: { site: 'hive', url: 'https://www.hiveworkshop.com/' },
+  category: 'Community',
+  order: 1,
+  added: '2026-09-22',
+});
+
 async function tree(files: Record<string, unknown>) {
   const root = await Deno.makeTempDir({ prefix: 'wc3-check-' });
   for (const [path, data] of Object.entries(files)) {
@@ -43,6 +53,14 @@ Deno.test('reports schema errors, wrong folders, duplicate slugs, bad slugs, and
   assert.match(text, /broken\.json: .*source/);
   assert.match(text, /not-json\.json: /);
   assert.match(text, /related resource "ghost" does not exist/);
+});
+
+Deno.test('rejects a related reference to a link-type resource', async () => {
+  const errors = await checkResources(await tree({
+    'icon/sword.json': icon(['hive-workshop']),
+    'link/hive-workshop.json': link(),
+  }));
+  assert.match(errors.join('\n'), /related resource "hive-workshop" is a link, not a hosted resource/);
 });
 
 Deno.test('remote mode reports keys missing from the store', async () => {
