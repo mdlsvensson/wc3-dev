@@ -68,6 +68,8 @@ Deno.test('store keys follow the resource layout and refuse unsafe names', async
   assert(isSlug('night-elf-archer'));
   assert(!isSlug('night--elf'));
   assert(!isSlug('-archer'));
+  assert.equal(storeKey('icon', 'sword', hash, 'Death Knight - Sword.blp'), 'resources/icon/sword/ba7816bf8f01/Death Knight - Sword.blp');
+  assert.throws(() => storeKey('icon', 'sword', hash, 'a\x00b.blp'));
 });
 
 Deno.test('wavDurationSec reads PCM headers', () => {
