@@ -48,7 +48,7 @@ code blocks referencing old stylesheets. Code-block styles are inlined with the 
 | `src/pages/index.astro` | Community and modding resource portal |
 | `src/pages/framework/index.astro` | Framework landing page at `/framework/` |
 | `src/content/docs/framework/docs/` | Starlight docs at `/framework/docs/` |
-| `src/content/resources/*.json` | Resource cards, validated with Zod |
+| `src/content/resources/` | Resource cards, validated with Zod — curated links in `link/`, hosted resources in `<type>/`, build fixtures in `_fixtures/` |
 | `src/content.config.ts` | Content collection loaders and schemas |
 | `src/syntax/jass.ts` | Project-owned JASS / basic vJASS TextMate grammar |
 | `src/styles/` | Portal and Starlight themes |
