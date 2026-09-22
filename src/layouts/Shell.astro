@@ -29,6 +29,13 @@ const hasSide = Astro.slots.has('side');
     <meta property="og:type" content="website" />
     <link rel="icon" type="image/png" href="/brand/wc3-crest.png" />
     {tab && <meta name="wc3-tab" content={title} />}
+    <script is:inline>
+      try {
+        var width = Number(localStorage.getItem('wc3.panel.width'));
+        if (width) document.documentElement.style.setProperty('--panel-width', Math.round(Math.min(420, Math.max(200, width))) + 'px');
+        if (localStorage.getItem('wc3.panel.collapsed') === '1') document.documentElement.dataset.panel = 'collapsed';
+      } catch (e) {}
+    </script>
     <ClientRouter />
   </head>
   <body class:list={['shell', { 'no-side': !hasSide }]}>
