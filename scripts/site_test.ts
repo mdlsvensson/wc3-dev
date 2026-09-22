@@ -73,6 +73,7 @@ Deno.test('shell pages share the application shell', async () => {
     assert.match(html, /data-pagefind-body/, `Workspace must be searchable at /${route}`);
     assert.match(html, /name="astro-view-transitions-enabled"/, `Client router missing at /${route}`);
     assert.match(html, /class="status-bar"/, `Missing status bar at /${route}`);
+    assert.match(html, /id="command-palette"/, `Missing command palette at /${route}`);
   }
   const docs = await Deno.readTextFile(new URL('framework/docs/index.html', root));
   assert.match(docs, /class="status-bar"/, 'Docs must share the status bar');

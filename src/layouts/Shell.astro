@@ -4,6 +4,7 @@ import '../styles/fonts.css';
 import '../styles/portal.css';
 import '../styles/shell.css';
 import ActivityRail from '../components/shell/ActivityRail.astro';
+import CommandPalette from '../components/shell/CommandPalette.astro';
 import StatusBar from '../components/shell/StatusBar.astro';
 import TabStrip from '../components/shell/TabStrip.astro';
 import TitleBar from '../components/shell/TitleBar.astro';
@@ -53,6 +54,7 @@ const hasSide = Astro.slots.has('side');
       <main id="main" class="app-scroll" tabindex="0" data-pagefind-body transition:animate="fade"><slot /></main>
     </div>
     <StatusBar />
+    <CommandPalette />
     <script>import '../scripts/shell/index.ts';</script>
   </body>
 </html>

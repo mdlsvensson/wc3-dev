@@ -1,0 +1,14 @@
+---
+import { Search } from 'lucide-astro';
+---
+<dialog class="palette" id="command-palette" aria-label="Search wc3.dev">
+  <div class="palette-body">
+    <div class="palette-field">
+      <Search size={16} />
+      <input id="palette-input" type="search" placeholder="Search resources, tutorials, docs…" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="palette-results" aria-autocomplete="list" />
+      <kbd>Esc</kbd>
+    </div>
+    <ul id="palette-results" class="palette-results" role="listbox" aria-label="Search results"></ul>
+    <p class="palette-status" aria-live="polite">Type to search.</p>
+  </div>
+</dialog>
