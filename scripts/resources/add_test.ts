@@ -93,6 +93,18 @@ Deno.test('a dry run writes and uploads nothing', async () => {
   await assert.rejects(() => Deno.stat(result.path));
 });
 
+Deno.test('validates every file before uploading any of them: nothing is uploaded when a later file is invalid', async () => {
+  const ws = await workspace();
+  const dir = await folder(ws.root, 'test-mixed', { type: 'model', title: 'Test', summary: 'A test.', kind: 'unit', ...hosted }, {
+    'AGood.blp': makeBlp(),
+    'ZBad.mdx': new TextEncoder().encode('not a model'),
+  });
+  const puts: string[] = [];
+  const store = { label: 'recording', put: (key: string) => { puts.push(key); return Promise.resolve(); } };
+  await assert.rejects(() => addResource({ folder: dir, contentRoot: ws.content, store, today: '2026-09-22' }), /ZBad\.mdx/);
+  assert.deepEqual(puts, []);
+});
+
 Deno.test('rejects bad slugs and link resources', async () => {
   const ws = await workspace();
   const badSlug = await folder(ws.root, 'Bad_Slug', { type: 'audio', title: 'x', summary: 'x', usage: 'sfx', ...hosted }, { 'Horn.wav': makeWav(1) });
