@@ -19,7 +19,7 @@ const tags = [...tagCounts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0
     {tags.length > 0 && (
       <fieldset>
         <legend class="panel-title">Tags</legend>
-        {tags.map(([tag, count]) => <label><input type="checkbox" name="tag" value={tag} /> {tag} <span>{count}</span></label>)}
+        {tags.map(([tag, count]) => <label><input type="checkbox" name="tag" value={tag} /> {tag} <span aria-hidden="true">{count}</span></label>)}
       </fieldset>
     )}
     <label class="filter-author"><span class="panel-title">Author</span><input type="search" name="author" autocomplete="off" /></label>
