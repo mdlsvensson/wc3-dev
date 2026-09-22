@@ -5,8 +5,9 @@
     "check": "deno run -A npm:astro check",
     "build": "deno run -A npm:astro build --force",
     "preview": "deno run -A npm:astro preview --host 127.0.0.1",
-    "test": "deno test -A scripts/",
-    "test:unit": "deno test scripts/shell_test.ts"
+    "build:test": "RESOURCE_FIXTURES=1 ASSET_BASE_URL=https://assets.example.test/ deno task build",
+    "test": "deno task build:test && deno test -A scripts/",
+    "test:unit": "deno test -A scripts/shell_test.ts scripts/resources/"
   },
   "fmt": { "exclude": ["node_modules", "dist", ".astro", "deno.lock"] }
 }

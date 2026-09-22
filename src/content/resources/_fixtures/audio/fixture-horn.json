@@ -1,0 +1,13 @@
+{
+  "type": "audio",
+  "title": "Fixture Horn",
+  "summary": "Test fixture: a war horn sound effect.",
+  "tags": ["orc"],
+  "authors": [{ "name": "Fixture Author" }],
+  "source": { "site": "hive", "url": "https://www.hiveworkshop.com/threads/fixture-horn.3/" },
+  "compat": { "sd": true, "hd": true },
+  "usage": "sfx",
+  "durationSec": 2.5,
+  "files": [{ "key": "resources/audio/fixture-horn/6123456789ab/Horn.wav", "role": "audio", "format": "wav", "bytes": 40044 }],
+  "added": "2026-09-04"
+}

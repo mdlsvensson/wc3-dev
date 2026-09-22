@@ -23,6 +23,7 @@ Deno.test('portal, framework, and migrated documentation routes are built', asyn
   const homepage = await Deno.readTextFile(new URL('index.html', root));
   assert.match(homepage, /Hive Workshop/);
   assert.match(homepage, /w3ts framework/);
+  for (const title of ['Lua Reference', 'w3ts', 'WCSharp', 'Jassbot']) assert(homepage.includes(title), `Missing link ${title}`);
   const search = await Deno.stat(new URL('pagefind/pagefind.js', root));
   assert(search.isFile, 'Search bundle must exist');
 });

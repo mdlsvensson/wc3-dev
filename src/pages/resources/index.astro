@@ -1,9 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
 import Shell from '../../layouts/Shell.astro';
 import ResourceDirectory from '../../components/ResourceDirectory.astro';
+import { getLinks } from '../../lib/resources';
 import '../../styles/home.css';
-const resources = (await getCollection('resources')).sort((a, b) => a.data.order - b.data.order);
+const resources = await getLinks();
 const categories = [...new Set(resources.map(({ data }) => data.category))];
 const inCategory = (category: string) => resources.filter(({ data }) => data.category === category);
 ---

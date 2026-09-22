@@ -1,0 +1,14 @@
+{
+  "type": "icon",
+  "title": "Fixture Sword Icon",
+  "summary": "Test fixture: a sword command button.",
+  "tags": ["weapon", "human"],
+  "authors": [{ "name": "Fixture Author" }],
+  "source": { "site": "hive", "url": "https://www.hiveworkshop.com/threads/fixture-sword.2/" },
+  "compat": { "sd": true, "hd": true },
+  "variants": ["BTN", "DISBTN"],
+  "files": [{ "key": "resources/icon/fixture-sword-icon/3123456789ab/BTNSword.blp", "role": "icon", "format": "blp", "bytes": 1024 }],
+  "preview": { "key": "resources/icon/fixture-sword-icon/4123456789ab/preview.png", "width": 64, "height": 64 },
+  "added": "2026-09-02",
+  "updated": "2026-09-10"
+}
