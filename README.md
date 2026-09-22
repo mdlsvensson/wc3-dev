@@ -32,9 +32,10 @@ deno task test
 deno task preview
 ```
 
-The tests require a fresh build. They check required routes, all generated local
-links and anchors, asset references, the search bundle, and syntax tokenization.
-The build clears Astro's content cache so theme changes cannot leave generated
+`deno task test` builds with test fixtures first (`deno task build:test`), then runs the tests.
+They check required routes, all generated local links and anchors, asset references, the search
+bundle, and syntax tokenization. For deployments, use `deno task build`, which never includes
+fixtures. The build clears Astro's content cache so theme changes cannot leave generated
 code blocks referencing old stylesheets. Code-block styles are inlined with the content.
 `dist/` is a static website, suitable for any static host. Serve the generated
 `404.html` for missing pages. Production hosting and DNS are not configured.
@@ -52,8 +53,35 @@ code blocks referencing old stylesheets. Code-block styles are inlined with the 
 | `src/syntax/jass.ts` | Project-owned JASS / basic vJASS TextMate grammar |
 | `src/styles/` | Portal and Starlight themes |
 
-Add a resource by adding JSON with `title`, `description`, `url`, `category`
-(`Community`, `Tooling`, or `Scripting`), `label`, and numeric `order`.
+### Resources
+
+Resources are view-only: the site previews them and links to where they were
+originally published, and never offers downloads. Only the maintainer adds
+them. See `docs/hive-integration.md` for the rules on third-party content.
+
+- **Curated links** (`type: "link"`): write
+  `src/content/resources/link/<slug>.json` by hand.
+- **Hosted resources** (models, icons, textures, audio, scripts): put the files
+  and a `resource.json` with the authored fields in a folder named after the
+  slug, then run:
+
+  ```sh
+  deno task resource:add path/to/<slug> --dry-run   # preview the result
+  deno task resource:add path/to/<slug> --local     # store files in .asset-store/
+  deno task resource:add path/to/<slug>             # upload to the asset store
+  ```
+
+  Uploads need `ASSET_STORE_ENDPOINT`, `ASSET_STORE_BUCKET`,
+  `ASSET_STORE_ACCESS_KEY_ID`, and `ASSET_STORE_SECRET_ACCESS_KEY`. Add a
+  `preview.png` for models. Pass `--update` to replace an existing resource.
+- `deno task resource:check` validates every resource (`--remote` also checks
+  the store at `ASSET_BASE_URL`).
+- `deno task assets:serve` serves `.asset-store/` on `http://127.0.0.1:4322/`,
+  the default asset URL in development.
+- Production builds must set `ASSET_BASE_URL` once any hosted resource exists.
+  Configure the store with no public listing, a CORS allowlist for the site's
+  origins, and hotlink protection.
+
 Add documentation as Markdown with `title` and `description` frontmatter, then
 add its slug to the sidebar in `astro.config.ts`.
 
