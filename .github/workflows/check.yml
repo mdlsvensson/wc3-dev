@@ -14,5 +14,6 @@ jobs:
           deno-version: v2.9.7
       - run: deno install --frozen
       - run: deno task check
+      - run: deno task resource:check
       - run: deno task test
       - run: deno task build
