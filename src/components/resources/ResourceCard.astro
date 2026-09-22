@@ -1,0 +1,33 @@
+---
+import { assetUrl } from '../../lib/assets';
+import { TYPE_NAMES } from '../../lib/resource-schema';
+import { resourceHref, type HostedEntry } from '../../lib/resources';
+import TypeIcon from './TypeIcon.astro';
+interface Props { entry: HostedEntry }
+const { entry } = Astro.props;
+const { data } = entry;
+---
+<a
+  class="catalog-card"
+  href={resourceHref(entry)}
+  data-resource-card
+  data-tags={data.tags.join(' ')}
+  data-authors={data.authors.map((author) => author.name).join('|')}
+  data-sd={String(data.compat.sd)}
+  data-hd={String(data.compat.hd)}
+>
+  <span class="catalog-thumb">
+    {data.preview
+      ? <img src={assetUrl(data.preview.key)} alt="" width={data.preview.width} height={data.preview.height} loading="lazy" />
+      : <TypeIcon type={data.type} size={36} />}
+  </span>
+  <span class="catalog-card-body">
+    <span class="catalog-card-type">{TYPE_NAMES[data.type]}</span>
+    <strong>{data.title}</strong>
+    <span class="catalog-card-author">{data.authors[0].name}</span>
+    <span class="catalog-badges">
+      {data.compat.sd && <span class="catalog-badge">SD</span>}
+      {data.compat.hd && <span class="catalog-badge">HD</span>}
+    </span>
+  </span>
+</a>

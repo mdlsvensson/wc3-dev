@@ -1,0 +1,30 @@
+---
+import Shell from '../../../layouts/Shell.astro';
+import ResourceCard from '../../../components/resources/ResourceCard.astro';
+import TypeNav from '../../../components/resources/TypeNav.astro';
+import { HOSTED_TYPES, TYPE_PLURALS, TYPE_SEGMENTS, type HostedType } from '../../../lib/resource-schema';
+import { getResources, type HostedEntry, isHosted } from '../../../lib/resources';
+import '../../../styles/home.css';
+import '../../../styles/resources.css';
+
+// Minimal type index so TypeNav's links resolve; Task 7 replaces this with the full filterable catalog.
+export async function getStaticPaths() {
+  const all = (await getResources()).filter(isHosted);
+  return HOSTED_TYPES.map((type) => ({
+    params: { type: TYPE_SEGMENTS[type] },
+    props: { type, all, entries: all.filter((entry) => entry.data.type === type) },
+  }));
+}
+
+interface Props { type: HostedType; all: HostedEntry[]; entries: HostedEntry[] }
+const { type, all, entries } = Astro.props;
+---
+<Shell title={TYPE_PLURALS[type]} description={`Hosted ${TYPE_PLURALS[type].toLowerCase()} on wc3.dev.`}>
+  <TypeNav slot="side" all={all} activeType={type} />
+  <div class="portal-workspace wrap">
+    <div class="workspace-heading"><h1>{TYPE_PLURALS[type]}</h1></div>
+    {entries.length > 0
+      ? <div class="catalog-grid">{entries.map((entry) => <ResourceCard entry={entry} />)}</div>
+      : <p>No resources here yet.</p>}
+  </div>
+</Shell>

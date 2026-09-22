@@ -88,3 +88,33 @@ Deno.test('the search index covers every page marked for indexing', async () => 
     .reduce((total, language) => total + language.page_count, 0);
   assert.equal(indexed, marked);
 });
+
+const ASSETS = 'https://assets.example.test/';
+
+Deno.test('resource detail pages credit and link the source without offering downloads', async () => {
+  const html = await Deno.readTextFile(new URL('resources/models/fixture-footman/index.html', root));
+  assert.match(html, /href="https:\/\/www\.hiveworkshop\.com\/threads\/fixture-footman\.1\/"[^>]*>\s*View on Hive Workshop/);
+  assert.match(html, /id="resource-preview"/);
+  assert.match(html, /name="wc3-tab"/);
+  assert(html.includes(`src="${ASSETS}resources/model/fixture-footman/2123456789ab/preview.png"`), 'Preview image must load from the asset store');
+  assert(!html.includes(`href="${ASSETS}`), 'Store files must never be linked');
+  assert(!/\sdownload(?=[\s=>])/.test(html), 'No download attributes');
+  // Store URLs are allowed only inside data-files (for the previewers); nothing visible may name a file.
+  const visible = html.replace(/data-files="[^"]*"/, '');
+  assert(!visible.includes('Footman.mdx'), 'File names must not be shown');
+  for (const text of ['Fixture Author', 'Stand', 'Walk', 'Attack', 'Fixture Sword Icon']) assert(html.includes(text), `Missing ${text}`);
+});
+
+Deno.test('every hosted fixture has a detail page, with an icon when it has no preview', async () => {
+  for (const route of ['icons/fixture-sword-icon', 'textures/fixture-grass-tile', 'audio/fixture-horn', 'scripts/fixture-damage-lib']) {
+    const html = await Deno.readTextFile(new URL(`resources/${route}/index.html`, root));
+    assert.match(html, /id="resource-preview"/, `Missing preview area on ${route}`);
+  }
+  const texture = await Deno.readTextFile(new URL('resources/textures/fixture-grass-tile/index.html', root));
+  const preview = texture.match(/<section[^>]*id="resource-preview"[\s\S]*?<\/section>/)?.[0] ?? '';
+  assert(!preview.includes('<img'), 'A resource without a preview shows its type icon');
+  assert.match(texture, /Original source/);
+  assert.match(texture, /Derived from Blizzard Entertainment assets/);
+  const audio = await Deno.readTextFile(new URL('resources/audio/fixture-horn/index.html', root));
+  assert.match(audio, /0:03/);
+});
