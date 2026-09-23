@@ -90,6 +90,14 @@
 .script-code pre { margin: 0; padding: 14px 16px 14px 0; background: #1b2934 !important; counter-reset: line; }
 .script-code .line { counter-increment: line; }
 .script-code .line::before { content: counter(line); display: inline-block; width: 3.5em; margin-right: 1em; color: #53636c; text-align: right; user-select: none; }
+.preview-model .model-canvas { display: block; width: 100%; aspect-ratio: 16 / 9; max-height: 70vh; background: #0c151a; cursor: grab; touch-action: none; }
+.preview-model .model-canvas:active { cursor: grabbing; }
+.preview-model .model-canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.preview-model:fullscreen { grid-template-rows: minmax(0, 1fr) auto auto; background: #0c151a; }
+.preview-model:fullscreen .model-canvas { height: 100%; max-height: none; aspect-ratio: auto; }
+.model-missing { padding: 8px 10px; border-top: 1px solid var(--line); background: #101a20; color: var(--muted); font-size: .8rem; }
+.model-missing summary { cursor: pointer; }
+.model-missing ul { margin: 6px 0 0; padding-left: 1.2rem; font-family: var(--font-code); }
 
 @container (max-width: 560px) {
   .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
