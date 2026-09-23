@@ -102,7 +102,8 @@ export interface SyncResult {
 }
 
 /**
- * Uploads the game textures the catalog needs and rewrites the manifest. Entries for sets not being synced are kept.
+ * Uploads the game textures the catalog needs and rewrites the manifest. Entries for sets not being synced are kept, and
+ * so are entries for paths still needed whose files were not found this run; only entries no model uses are dropped.
  * Every planned file is uploaded on every run: the manifest may have been written by a `--local` run, so a matching key
  * does not prove the object is in this store, and content-addressed keys make re-uploads harmless.
  */
@@ -113,10 +114,15 @@ export async function syncGameTextures(options: SyncOptions): Promise<SyncResult
   const indexes: Partial<Record<TextureSet, Map<string, string>>> = {};
   for (const set of sets) indexes[set] = await indexGameRoot(roots[set]!);
 
-  const plan = planGameSync(neededGamePaths(await readModelRefs(join(contentRoot, 'model')), sets), indexes);
+  const needed = neededGamePaths(await readModelRefs(join(contentRoot, 'model')), sets);
+  const plan = planGameSync(needed, indexes);
   const previous = await readManifest(manifestPath);
   const synced = (entry: string) => sets.some((set) => entry.startsWith(`${set}:`));
-  const manifest: GameTextureMap = Object.fromEntries(Object.entries(previous).filter(([entry]) => !synced(entry)));
+  const stillNeeded = new Set(needed.map(normalizeGamePath));
+  const neededEntry = (entry: string) => stillNeeded.has(entry.slice(entry.indexOf(':') + 1));
+  // Entries of synced sets start from the previous manifest when their path is still needed, so a file missing from a
+  // partial extraction keeps its hosted texture; files found this run overwrite them below.
+  const manifest: GameTextureMap = Object.fromEntries(Object.entries(previous).filter(([entry]) => !synced(entry) || neededEntry(entry)));
   const uploaded: string[] = [];
   const unchanged: string[] = [];
 
@@ -129,7 +135,7 @@ export async function syncGameTextures(options: SyncOptions): Promise<SyncResult
     (previous[item.entry] === key ? unchanged : uploaded).push(item.entry);
   }
 
-  const dropped = Object.keys(previous).filter((entry) => synced(entry) && !(entry in manifest));
+  const dropped = Object.keys(previous).filter((entry) => synced(entry) && !neededEntry(entry));
   if (write) await writeManifest(manifestPath, manifest);
   return { manifest, uploaded, unchanged, missing: plan.missing, dropped };
 }

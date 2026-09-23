@@ -125,6 +125,22 @@ Deno.test('syncGameTextures drops unused entries of synced sets and keeps other 
   assert.equal(manifest['sd:textures/old.blp'], undefined);
 });
 
+Deno.test('syncGameTextures keeps entries for still-needed paths missing from the folders', async () => {
+  const ws = await workspace();
+  await Deno.writeTextFile(ws.manifest, JSON.stringify({
+    'sd:textures/nowhere.blp': 'game/sd/111111111111/textures/nowhere.blp',
+    'hd:textures/gutz.blp': 'game/hd/222222222222/textures/gutz.blp',
+    'sd:textures/old.blp': 'game/sd/000000000000/textures/old.blp',
+  }));
+  const result = await syncGameTextures({ contentRoot: ws.content, roots: { sd: ws.sd, hd: ws.hd }, store: localStore(ws.store), manifestPath: ws.manifest });
+  assert(result.missing.includes('Textures\\Nowhere.blp'));
+  assert.deepEqual(result.dropped, ['sd:textures/old.blp']);
+  const manifest = JSON.parse(await Deno.readTextFile(ws.manifest));
+  assert.equal(manifest['sd:textures/nowhere.blp'], 'game/sd/111111111111/textures/nowhere.blp');
+  assert.equal(manifest['hd:textures/gutz.blp'], 'game/hd/222222222222/textures/gutz.blp');
+  assert.equal(manifest['sd:textures/old.blp'], undefined);
+});
+
 Deno.test('a dry run writes no manifest', async () => {
   const ws = await workspace();
   const logged: string[] = [];
