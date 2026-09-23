@@ -26,6 +26,13 @@ export const infoLine = (image: DecodedImage): string => `${image.label}, ${imag
 
 /** Decodes one mipmap level of a BLP1, DDS, or TGA file to RGBA. Throws for data it cannot preview. */
 export function decodeImage(format: ImageFormat, bytes: Uint8Array, level = 0): DecodedImage {
+  const image = decodePixels(format, bytes, level);
+  // A header can claim a zero size; ImageData and the canvas cannot hold one.
+  if (image.width === 0 || image.height === 0) throw new Error('this image has no pixels');
+  return image;
+}
+
+function decodePixels(format: ImageFormat, bytes: Uint8Array, level: number): DecodedImage {
   // The parsers read from offset 0 of the underlying buffer, so hand them an exact copy.
   const copy = bytes.slice();
   if (format === 'blp') {

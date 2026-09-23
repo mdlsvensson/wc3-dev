@@ -13,7 +13,7 @@ export function displaySize(image: Size, viewport: Size, zoom: Zoom): Size & { p
 }
 
 /** The alpha channel as opaque greyscale. */
-export function alphaOnly(data: Uint8ClampedArray): Uint8ClampedArray {
+export function alphaOnly(data: Uint8ClampedArray): Uint8ClampedArray<ArrayBuffer> {
   const out = new Uint8ClampedArray(data.length);
   for (let index = 0; index < data.length; index += 4) {
     const alpha = data[index + 3];
