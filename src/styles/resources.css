@@ -71,6 +71,10 @@
 .filter-author input { height: 30px; padding: 0 8px; border: 1px solid var(--line); border-radius: 3px; background: #101a20; color: var(--ink); }
 .filter-author input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .filter-clear { justify-self: start; margin-left: 8px; padding: 7px 12px; font-size: .8rem; }
+.preview-image .image-viewport { display: grid; place-items: safe center; aspect-ratio: 16 / 9; max-height: 60vh; overflow: auto; background: #0c151a; }
+.preview-image .image-viewport.checkered { background: repeating-conic-gradient(#2a3740 0 25%, #1c2830 0 50%) 0 0 / 16px 16px; }
+.preview-image .image-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.image-canvas.pixelated { image-rendering: pixelated; }
 
 @container (max-width: 560px) {
   .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }

@@ -11,7 +11,8 @@
     "aws4fetch": "1.0.20",
     "lucide-astro": "0.556.0",
     "mdx-m3-viewer-th": "5.13.4",
-    "shiki": "4.4.3"
+    "shiki": "4.4.3",
+    "tga-js": "1.1.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

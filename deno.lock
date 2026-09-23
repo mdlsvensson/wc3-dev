@@ -15,13 +15,14 @@
     "jsr:@std/streams@^1.1.2": "1.1.2",
     "npm:@astrojs/check@0.9.10": "0.9.10_typescript@6.0.3_@emnapi+runtime@1.11.3",
     "npm:@astrojs/markdown-remark@7.3.0": "7.3.0",
-    "npm:@astrojs/starlight@0.42.2": "0.42.2_@astrojs+markdown-remark@7.3.0_astro@7.3.3__@astrojs+markdown-remark@7.3.0__aws4fetch@1.0.20_aws4fetch@1.0.20",
+    "npm:@astrojs/starlight@0.42.2": "0.42.2_@astrojs+markdown-remark@7.3.0_astro@7.3.3_aws4fetch@1.0.20",
     "npm:astro@*": "7.3.3_@astrojs+markdown-remark@7.3.0_aws4fetch@1.0.20",
     "npm:astro@7.3.3": "7.3.3_@astrojs+markdown-remark@7.3.0_aws4fetch@1.0.20",
     "npm:aws4fetch@1.0.20": "1.0.20",
-    "npm:lucide-astro@0.556.0": "0.556.0_astro@7.3.3__@astrojs+markdown-remark@7.3.0__aws4fetch@1.0.20_aws4fetch@1.0.20",
+    "npm:lucide-astro@0.556.0": "0.556.0_astro@7.3.3_aws4fetch@1.0.20",
     "npm:mdx-m3-viewer-th@5.13.4": "5.13.4",
     "npm:shiki@4.4.3": "4.4.3",
+    "npm:tga-js@1.1.1": "1.1.1",
     "npm:typescript@6.0.3": "6.0.3"
   },
   "jsr": {
@@ -237,7 +238,7 @@
         "satteri"
       ]
     },
-    "@astrojs/mdx@8.0.1_@astrojs+markdown-remark@7.3.0_@astrojs+markdown-satteri@0.4.1_astro@7.3.3__@astrojs+markdown-remark@7.3.0__aws4fetch@1.0.20_aws4fetch@1.0.20": {
+    "@astrojs/mdx@8.0.1_@astrojs+markdown-remark@7.3.0_@astrojs+markdown-satteri@0.4.1_astro@7.3.3_aws4fetch@1.0.20": {
       "integrity": "sha512-VKodp/f3+XE6L0950K+ZOAolY47vdt0R78Ao+L2RdJ1hfAdYffL7IEjc/MsoyuS7CPVvCsd5/I3RP0ZyAIewdQ==",
       "dependencies": [
         "@astrojs/internal-helpers",
@@ -263,7 +264,7 @@
         "zod"
       ]
     },
-    "@astrojs/starlight@0.42.2_@astrojs+markdown-remark@7.3.0_astro@7.3.3__@astrojs+markdown-remark@7.3.0__aws4fetch@1.0.20_aws4fetch@1.0.20": {
+    "@astrojs/starlight@0.42.2_@astrojs+markdown-remark@7.3.0_astro@7.3.3_aws4fetch@1.0.20": {
       "integrity": "sha512-rDAgv3QCJOo0F4EoWeuFG31OdhQOrcipATl9+gCkOqpQiO7u7FR8uVam+HHNJO8Sl21TOAQKUSUEvCXv8jEgJA==",
       "dependencies": [
         "@astrojs/markdown-remark",
@@ -1240,7 +1241,7 @@
       "integrity": "sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==",
       "bin": true
     },
-    "astro-expressive-code@0.44.2_astro@7.3.3__@astrojs+markdown-remark@7.3.0__aws4fetch@1.0.20_aws4fetch@1.0.20": {
+    "astro-expressive-code@0.44.2_astro@7.3.3_aws4fetch@1.0.20": {
       "integrity": "sha512-avop7nZcRwC7quvIxVguhwEZ9Tp6IoTzKUCLwP30Fb7+er+pWQgcysP01dcuzRIJo81kLGg30q/YAI2Yb1Sdzg==",
       "dependencies": [
         "astro",
@@ -2120,7 +2121,7 @@
     "lru-cache@11.5.3": {
       "integrity": "sha512-U4N8FgzmWxc8k1VH8Kr6lQg18U7Fjvby6wXHVRX/ZZ7IwWbRMgrRbP0Wrb5q5NVinryp4SQampHKdvtecItxUg=="
     },
-    "lucide-astro@0.556.0_astro@7.3.3__@astrojs+markdown-remark@7.3.0__aws4fetch@1.0.20_aws4fetch@1.0.20": {
+    "lucide-astro@0.556.0_astro@7.3.3_aws4fetch@1.0.20": {
       "integrity": "sha512-ugMjPb45AMfkLCaduNSbyy5NQEKvB1TxVVMmUS4S6L807PMESnX0Qp+DIKHjbyjJmPXOyLRbrzvR3YikTK7brg==",
       "dependencies": [
         "astro"
@@ -3692,6 +3693,7 @@
         "npm:lucide-astro@0.556.0",
         "npm:mdx-m3-viewer-th@5.13.4",
         "npm:shiki@4.4.3",
+        "npm:tga-js@1.1.1",
         "npm:typescript@6.0.3"
       ]
     }
