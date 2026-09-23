@@ -1,9 +1,17 @@
 // Tiny, valid Warcraft III files built in memory so tests need no binary fixtures.
+import BoneModule from 'mdx-m3-viewer-th/dist/cjs/parsers/mdlx/bone.js';
+import GeosetModule from 'mdx-m3-viewer-th/dist/cjs/parsers/mdlx/geoset.js';
+import LayerModule from 'mdx-m3-viewer-th/dist/cjs/parsers/mdlx/layer.js';
+import MaterialModule from 'mdx-m3-viewer-th/dist/cjs/parsers/mdlx/material.js';
 import ModelModule from 'mdx-m3-viewer-th/dist/cjs/parsers/mdlx/model.js';
 import SequenceModule from 'mdx-m3-viewer-th/dist/cjs/parsers/mdlx/sequence.js';
 import TextureModule from 'mdx-m3-viewer-th/dist/cjs/parsers/mdlx/texture.js';
 
 // This library publishes CommonJS modules with exports.default; Deno's default import is that exports object.
+const Bone = BoneModule.default;
+const Geoset = GeosetModule.default;
+const Layer = LayerModule.default;
+const Material = MaterialModule.default;
 const Model = ModelModule.default;
 const Sequence = SequenceModule.default;
 const Texture = TextureModule.default;
@@ -88,4 +96,45 @@ export function makeWav(seconds: number, sampleRate = 8000): Uint8Array {
   ascii(36, 'data');
   view.setUint32(40, dataSize, true);
   return bytes;
+}
+
+/**
+ * A single upright 100×100 quad textured with the model's first texture, framed by its extent.
+ * Renders in the viewer (verified in a browser during planning); used for the fixture store and manual checks.
+ */
+export function makeTexturedMdx(options: { sequences?: string[]; textures?: string[]; replaceableIds?: number[] } = {}): Uint8Array {
+  const result = model(options.sequences ?? ['Stand'], options.textures ?? ['Textures\\Footman.blp'], options.replaceableIds ?? []);
+  const material = new Material();
+  const layer = new Layer();
+  layer.textureId = 0;
+  material.layers.push(layer);
+  result.materials.push(material);
+
+  const geoset = new Geoset();
+  geoset.vertices = new Float32Array([-50, 0, 0, 50, 0, 0, 50, 0, 100, -50, 0, 100]);
+  geoset.normals = new Float32Array([0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0]);
+  geoset.faceTypeGroups = new Uint32Array([4]);
+  geoset.faceGroups = new Uint32Array([6]);
+  geoset.faces = new Uint16Array([0, 1, 2, 0, 2, 3]);
+  geoset.vertexGroups = new Uint8Array([0, 0, 0, 0]);
+  geoset.matrixGroups = new Uint32Array([1]);
+  geoset.matrixIndices = new Uint32Array([0]);
+  geoset.uvSets = [new Float32Array([0, 1, 1, 1, 1, 0, 0, 0])];
+  geoset.materialId = 0;
+  geoset.extent.min.set([-50, 0, 0]);
+  geoset.extent.max.set([50, 0, 100]);
+  geoset.extent.boundsRadius = 80;
+  result.geosets.push(geoset);
+
+  const bone = new Bone();
+  bone.name = 'Root';
+  bone.objectId = 0;
+  bone.parentId = -1;
+  bone.geosetId = 0;
+  result.bones.push(bone);
+  result.pivotPoints.push(new Float32Array([0, 0, 0]));
+  result.extent.min.set([-50, 0, 0]);
+  result.extent.max.set([50, 0, 100]);
+  result.extent.boundsRadius = 80;
+  return result.saveMdx();
 }

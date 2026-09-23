@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { decodeTexture, pickMipmap } from './images.ts';
 import { readModelMeta } from './model-meta.ts';
-import { makeBlp, makeDxt1Dds, makeMdl, makeMdx } from './testdata.ts';
+import { makeBlp, makeDxt1Dds, makeMdl, makeMdx, makeTexturedMdx } from './testdata.ts';
 
 Deno.test('readModelMeta lists sequences and unique texture paths from MDX', () => {
   const meta = readModelMeta(makeMdx(['Stand', 'Walk', 'Attack'], ['Textures\\Footman.blp', 'Textures\\Footman.blp']));
@@ -44,4 +44,11 @@ Deno.test('readModelMeta lists replaceable textures other than team colour and g
   const meta = readModelMeta(makeMdx(['Stand'], ['Textures\\A.blp'], [1, 2, 11, 31]));
   assert.deepEqual(meta.replaceables, ['ReplaceableTextures\\Cliff\\Cliff0', 'ReplaceableTextures\\LordaeronTree\\LordaeronSummerTree']);
   assert.deepEqual(meta.textures, ['Textures\\A.blp']);
+});
+
+Deno.test('makeTexturedMdx builds a parseable model with geometry', () => {
+  const meta = readModelMeta(makeTexturedMdx({ sequences: ['Stand', 'Walk'], textures: ['Textures\\Footman.blp', 'Textures\\Missing.blp'], replaceableIds: [1] }));
+  assert.deepEqual(meta.animations, ['Stand', 'Walk']);
+  assert.deepEqual(meta.textures, ['Textures\\Footman.blp', 'Textures\\Missing.blp']);
+  assert.deepEqual(meta.replaceables, []);
 });
