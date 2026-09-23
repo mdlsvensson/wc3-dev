@@ -100,7 +100,8 @@ export function makeWav(seconds: number, sampleRate = 8000): Uint8Array {
 
 /**
  * A single upright 100×100 quad textured with the model's first texture, framed by its extent.
- * Renders in the viewer (verified in a browser during planning); used for the fixture store and manual checks.
+ * The quad faces +X, the viewer's default camera direction, so it shows at the initial view
+ * (verified in Task 9's browser checks); used for the fixture store and manual checks.
  */
 export function makeTexturedMdx(options: { sequences?: string[]; textures?: string[]; replaceableIds?: number[] } = {}): Uint8Array {
   const result = model(options.sequences ?? ['Stand'], options.textures ?? ['Textures\\Footman.blp'], options.replaceableIds ?? []);
