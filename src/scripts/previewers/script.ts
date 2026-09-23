@@ -28,7 +28,9 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
     Promise.all(scripts.map(async (file) => new TextDecoder().decode(await fetchBytes(file.url)))),
   ]);
 
-  const code = h('div', { class: 'script-code', tabindex: '0', role: 'tabpanel' });
+  // With one file there is no tablist, so the code is labelled by its file name instead of being a tab panel.
+  const tabbed = scripts.length > 1;
+  const code = h('div', { class: 'script-code', tabindex: '0', ...(tabbed ? { role: 'tabpanel' } : { 'aria-label': `${scripts[0].name} source` }) });
   const info = h('span', { class: 'preview-info' });
   const tabs = scripts.map((file, index) =>
     h('button', { type: 'button', role: 'tab', class: 'script-tab', id: `script-tab-${index}`, 'aria-selected': 'false', tabindex: '-1' }, file.name)
@@ -47,7 +49,7 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
   const render = (index: number, html: string | HTMLElement) => {
     if (typeof html === 'string') code.innerHTML = html;
     else code.replaceChildren(html);
-    code.setAttribute('aria-labelledby', `script-tab-${index}`);
+    if (tabbed) code.setAttribute('aria-labelledby', `script-tab-${index}`);
     const lines = trimmed(index).split('\n').length;
     info.textContent = `${scripts[index].name} · ${lines} ${lines === 1 ? 'line' : 'lines'}`;
     tabs.forEach((tab, tabIndex) => {
@@ -79,7 +81,7 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
 
   // The first highlight runs before going live, so a Shiki failure keeps the static fallback.
   render(0, highlight(0));
-  const tabList = tabs.length > 1 ? [h('div', { class: 'script-tabs', role: 'tablist', 'aria-label': 'Script files' }, ...tabs)] : [];
+  const tabList = tabbed ? [h('div', { class: 'script-tabs', role: 'tablist', 'aria-label': 'Script files' }, ...tabs)] : [];
   goLive(preview, h('div', { class: 'preview-stage preview-script' }, ...tabList, code, toolbar(info)));
   return () => {};
 }
