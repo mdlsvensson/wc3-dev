@@ -43,6 +43,7 @@ export interface AddOptions {
 export interface AddResult { path: string; resource: Resource; warnings: string[] }
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
+const withArticle = (word: string) => `${/^[aeiou]/i.test(word) ? 'an' : 'a'} ${word}`;
 
 async function readJson(path: string): Promise<{ added?: string } | null> {
   try {
@@ -75,7 +76,7 @@ export async function addResource(options: AddOptions): Promise<AddResult> {
   const path = join(contentRoot, type, `${slug}.json`);
   const existing = await readExisting(contentRoot, type, slug);
   if (existing && existing.type !== type) {
-    throw new Error(`"${slug}" already exists as a ${existing.type} resource at ${existing.path}; delete it before adding it as a ${type} resource.`);
+    throw new Error(`"${slug}" already exists as ${withArticle(existing.type)} resource at ${existing.path}; delete it before adding it as ${withArticle(type)} resource.`);
   }
   if (existing && !update) throw new Error(`${path} already exists; pass --update to replace it.`);
 
@@ -104,8 +105,7 @@ export async function addResource(options: AddOptions): Promise<AddResult> {
     const bytes = await Deno.readFile(join(folder, name));
     const format = sniff(name, bytes);
     if (!format || !ALLOWED_FORMATS[type].includes(format)) {
-      const article = /^[aeiou]/i.test(type) ? 'an' : 'a';
-      throw new Error(`${name}: not a valid ${ALLOWED_FORMATS[type].join('/')} file for ${article} ${type} resource.`);
+      throw new Error(`${name}: not a valid ${ALLOWED_FORMATS[type].join('/')} file for ${withArticle(type)} resource.`);
     }
     const role = roleFor(type, format, name);
     plannedFiles.push({ name, bytes, format, role });
