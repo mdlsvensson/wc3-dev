@@ -4,6 +4,9 @@ import { jass } from '../src/syntax/jass.ts';
 
 const root = new URL('../dist/', import.meta.url);
 const ASSETS = 'https://assets.example.test/';
+// Scoped to inside an <a ...> tag: an unscoped \sdownload(?=[\s=>]) also matches the plain
+// English word, which shows up legitimately in documentation prose (e.g. "package download fails").
+const DOWNLOAD_ATTRIBUTE = /<a\b[^>]*\sdownload(?=[\s=>/])/;
 async function htmlFiles(directory: URL): Promise<URL[]> {
   const files: URL[] = [];
   for await (const entry of Deno.readDir(directory)) {
@@ -13,6 +16,14 @@ async function htmlFiles(directory: URL): Promise<URL[]> {
   }
   return files;
 }
+
+Deno.test('the download-attribute check matches download in any attribute position and not the plain word', () => {
+  assert.match('<a download href="x">', DOWNLOAD_ATTRIBUTE);
+  assert.match('<a href="x" download>', DOWNLOAD_ATTRIBUTE);
+  assert.match('<a href="x" download="f.mdx">', DOWNLOAD_ATTRIBUTE);
+  assert(!DOWNLOAD_ATTRIBUTE.test('<abbr download>'), 'Must not match non-<a> tags');
+  assert(!DOWNLOAD_ATTRIBUTE.test('<p>the package download fails</p>'), 'Must not match prose');
+});
 
 Deno.test('portal, framework, and migrated documentation routes are built', async () => {
   for (const route of ['', 'resources/', 'learn/', 'framework/', 'framework/docs/', ...[
@@ -34,9 +45,7 @@ Deno.test('built pages have no broken local links, anchors, or asset references,
     const html = await Deno.readTextFile(file);
     const pathname = file.href.slice(root.href.length).replace(/index\.html$/, '');
     assert(!html.includes(`href="${ASSETS}`), `Store files must never be linked (${pathname})`);
-    // Scoped to inside an <a ...> tag: an unscoped \sdownload(?=[\s=>]) also matches the plain
-    // English word, which shows up legitimately in documentation prose (e.g. "package download fails").
-    assert(!/<a\s[^>]*\sdownload(?=[\s=>/])/.test(html), `No download attributes (${pathname})`);
+    assert(!DOWNLOAD_ATTRIBUTE.test(html), `No download attributes (${pathname})`);
     for (const [, reference] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
       const url = new URL(reference.replaceAll('&amp;', '&'), `https://wc3.dev/${pathname}`);
       if (url.origin !== 'https://wc3.dev') continue;
