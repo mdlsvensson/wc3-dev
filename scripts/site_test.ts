@@ -156,18 +156,27 @@ Deno.test('resource previews keep a static fallback and model pages carry their 
   }
 });
 
-Deno.test('the WebGL model viewer is a separate chunk that no page loads up front', async () => {
-  const assets = new URL('_astro/', root);
-  const viewerChunks: string[] = [];
-  for await (const entry of Deno.readDir(assets)) {
-    if (entry.name.endsWith('.js') && (await Deno.readTextFile(new URL(entry.name, assets))).includes('WEBGL_lose_context')) viewerChunks.push(entry.name);
-  }
-  assert(viewerChunks.length > 0, 'The model viewer chunk must be built');
-  for (const file of await htmlFiles(root)) {
-    const html = await Deno.readTextFile(file);
-    assert(!html.includes('WEBGL_lose_context'), `Viewer code inlined into ${file.pathname}`);
-    for (const [, src] of html.matchAll(/(?:src|href)="\/_astro\/([^"]+\.js)"/g)) {
-      assert(!viewerChunks.includes(src), `${file.pathname} loads the viewer eagerly`);
+// Heavy previewer code, each found by a string only its chunk contains. Shiki's error message names
+// createJavaScriptRegexEngine; theme names such as github-dark also appear in pages' highlighted code.
+const LAZY_CHUNKS = [
+  { name: 'the WebGL model viewer', marker: 'WEBGL_lose_context' },
+  { name: 'the Shiki script highlighter', marker: 'createJavaScriptRegexEngine' },
+];
+
+for (const { name, marker } of LAZY_CHUNKS) {
+  Deno.test(`${name} is a separate chunk that no page loads up front`, async () => {
+    const assets = new URL('_astro/', root);
+    const chunks: string[] = [];
+    for await (const entry of Deno.readDir(assets)) {
+      if (entry.name.endsWith('.js') && (await Deno.readTextFile(new URL(entry.name, assets))).includes(marker)) chunks.push(entry.name);
     }
-  }
-});
+    assert(chunks.length > 0, `The chunk for ${name} must be built`);
+    for (const file of await htmlFiles(root)) {
+      const html = await Deno.readTextFile(file);
+      assert(!html.includes(marker), `Code for ${name} inlined into ${file.pathname}`);
+      for (const [, src] of html.matchAll(/(?:src|href)="\/_astro\/([^"]+\.js)"/g)) {
+        assert(!chunks.includes(src), `${file.pathname} loads ${name} eagerly`);
+      }
+    }
+  });
+}
