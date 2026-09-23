@@ -88,7 +88,7 @@ const generated = { files: z.array(storedFile).min(1), preview: preview.optional
 
 /** A complete resource as stored in `src/content/resources/<type>/<slug>.json`. */
 export const resourceSchema = z.discriminatedUnion('type', [
-  modelAuthored.extend({ ...generated, animations: z.array(z.string()).default([]), textures: z.array(z.string()).default([]) }),
+  modelAuthored.extend({ ...generated, animations: z.array(z.string()).default([]), textures: z.array(z.string()).default([]), replaceables: z.array(z.string()).default([]) }),
   iconAuthored.extend(generated),
   textureAuthored.extend(generated),
   audioAuthored.extend({ ...generated, durationSec: z.number().positive() }),

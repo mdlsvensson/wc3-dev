@@ -128,3 +128,19 @@ Deno.test('rejects bad slugs and link resources', async () => {
   const link = await folder(ws.root, 'a-link', { type: 'link', title: 'x', summary: 'x', source: hosted.source, category: 'Community', order: 1 }, {});
   await assert.rejects(() => addResource({ folder: link, contentRoot: ws.content, store: dryRunStore(() => {}), today: '2026-09-22' }), /by hand/);
 });
+
+Deno.test('warns about game textures a new model needs that are not hosted yet', async () => {
+  const ws = await workspace();
+  const dir = await folder(ws.root, 'test-gutz', { type: 'model', title: 'Gutz', summary: 'A test.', kind: 'unit', ...hosted }, {
+    'Gutz.mdx': makeMdx(['Stand'], ['Textures\\gutz.blp'], [11]),
+  });
+  const manifestPath = join(ws.root, 'game-textures.json');
+  const { resource, warnings } = await addResource({ folder: dir, contentRoot: ws.content, store: localStore(ws.store), today: '2026-09-23', manifestPath });
+  assert(resource.type === 'model');
+  assert.deepEqual(resource.replaceables, ['ReplaceableTextures\\Cliff\\Cliff0']);
+  assert(warnings.some((warning) => /2 game textures are not hosted yet: Textures\\gutz\.blp, ReplaceableTextures\\Cliff\\Cliff0\. Run deno task game:sync\./.test(warning)), warnings.join('\n'));
+
+  await Deno.writeTextFile(manifestPath, JSON.stringify({ 'sd:textures/gutz.blp': 'k', 'sd:replaceabletextures/cliff/cliff0.blp': 'k' }));
+  const again = await addResource({ folder: dir, contentRoot: ws.content, store: localStore(ws.store), today: '2026-09-23', manifestPath, update: true });
+  assert(!again.warnings.some((warning) => warning.includes('game texture')), again.warnings.join('\n'));
+});

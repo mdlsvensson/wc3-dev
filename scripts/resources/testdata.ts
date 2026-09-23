@@ -8,7 +8,7 @@ const Model = ModelModule.default;
 const Sequence = SequenceModule.default;
 const Texture = TextureModule.default;
 
-function model(animations: string[], textures: string[]) {
+function model(animations: string[], textures: string[], replaceableIds: number[] = []) {
   const result = new Model();
   result.version = 800;
   animations.forEach((name, index) => {
@@ -23,11 +23,16 @@ function model(animations: string[], textures: string[]) {
     texture.path = path;
     result.textures.push(texture);
   }
+  for (const replaceableId of replaceableIds) {
+    const texture = new Texture();
+    texture.replaceableId = replaceableId;
+    result.textures.push(texture);
+  }
   return result;
 }
 
-export const makeMdx = (animations = ['Stand', 'Walk'], textures = ['Textures\\Footman.blp']): Uint8Array =>
-  model(animations, textures).saveMdx();
+export const makeMdx = (animations = ['Stand', 'Walk'], textures = ['Textures\\Footman.blp'], replaceableIds: number[] = []): Uint8Array =>
+  model(animations, textures, replaceableIds).saveMdx();
 
 export const makeMdl = (animations = ['Stand'], textures = ['Textures\\Footman.blp']): string =>
   model(animations, textures).saveMdl();

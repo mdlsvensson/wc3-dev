@@ -5,7 +5,7 @@ import { makeBlp, makeDxt1Dds, makeMdl, makeMdx } from './testdata.ts';
 
 Deno.test('readModelMeta lists sequences and unique texture paths from MDX', () => {
   const meta = readModelMeta(makeMdx(['Stand', 'Walk', 'Attack'], ['Textures\\Footman.blp', 'Textures\\Footman.blp']));
-  assert.deepEqual(meta, { animations: ['Stand', 'Walk', 'Attack'], textures: ['Textures\\Footman.blp'] });
+  assert.deepEqual(meta, { animations: ['Stand', 'Walk', 'Attack'], textures: ['Textures\\Footman.blp'], replaceables: [] });
 });
 
 Deno.test('readModelMeta reads MDL text', () => {
@@ -38,4 +38,10 @@ Deno.test('pickMipmap chooses the first level at or under the preview size', () 
   assert.equal(pickMipmap(64, 64, 1), 0);
   assert.equal(pickMipmap(2048, 1024, 12), 2);
   assert.equal(pickMipmap(2048, 2048, 1), 0);
+});
+
+Deno.test('readModelMeta lists replaceable textures other than team colour and glow', () => {
+  const meta = readModelMeta(makeMdx(['Stand'], ['Textures\\A.blp'], [1, 2, 11, 31]));
+  assert.deepEqual(meta.replaceables, ['ReplaceableTextures\\Cliff\\Cliff0', 'ReplaceableTextures\\LordaeronTree\\LordaeronSummerTree']);
+  assert.deepEqual(meta.textures, ['Textures\\A.blp']);
 });

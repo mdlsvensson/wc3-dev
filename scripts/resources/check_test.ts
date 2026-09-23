@@ -1,6 +1,6 @@
 import { strict as assert } from 'node:assert';
 import { join } from 'jsr:@std/path@^1';
-import { checkResources } from './check.ts';
+import { checkResources, gameTextureWarnings } from './check.ts';
 
 const icon = (related: string[] = []) => ({
   type: 'icon',
@@ -84,4 +84,21 @@ Deno.test('remote mode resolves the same URL as the site for a base with a path 
   assert.deepEqual(errors, []);
   // Matches assetUrl(): the base's last path segment is kept, not treated as a file to replace.
   assert.deepEqual(requested, ['https://assets.example.test/store/resources/icon/sword/0123456789ab/BTNSword.blp']);
+});
+
+Deno.test('game texture warnings name models with unhosted game textures', async () => {
+  const model = {
+    type: 'model', title: 'Gutz', summary: 'A test.', authors: [{ name: 'Tester' }],
+    source: { site: 'hive', url: 'https://www.hiveworkshop.com/threads/gutz.1/' },
+    compat: { sd: true, hd: false }, kind: 'unit',
+    textures: ['Textures\\Gutz.blp', 'Textures\\Own.blp'], replaceables: [],
+    files: [
+      { key: 'resources/model/gutz/0123456789ab/Gutz.mdx', role: 'model', format: 'mdx', bytes: 10 },
+      { key: 'resources/model/gutz/1123456789ab/Own.blp', role: 'texture', format: 'blp', bytes: 10 },
+    ],
+    added: '2026-09-23',
+  };
+  const root = await tree({ 'model/gutz.json': model });
+  assert.deepEqual(await gameTextureWarnings(root, {}), ['model/gutz.json: 1 game texture not hosted (run deno task game:sync): Textures\\Gutz.blp']);
+  assert.deepEqual(await gameTextureWarnings(root, { 'sd:textures/gutz.blp': 'k' }), []);
 });
