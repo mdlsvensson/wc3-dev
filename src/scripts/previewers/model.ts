@@ -71,7 +71,7 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
   try {
     // Without a listener the viewer's event emitter throws on the first failed request.
     viewer.on('error', () => {});
-    viewer.addHandler(handler(MdxHandlerModule), resolver.solve, hd);
+    if (!viewer.addHandler(handler(MdxHandlerModule), resolver.solve, hd)) throw new Error('this browser lacks WebGL features the viewer needs');
     viewer.addHandler(handler(BlpHandlerModule));
     viewer.addHandler(handler(DdsHandlerModule));
     viewer.addHandler(handler(TgaHandlerModule));
