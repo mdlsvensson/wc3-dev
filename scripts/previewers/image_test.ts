@@ -35,8 +35,17 @@ Deno.test('decodeImage decodes TGA', () => {
   assert.deepEqual([...image.data], [255, 0, 0, 255, 0, 255, 0, 128]);
 });
 
+Deno.test('decodeImage clamps the mipmap level to the last one', () => {
+  const image = decodeImage('blp', makeBlp(), 5);
+  assert.deepEqual([image.width, image.height, image.mipmaps], [2, 2, 1]);
+});
+
 Deno.test('decodeImage rejects data it cannot read', () => {
   assert.throws(() => decodeImage('dds', new Uint8Array(200)));
+  assert.throws(() => decodeImage('tga', new Uint8Array(10)));
+  const zeroWidth = makeDxt1Dds();
+  new DataView(zeroWidth.buffer).setUint32(16, 0, true); // header width
+  assert.throws(() => decodeImage('dds', zeroWidth), /this image has no pixels/);
 });
 
 Deno.test('displaySize fits or scales, pixelating at 2× and above', () => {

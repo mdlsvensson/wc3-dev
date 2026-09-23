@@ -25,11 +25,15 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
     canvas.style.height = `${size.height}px`;
     canvas.classList.toggle('pixelated', size.pixelated);
   };
-  const draw = () => {
+  // Painting needs only the decoded image, so it runs before going live; layout needs the live viewport's size.
+  const paint = () => {
     canvas.width = image.width;
     canvas.height = image.height;
-    const pixels = new Uint8ClampedArray(alpha ? alphaOnly(image.data) : image.data);
+    const pixels = alpha ? alphaOnly(image.data) : new Uint8ClampedArray(image.data);
     canvas.getContext('2d')?.putImageData(new ImageData(pixels, image.width, image.height), 0, 0);
+  };
+  const draw = () => {
+    paint();
     layout();
   };
 
@@ -49,15 +53,30 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
       value: String(level),
       text: `${level} (${Math.max(1, fullSize.width >> level)}×${Math.max(1, fullSize.height >> level)})`,
     }));
-    controls.append(labelledSelect('Mipmap', levels, '0', (value) => {
-      image = decodeImage(format, bytes, Number(value));
+    let shownLevel = '0';
+    const mipmapField = labelledSelect('Mipmap', levels, shownLevel, (value) => {
+      let next: DecodedImage;
+      try {
+        next = decodeImage(format, bytes, Number(value));
+      } catch {
+        // Keep the level already on screen.
+        const select = mipmapField.querySelector('select');
+        if (select) select.value = shownLevel;
+        info.textContent = `${infoLine(image)}; mipmap ${value} could not be decoded`;
+        return;
+      }
+      image = next;
+      shownLevel = value;
+      info.textContent = infoLine(image);
       draw();
-    }));
+    });
+    controls.append(mipmapField);
   }
   controls.append(info);
+  paint();
 
   goLive(preview, h('div', { class: 'preview-stage preview-image' }, viewport, controls));
-  draw();
+  layout();
   const observer = new ResizeObserver(layout);
   observer.observe(viewport);
   return () => observer.disconnect();
