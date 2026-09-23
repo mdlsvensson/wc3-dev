@@ -1,4 +1,5 @@
 import { strict as assert } from 'node:assert';
+import ModelModule from 'mdx-m3-viewer-th/dist/cjs/parsers/mdlx/model.js';
 import { decodeTexture, pickMipmap } from './images.ts';
 import { readModelMeta } from './model-meta.ts';
 import { makeBlp, makeDxt1Dds, makeMdl, makeMdx, makeTexturedMdx } from './testdata.ts';
@@ -51,4 +52,12 @@ Deno.test('makeTexturedMdx builds a parseable model with geometry', () => {
   assert.deepEqual(meta.animations, ['Stand', 'Walk']);
   assert.deepEqual(meta.textures, ['Textures\\Footman.blp', 'Textures\\Missing.blp']);
   assert.deepEqual(meta.replaceables, []);
+
+  // The quad must face +X, the viewer's default camera direction, or the first view shows it edge-on.
+  const model = new ModelModule.default();
+  model.load(makeTexturedMdx());
+  assert.equal(model.geosets.length, 1);
+  const normals = [...model.geosets[0].normals];
+  assert.equal(normals.length, 12);
+  for (let index = 0; index < normals.length; index += 3) assert.deepEqual(normals.slice(index, index + 3), [1, 0, 0]);
 });
