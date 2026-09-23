@@ -155,3 +155,19 @@ Deno.test('resource previews keep a static fallback and model pages carry their 
     assert.equal(/data-game-textures=/.test(html), route.startsWith('models/'), `data-game-textures only on model pages (${route})`);
   }
 });
+
+Deno.test('the WebGL model viewer is a separate chunk that no page loads up front', async () => {
+  const assets = new URL('_astro/', root);
+  const viewerChunks: string[] = [];
+  for await (const entry of Deno.readDir(assets)) {
+    if (entry.name.endsWith('.js') && (await Deno.readTextFile(new URL(entry.name, assets))).includes('WEBGL_lose_context')) viewerChunks.push(entry.name);
+  }
+  assert(viewerChunks.length > 0, 'The model viewer chunk must be built');
+  for (const file of await htmlFiles(root)) {
+    const html = await Deno.readTextFile(file);
+    assert(!html.includes('WEBGL_lose_context'), `Viewer code inlined into ${file.pathname}`);
+    for (const [, src] of html.matchAll(/(?:src|href)="\/_astro\/([^"]+\.js)"/g)) {
+      assert(!viewerChunks.includes(src), `${file.pathname} loads the viewer eagerly`);
+    }
+  }
+});

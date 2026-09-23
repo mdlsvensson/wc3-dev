@@ -19,6 +19,7 @@
     "npm:astro@*": "7.3.3_@astrojs+markdown-remark@7.3.0_aws4fetch@1.0.20",
     "npm:astro@7.3.3": "7.3.3_@astrojs+markdown-remark@7.3.0_aws4fetch@1.0.20",
     "npm:aws4fetch@1.0.20": "1.0.20",
+    "npm:events@3.3.0": "3.3.0",
     "npm:lucide-astro@0.556.0": "0.556.0_astro@7.3.3_aws4fetch@1.0.20",
     "npm:mdx-m3-viewer-th@5.13.4": "5.13.4",
     "npm:shiki@4.4.3": "4.4.3",
@@ -1635,6 +1636,9 @@
     },
     "eventemitter3@5.0.4": {
       "integrity": "sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw=="
+    },
+    "events@3.3.0": {
+      "integrity": "sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q=="
     },
     "expressive-code@0.44.2": {
       "integrity": "sha512-MLNghkvhyFgVW4oCD5DxBuYnnTXIf0PygzGmfT6OZeOOYWh/D4sH1j931biElkA5RG/J9wY/iuSMGAPF5vzHOg==",
@@ -3690,6 +3694,7 @@
         "npm:@astrojs/starlight@0.42.2",
         "npm:astro@7.3.3",
         "npm:aws4fetch@1.0.20",
+        "npm:events@3.3.0",
         "npm:lucide-astro@0.556.0",
         "npm:mdx-m3-viewer-th@5.13.4",
         "npm:shiki@4.4.3",
