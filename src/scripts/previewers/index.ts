@@ -5,6 +5,7 @@ type Mount = (preview: HTMLElement, files: PreviewFile[]) => Promise<() => void>
 
 /** Previewers load on demand so each page downloads only the code its resource type needs. */
 const LOADERS: Partial<Record<PreviewKind, () => Promise<{ mount: Mount }>>> = {
+  image: () => import('./image.ts'),
 };
 
 const LABELS: Record<PreviewKind, string> = { model: '3D preview', image: 'Image preview', audio: 'Audio preview', script: 'Source view' };
@@ -32,6 +33,11 @@ async function mountPreview(): Promise<void> {
 document.addEventListener('astro:page-load', () => void mountPreview());
 document.addEventListener('astro:before-swap', () => {
   generation++;
-  dispose?.();
+  const cleanup = dispose;
   dispose = undefined;
+  try {
+    cleanup?.();
+  } catch {
+    // A failed cleanup must not break navigation.
+  }
 });
