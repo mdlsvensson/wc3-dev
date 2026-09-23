@@ -161,6 +161,20 @@ function startViewer({ preview, canvas, viewer, scene, instance, parser, hd, mis
     playButton.title = playButton.getAttribute('aria-label') ?? '';
   };
   const stage = h('div', { class: 'preview-stage preview-model' });
+  // Rejections (e.g. a request the browser refuses) only mean the view stays as it is.
+  const fullscreenButton = document.fullscreenEnabled
+    ? toolButton('Fullscreen', 'Fullscreen', () => {
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      else stage.requestFullscreen().catch(() => {});
+    })
+    : undefined;
+  const fullscreenChange = () => {
+    if (!fullscreenButton) return;
+    const label = document.fullscreenElement === stage ? 'Exit fullscreen' : 'Fullscreen';
+    fullscreenButton.textContent = label;
+    fullscreenButton.setAttribute('aria-label', label);
+    fullscreenButton.title = label;
+  };
   const controls = toolbar(
     ...(sequences.length
       ? [labelledSelect('Animation', sequences.map((name, index) => ({ value: String(index), text: name || `Sequence ${index + 1}` })), String(first), (value) => instance.setSequence(Number(value)))]
@@ -171,10 +185,7 @@ function startViewer({ preview, canvas, viewer, scene, instance, parser, hd, mis
     }),
     labelledSelect('Player colour', teamColorOptions(hd), '0', (value) => instance.setTeamColor(Number(value))),
     toolButton('Reset view', 'Reset view', () => moveCamera(initial)),
-    toolButton('Fullscreen', 'Fullscreen', () => {
-      if (document.fullscreenElement) void document.exitFullscreen();
-      else void stage.requestFullscreen?.();
-    }),
+    ...(fullscreenButton ? [fullscreenButton] : []),
     h('span', { class: 'preview-info' }, h('span', { class: 'catalog-badge' }, hd ? 'HD' : 'SD')),
   );
   const unavailable = summarizeMissing(missing);
@@ -227,6 +238,8 @@ function startViewer({ preview, canvas, viewer, scene, instance, parser, hd, mis
     moveCamera(zoomOrbit(orbit, event.deltaY > 0 ? 1.1 : 1 / 1.1));
   }, { passive: false });
   canvas.addEventListener('keydown', (event) => {
+    // Leave browser shortcuts such as Ctrl+Plus (zoom) and Ctrl+0 alone.
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
     const actions: Record<string, () => void> = {
       ArrowLeft: () => moveCamera(rotateOrbit(orbit, -20, 0)),
       ArrowRight: () => moveCamera(rotateOrbit(orbit, 20, 0)),
@@ -256,6 +269,7 @@ function startViewer({ preview, canvas, viewer, scene, instance, parser, hd, mis
   resizeObserver.observe(canvas);
   visibility.observe(canvas);
   document.addEventListener('visibilitychange', run);
+  document.addEventListener('fullscreenchange', fullscreenChange);
   run();
 
   return () => {
@@ -264,7 +278,8 @@ function startViewer({ preview, canvas, viewer, scene, instance, parser, hd, mis
     resizeObserver.disconnect();
     visibility.disconnect();
     document.removeEventListener('visibilitychange', run);
-    if (document.fullscreenElement === stage) void document.exitFullscreen();
+    document.removeEventListener('fullscreenchange', fullscreenChange);
+    if (document.fullscreenElement === stage) document.exitFullscreen().catch(() => {});
     release();
   };
 }
