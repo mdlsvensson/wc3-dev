@@ -25,7 +25,10 @@ To render models as they appear in game, wc3.dev hosts the base-game
 textures that catalog models reference, and nothing more: no game models,
 sounds, or other files. These are Blizzard Entertainment's assets. Blizzard
 or its representatives can ask for them to be removed, and removal happens
-promptly; models then render with stand-in textures.
+promptly. Honouring a removal means deleting the texture's entries from
+`src/data/game-textures.json`, not only its files in the store (and leaving
+the file out of the folders later `game:sync` runs read); models then render
+with stand-in textures.
 
 ## Automated access
 
