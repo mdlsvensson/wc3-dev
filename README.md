@@ -78,6 +78,32 @@ them. See `docs/hive-integration.md` for the rules on third-party content.
   the store at `ASSET_BASE_URL`).
 - `deno task assets:serve` serves `.asset-store/` on `http://127.0.0.1:4322/`,
   the default asset URL in development.
+- **Previews.** Resource pages show live previews: a 3D viewer for models, a
+  zoomable image view for icons and textures, an audio player with waveform,
+  and highlighted source for scripts. Try them all locally with
+  `deno task fixtures:store`, `deno task build:fixtures`, `deno task assets:serve`
+  and `deno task preview`.
+- **Game textures.** Models often use textures from the base game (team
+  colours, cliffs, trees, standard unit textures). Extract the game's files
+  with a tool such as CascView, then run:
+
+  ```sh
+  deno task game:sync --sd path/to/war3.w3mod --hd path/to/war3.w3mod/_hd.w3mod --dry-run
+  deno task game:sync --sd path/to/war3.w3mod --hd path/to/war3.w3mod/_hd.w3mod
+  ```
+
+  It uploads only the game textures catalog models use (plus the team colour
+  sets) and rewrites `src/data/game-textures.json`; commit that file.
+  `resource:add` and `resource:check` warn when a model needs game textures
+  that are not hosted yet.
+
+  `--dry-run` uploads nothing and leaves the manifest as it is. Uploads need
+  the same `ASSET_STORE_*` variables as `resource:add`; pass `--local` to write
+  to `.asset-store/` instead. Each run uploads every file it needs again, which
+  is safe because store keys are content-addressed, and reports how many
+  entries are new or changed and how many are unchanged. Syncing only `--sd`
+  or only `--hd` keeps the other set's manifest entries. Entries that no model
+  uses any more are dropped from the manifest; their files stay in the store.
 - Production builds must set `ASSET_BASE_URL` once any hosted resource exists.
   Configure the store with no public listing, a CORS allowlist for the site's
   origins, and hotlink protection.
