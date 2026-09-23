@@ -99,11 +99,14 @@ them. See `docs/hive-integration.md` for the rules on third-party content.
 
   `--dry-run` uploads nothing and leaves the manifest as it is. Uploads need
   the same `ASSET_STORE_*` variables as `resource:add`; pass `--local` to write
-  to `.asset-store/` instead. Each run uploads every file it needs again, which
-  is safe because store keys are content-addressed, and reports how many
-  entries are new or changed and how many are unchanged. Syncing only `--sd`
-  or only `--hd` keeps the other set's manifest entries. Entries that no model
-  uses any more are dropped from the manifest; their files stay in the store.
+  to `.asset-store/` instead; a `--local` run still rewrites
+  `src/data/game-textures.json`, so do not commit the result. Each run uploads
+  every file it needs again, which is safe because store keys are
+  content-addressed, and reports how many entries are new or changed and how
+  many are unchanged. Syncing only `--sd` or only `--hd` keeps the other set's
+  manifest entries, and a texture missing from the given folders keeps its
+  entry while a model still needs it. Entries are dropped from the manifest
+  only when no model uses them any more; their files stay in the store.
 - Production builds must set `ASSET_BASE_URL` once any hosted resource exists.
   Configure the store with no public listing, a CORS allowlist for the site's
   origins, and hotlink protection.
