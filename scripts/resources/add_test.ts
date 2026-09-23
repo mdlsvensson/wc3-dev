@@ -117,7 +117,7 @@ Deno.test('refuses to add a resource whose slug already exists under a different
   await Deno.writeFile(join(iconDir, 'BTNTest.blp'), makeBlp());
   await assert.rejects(
     () => addResource({ folder: iconDir, contentRoot: ws.content, store, today: '2026-09-22', update: true }),
-    /"dual-type" already exists as a audio resource.*delete it before adding it as a icon resource/,
+    /"dual-type" already exists as an audio resource.*delete it before adding it as an icon resource/,
   );
 });
 
