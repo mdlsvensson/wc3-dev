@@ -41,8 +41,8 @@ JavaScript or WebGL is unavailable.
 ## Shared structure
 
 `#resource-preview` already carries `data-type` and `data-files` (JSON array of
-`{ role, format, url }`). The viewer reads the model version from the file
-itself, so no new attributes are needed. A static fallback stays in the HTML
+`{ role, format, url }`). Model pages add `data-game-textures` (see Game
+textures); the viewer reads the model version from the file itself. A static fallback stays in the HTML
 (the preview image or type icon). A previewer replaces it only after it has
 loaded successfully; on failure the fallback stays and a short inline message
 explains why.
@@ -130,8 +130,8 @@ never requests the game's SLK tables.
 - **Background**: transparency checkerboard (default) or solid dark.
 - **Channels**: RGBA (default) or alpha only (greyscale).
 - **Mipmap**: level selector when the file has mipmaps.
-- **Info line**: dimensions, format (e.g. "BLP1, 256×256, 9 mipmaps"), and for
-  icons the variants.
+- **Info line**: format, dimensions and mipmap count (e.g. "BLP1, 256×256,
+  9 mipmaps"). Icon variants stay in the Details table.
 - Decoding failure keeps the static preview PNG and says so.
 
 ## Audio player
@@ -160,8 +160,11 @@ never requests the game's SLK tables.
 - Keys: `game/<sd|hd>/<first 12 hex of sha256>/<normalised path>`, immutable
   cache headers like resource files.
 - Manifest: `src/data/game-textures.json`, an object mapping
-  `"<sd|hd>:<normalised path>"` to its store key. Committed to git, loaded by
-  the model previewer as a static import on model pages only.
+  `"<sd|hd>:<normalised path>"` to its store key, committed to git. Each model
+  page embeds only the entries its model can use (its own game paths plus the
+  team colour sets), already turned into URLs, in a `data-game-textures`
+  attribute on `#resource-preview`; the manifest itself never ships to the
+  browser.
 
 ### `deno task game:sync --sd <dir> [--hd <dir>] [--dry-run] [--local]`
 
@@ -198,9 +201,11 @@ The command:
 
 - Every previewer catches its own failures, keeps the static fallback, and
   shows a one-line reason. Nothing throws out of `mount()`.
-- Network errors fetching store files show "Couldn't load <type> preview" with
-  a retry button.
-- A slow model load shows a progress indicator (files loaded / total).
+- Any failure, including network errors fetching store files, shows
+  "<Previewer> unavailable: <reason>" (e.g. "3D preview unavailable: the file
+  returned HTTP 404") with a Retry button.
+- While a model loads, the preview shows "Loading 3D preview…"; the viewer does
+  not report a file total up front, so there is no loaded/total count.
 
 ## Testing
 
