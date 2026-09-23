@@ -72,10 +72,13 @@ pulls in the map viewer and its Lua runtime.
 - **Animation**: a list of the model's sequences (names from the file), the
   first "Stand" sequence selected by default (otherwise the first); play/pause;
   speed 0.25×, 0.5×, 1×, 2×.
-- **Player colour**: a picker for team colours 0–27 (Red first), applied with
-  `setTeamColor`.
+- **Player colour**: a picker for team colours (Red first), applied with
+  `setTeamColor`: 0–15 for SD models, 0–27 for HD models. The viewer loads the
+  team-colour set once, when it is created, so the previewer decides SD or HD
+  before creating it.
 - **Fullscreen** via the Fullscreen API on the preview element.
-- **Badges**: "SD" or "HD (Reforged)" from the model version (> 800 is HD).
+- **Badges**: "SD" or "HD" using the viewer's own rule: a model is HD when its
+  version is above 800 and any material names a shader.
 - **Missing textures**: textures that could not be resolved render with a
   neutral checker texture and are listed under the viewer ("2 textures not
   available").
@@ -90,6 +93,13 @@ pulls in the map viewer and its Lua runtime.
   (`WEBGL_lose_context`).
 - **Fallbacks**: no WebGL, a parse failure, or a missing model file keeps the
   static fallback and shows "3D preview unavailable: <reason>".
+- **Load sequence** (verified in a browser probe): fetch the model file, parse
+  it with the library's MDX/MDL parser, decide SD/HD, remove its event objects,
+  then create the `ModelViewer`, add the MDX handler with the path solver and
+  the HD flag, add the BLP/DDS/TGA handlers, register an `error` listener
+  (without one the viewer's event emitter throws on the first failed fetch),
+  and load the already-parsed model. The viewer's `EventEmitter` import needs
+  the `events` browser package as a dependency.
 
 ### Texture resolution
 
@@ -99,13 +109,17 @@ The viewer's path solver resolves each requested path in order:
    path's base name against the base names of the resource's files (from the
    `url` in `data-files`).
 2. **Hosted game textures**: the normalised path (lowercase, `/` separators)
-   looked up in the game-texture manifest — the `hd:` entry first for HD
-   models, then `sd:`; SD models use `sd:` only.
-3. **Missing**: a generated 2×2 checker texture, and the path is recorded for
-   the "not available" list.
+   looked up in the game-texture manifest — the `hd:` entry first when the
+   viewer asks for HD textures (its `hd` solver parameter), then `sd:`; SD
+   requests use `sd:` only.
+3. **Missing**: a generated 2×2 checker canvas (the viewer accepts canvases as
+   textures, so nothing is fetched), and the path is recorded for the "not
+   available" list.
 
-SLK table requests (event objects) resolve to nothing and event objects are
-disabled; this must not raise errors or block rendering.
+Non-string sources (the parsed model itself) pass through unchanged.
+
+Event objects are removed from the parsed model before loading, so the viewer
+never requests the game's SLK tables.
 
 ## Image viewer (icons and textures)
 
@@ -157,7 +171,8 @@ The command:
 
 1. Builds the **needed set**: every texture path in every model resource's
    `textures` list and `replaceables` list (see below), plus team colour and
-   team glow `00`–`27` (`.blp` in SD, `.dds` in HD).
+   team glow — `00`–`15` as `.blp` in SD and `00`–`27` as `.dds` in HD,
+   matching what the viewer requests.
 2. For each needed path, finds the file in the SD and HD roots
    (case-insensitive) and reports paths found in neither.
 3. Uploads new or changed files (same store abstraction and credentials as
@@ -206,14 +221,13 @@ The command:
 
 ## Risks
 
-- **Bundling mdx-m3-viewer for the browser.** It ships CommonJS with some
-  Node-only dependencies. The first plan task is a spike: bundle only the
-  viewer core and the four handlers with Vite, confirm it runs in the browser
-  and measure the chunk size. If it fails, fall back to the library's UMD
-  build loaded as a separate script on model pages.
+- **Bundling mdx-m3-viewer for the browser** — resolved by a probe during
+  planning: importing only the viewer core and the MDX/BLP/DDS/TGA handlers
+  bundles to about 292 KB once the `events` package is installed, and renders
+  a textured test model correctly.
 - **Reforged HD fidelity.** The library's HD shaders may not match the game
   exactly; acceptable for a preview.
-- **Event objects** may request SLK files during load; the solver returns
-  nothing for them and the spike confirms this does not break rendering.
+- **Event objects** would request SLK tables during load; the previewer
+  removes them from the parsed model first, so no tables are requested.
 - **Game-texture redistribution** is a deliberate owner decision (see
   Decisions).
