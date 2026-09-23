@@ -42,9 +42,10 @@ JavaScript or WebGL is unavailable.
 
 `#resource-preview` already carries `data-type` and `data-files` (JSON array of
 `{ role, format, url }`). The viewer reads the model version from the file
-itself, so no new attributes are needed. A static fallback stays in the HTML (the preview image or type icon). A
-  previewer replaces it only after it has loaded successfully; on failure the
-  fallback stays and a short inline message explains why.
+itself, so no new attributes are needed. A static fallback stays in the HTML
+(the preview image or type icon). A previewer replaces it only after it has
+loaded successfully; on failure the fallback stays and a short inline message
+explains why.
 
 A single client entry, `src/scripts/previewers/index.ts`, runs on
 `astro:page-load`: if `#resource-preview` exists, it dynamically imports the
