@@ -146,3 +146,12 @@ Deno.test('type pages list only their type', async () => {
     assert(html.includes(`/resources/${segment}/${slug}/`), `/resources/${segment}/ should link ${slug}`);
   }
 });
+
+Deno.test('resource previews keep a static fallback and model pages carry their game textures', async () => {
+  for (const route of ['models/fixture-footman', 'icons/fixture-sword-icon', 'textures/fixture-grass-tile', 'audio/fixture-horn', 'scripts/fixture-damage-lib']) {
+    const html = await Deno.readTextFile(new URL(`resources/${route}/index.html`, root));
+    assert.match(html, /class="preview-fallback"/, `Missing static fallback on ${route}`);
+    assert.match(html, /<p class="preview-message" role="status" hidden/, `Missing message slot on ${route}`);
+    assert.equal(/data-game-textures=/.test(html), route.startsWith('models/'), `data-game-textures only on model pages (${route})`);
+  }
+});
