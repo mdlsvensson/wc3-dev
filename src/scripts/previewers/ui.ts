@@ -71,7 +71,7 @@ export function labelledSelect(
   return h('label', { class: 'preview-field' }, h('span', {}, label), select);
 }
 
-export async function fetchBytes(url: string): Promise<Uint8Array> {
+export async function fetchBytes(url: string): Promise<Uint8Array<ArrayBuffer>> {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`the file returned HTTP ${response.status}`);
   return new Uint8Array(await response.arrayBuffer());

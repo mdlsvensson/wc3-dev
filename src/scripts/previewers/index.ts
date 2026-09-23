@@ -6,6 +6,7 @@ type Mount = (preview: HTMLElement, files: PreviewFile[]) => Promise<() => void>
 /** Previewers load on demand so each page downloads only the code its resource type needs. */
 const LOADERS: Partial<Record<PreviewKind, () => Promise<{ mount: Mount }>>> = {
   image: () => import('./image.ts'),
+  audio: () => import('./audio.ts'),
 };
 
 const LABELS: Record<PreviewKind, string> = { model: '3D preview', image: 'Image preview', audio: 'Audio preview', script: 'Source view' };
