@@ -10,6 +10,7 @@
     "test:unit": "deno test -A scripts/shell_test.ts scripts/resources/",
     "resource:add": "deno run -A scripts/resources/add.ts",
     "resource:check": "deno run -A scripts/resources/check.ts",
+    "game:sync": "deno run -A scripts/resources/game-sync.ts",
     "assets:serve": "mkdir -p .asset-store && deno run --allow-net --allow-read jsr:@std/http@^1/file-server .asset-store --host 127.0.0.1 --port 4322 --cors --no-dir-listing"
   },
   "fmt": { "exclude": ["node_modules", "dist", ".astro", "deno.lock"] }

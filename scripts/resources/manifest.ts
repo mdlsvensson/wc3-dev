@@ -12,8 +12,8 @@ export async function readManifest(path = DEFAULT_MANIFEST): Promise<GameTexture
   }
 }
 
-/** Writes entries in sorted order so manifest diffs stay readable. */
+/** Writes entries in code-point order so manifest diffs stay readable and identical on every machine. */
 export async function writeManifest(path: string, map: GameTextureMap): Promise<void> {
-  const sorted = Object.fromEntries(Object.entries(map).sort(([a], [b]) => a.localeCompare(b)));
+  const sorted = Object.fromEntries(Object.entries(map).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
   await Deno.writeTextFile(path, JSON.stringify(sorted, null, 2) + '\n');
 }
