@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { dirname, join } from 'jsr:@std/path@^1';
 import { gameKey, indexGameRoot, neededGamePaths, planGameSync, syncGameTextures } from './game-sync.ts';
-import { dryRunStore, localStore } from './store.ts';
+import { type AssetStore, dryRunStore, localStore } from './store.ts';
 
 async function write(path: string, text: string) {
   await Deno.mkdir(dirname(path), { recursive: true });
@@ -33,12 +33,21 @@ Deno.test('indexGameRoot maps normalised relative paths to files', async () => {
   const index = await indexGameRoot(ws.sd);
   assert.equal(index.get('textures/gutz.blp'), join(ws.sd, 'Textures', 'Gutz.blp'));
   assert.equal(index.get('replaceabletextures/teamcolor/teamcolor00.blp'), join(ws.sd, 'ReplaceableTextures', 'TeamColor', 'TeamColor00.blp'));
+  assert.deepEqual([...index.keys()].filter((key) => key.startsWith('_hd.w3mod/')), []);
 });
 
 Deno.test('neededGamePaths adds the team sets only for the sets being synced', () => {
   const models = [{ textures: ['Textures\\a.blp'], replaceables: [], ownFiles: [] }];
   assert.equal(neededGamePaths(models, ['sd']).length, 1 + 32);
   assert.equal(neededGamePaths(models, ['sd', 'hd']).length, 1 + 32 + 56);
+  const twoSpellings = [
+    { textures: ['Textures\\Footman.blp'], replaceables: [], ownFiles: [] },
+    { textures: ['textures/footman.blp'], replaceables: [], ownFiles: [] },
+  ];
+  const paths = neededGamePaths(twoSpellings, ['sd']);
+  assert.equal(paths.length, 1 + 32);
+  assert(paths.includes('Textures\\Footman.blp'));
+  assert(!paths.includes('textures/footman.blp'));
 });
 
 Deno.test('planGameSync finds files per set and reports only textures found nowhere', () => {
@@ -66,6 +75,41 @@ Deno.test('syncGameTextures uploads needed files, writes the manifest, and is id
   const second = await syncGameTextures(options);
   assert.deepEqual(second.uploaded, []);
   assert.equal(second.unchanged.length, 3);
+});
+
+const recordingStore = (keys: string[], inner: AssetStore): AssetStore => ({
+  label: 'recording',
+  put(key, bytes, contentType) {
+    keys.push(key);
+    return inner.put(key, bytes, contentType);
+  },
+});
+
+Deno.test('syncGameTextures uploads every planned file even when the manifest already lists it', async () => {
+  const ws = await workspace();
+  const first: string[] = [];
+  const options = { contentRoot: ws.content, roots: { sd: ws.sd, hd: ws.hd }, manifestPath: ws.manifest };
+  await syncGameTextures({ ...options, store: recordingStore(first, localStore(ws.store)) });
+  const second: string[] = [];
+  const result = await syncGameTextures({ ...options, store: recordingStore(second, localStore(join(ws.root, 'bucket'))) });
+  assert.equal(second.length, 3);
+  assert.deepEqual(second.sort(), first.sort());
+  assert.deepEqual(result.uploaded, []);
+  assert.equal(result.unchanged.length, 3);
+});
+
+Deno.test('changing a game file gives it a new key and reports it as new or changed', async () => {
+  const ws = await workspace();
+  const options = { contentRoot: ws.content, roots: { sd: ws.sd, hd: ws.hd }, store: localStore(ws.store), manifestPath: ws.manifest };
+  const first = await syncGameTextures(options);
+  await Deno.writeTextFile(join(ws.sd, 'Textures', 'Gutz.blp'), 'gutz-sd-v2');
+  const second = await syncGameTextures(options);
+  assert.notEqual(second.manifest['sd:textures/gutz.blp'], first.manifest['sd:textures/gutz.blp']);
+  assert.match(second.manifest['sd:textures/gutz.blp'], /^game\/sd\/[0-9a-f]{12}\/textures\/gutz\.blp$/);
+  assert.deepEqual(second.uploaded, ['sd:textures/gutz.blp']);
+  assert.equal(second.unchanged.length, 2);
+  const manifest = JSON.parse(await Deno.readTextFile(ws.manifest));
+  assert.equal(manifest['sd:textures/gutz.blp'], second.manifest['sd:textures/gutz.blp']);
 });
 
 Deno.test('syncGameTextures drops unused entries of synced sets and keeps other sets', async () => {
