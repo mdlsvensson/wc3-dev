@@ -26,10 +26,41 @@ Deno.test('the resolver prefers the resource’s own files, then game textures, 
   assert.deepEqual([...resolver.missing], ['Textures\\Nowhere.blp']);
 });
 
+Deno.test('the resolver prefers HD game textures when the viewer asks for HD', () => {
+  const resolver = createTextureResolver(files, game, () => MISSING);
+  const hdGame = { ...game, 'hd:replaceabletextures/teamcolor/teamcolor00.blp': 'https://a.test/game/hd/red.blp' };
+  assert.equal(createTextureResolver(files, hdGame, () => MISSING).solve('ReplaceableTextures\\TeamColor\\TeamColor00.blp', { hd: true }), 'https://a.test/game/hd/red.blp');
+  assert.equal(resolver.solve('ReplaceableTextures\\TeamColor\\TeamColor00.dds', { hd: true }), 'https://a.test/game/hd/red.dds');
+  assert.equal(resolver.solve('ReplaceableTextures\\TeamColor\\TeamColor00.blp', { hd: true }), 'https://a.test/game/sd/red.blp');
+});
+
+Deno.test('only texture paths get the stand-in; other unresolved paths resolve to nothing', () => {
+  const resolver = createTextureResolver(files, game, () => MISSING);
+  assert.equal(resolver.solve('UI\\SoundInfo\\AnimSounds.slk'), undefined);
+  assert.equal(resolver.solve('Units\\Spawn\\Spawn.mdx'), undefined);
+  assert.equal(resolver.missing.size, 0);
+  assert.equal(resolver.solve('Textures\\Nowhere.TGA'), MISSING);
+  assert.deepEqual([...resolver.missing], ['Textures\\Nowhere.TGA']);
+});
+
+Deno.test('only the resource’s texture files satisfy texture lookups, ahead of game textures', () => {
+  const own = [
+    { role: 'model', format: 'mdx', url: 'https://a.test/k/Gutz.blp', name: 'Gutz.blp' },
+    { role: 'texture', format: 'blp', url: 'https://a.test/k/Footman.blp', name: 'Footman.blp' },
+  ];
+  const withFootman = { ...game, 'sd:textures/footman.blp': 'https://a.test/game/sd/footman.blp' };
+  const resolver = createTextureResolver(own, withFootman, () => MISSING);
+  assert.equal(resolver.solve('Textures\\Footman.blp'), 'https://a.test/k/Footman.blp');
+  assert.equal(resolver.solve('Textures\\gutz.blp'), 'https://a.test/game/sd/gutz.blp');
+});
+
 Deno.test('missing team textures collapse into one line', () => {
   assert.deepEqual(summarizeMissing([
     'ReplaceableTextures\\TeamColor/TeamColor00.blp', 'ReplaceableTextures\\TeamGlow\\TeamGlow00.blp', 'Textures/Zed.blp', 'Textures\\Abe.blp',
   ]), ['Textures\\Abe.blp', 'Textures\\Zed.blp', 'Team colour textures (2)']);
+  assert.deepEqual(summarizeMissing([
+    'Textures/Zed.blp', 'Textures\\Zed.blp', 'ReplaceableTextures/TeamColor/TeamColor00.blp', 'ReplaceableTextures\\TeamColor\\TeamColor00.blp',
+  ]), ['Textures\\Zed.blp', 'Team colour textures (1)']);
   assert.deepEqual(summarizeMissing([]), []);
 });
 
