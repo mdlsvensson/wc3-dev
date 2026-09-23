@@ -37,7 +37,13 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
   const time = h('span', { class: 'audio-time' }, '0:00 / 0:00');
   const seek = h('input', { type: 'range', class: 'audio-seek', min: '0', max: '1000', value: '0', 'aria-label': 'Seek' });
   const volume = h('input', { type: 'range', class: 'audio-volume', min: '0', max: '100', value: '100', 'aria-label': 'Volume' });
-  const stage = h('div', { class: 'preview-stage preview-audio', tabindex: '0' }, canvas, toolbar(play, time, seek, h('label', { class: 'preview-field' }, h('span', {}, 'Volume'), volume)));
+  const info = h('span', { class: 'preview-info', role: 'status' });
+  const stage = h(
+    'div',
+    { class: 'preview-stage preview-audio', tabindex: '0' },
+    canvas,
+    toolbar(play, time, seek, h('label', { class: 'preview-field' }, h('span', {}, 'Volume'), volume), info),
+  );
 
   // Streams and some encoders report an infinite or NaN duration; seeking needs a finite one.
   const hasDuration = () => Number.isFinite(audio.duration) && audio.duration > 0;
@@ -71,6 +77,7 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
   };
   const update = () => {
     time.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    seek.setAttribute('aria-valuetext', `${formatTime(audio.currentTime)} of ${formatTime(audio.duration)}`);
     if (!seeking) seek.value = String(Math.round(progress() * 1000));
     draw();
   };
@@ -78,10 +85,16 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
     update();
     frame = audio.paused ? 0 : requestAnimationFrame(loop);
   };
+  const unplayable = () => {
+    if (!disposed) info.textContent = 'This browser cannot play this file';
+  };
   const toggle = () => {
-    // A refused play() (e.g. an undecodable file) just leaves the player paused.
-    if (audio.paused) audio.play().catch(() => {});
-    else audio.pause();
+    // An AbortError only means a pause interrupted the start; any other refusal means the file cannot be played.
+    if (audio.paused) {
+      audio.play().catch((error) => {
+        if (!(error instanceof DOMException && error.name === 'AbortError')) unplayable();
+      });
+    } else audio.pause();
   };
 
   audio.addEventListener('play', () => {
@@ -96,6 +109,7 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
     update();
   });
   audio.addEventListener('loadedmetadata', update);
+  audio.addEventListener('error', unplayable);
   play.addEventListener('click', toggle);
   seek.addEventListener('pointerdown', () => {
     seeking = true;

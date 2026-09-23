@@ -15,8 +15,9 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
   let zoom: Zoom = 'fit';
   let alpha = false;
 
+  const title = document.querySelector('h1')?.textContent?.trim() || 'The image';
   const canvas = h('canvas', { class: 'image-canvas' });
-  const viewport = h('div', { class: 'image-viewport checkered', tabindex: '0', role: 'img', 'aria-label': `${file.name} at full size` }, canvas);
+  const viewport = h('div', { class: 'image-viewport checkered', tabindex: '0', role: 'img', 'aria-label': `${title} at full size` }, canvas);
   const info = h('span', { class: 'preview-info' }, infoLine(image));
 
   const layout = () => {
@@ -43,7 +44,8 @@ export async function mount(preview: HTMLElement, files: PreviewFile[]): Promise
       layout();
     }),
     pressedButton('Dark background instead of the transparency grid', 'Dark background', (on) => viewport.classList.toggle('checkered', !on)),
-    pressedButton('Show only the alpha channel', 'Alpha only', (on) => {
+    // Accessible names start with the visible text, so speech input can use what is on screen.
+    pressedButton('Alpha only: show only the alpha channel', 'Alpha only', (on) => {
       alpha = on;
       draw();
     }),
