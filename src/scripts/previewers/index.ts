@@ -7,6 +7,7 @@ type Mount = (preview: HTMLElement, files: PreviewFile[]) => Promise<() => void>
 const LOADERS: Partial<Record<PreviewKind, () => Promise<{ mount: Mount }>>> = {
   image: () => import('./image.ts'),
   audio: () => import('./audio.ts'),
+  script: () => import('./script.ts'),
 };
 
 const LABELS: Record<PreviewKind, string> = { model: '3D preview', image: 'Image preview', audio: 'Audio preview', script: 'Source view' };
