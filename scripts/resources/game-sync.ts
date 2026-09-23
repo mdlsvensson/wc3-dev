@@ -9,12 +9,16 @@ import { type AssetStore, dryRunStore, localStore, s3StoreFromEnv } from './stor
 
 const GAME_CONTENT_TYPES: Record<string, string> = { blp: 'application/octet-stream', dds: 'image/vnd-ms.dds', tga: 'image/x-tga' };
 
-/** Maps normalised relative paths to files under an extracted game folder. */
+/**
+ * Maps normalised relative paths to files under an extracted game folder. A nested `_hd.w3mod` folder is skipped, so
+ * indexing the SD root does not also walk the HD tree; index the HD folder as its own root.
+ */
 export async function indexGameRoot(root: string): Promise<Map<string, string>> {
   const index = new Map<string, string>();
   const walk = async (dir: string): Promise<void> => {
     for await (const entry of Deno.readDir(dir)) {
       const path = join(dir, entry.name);
+      if (entry.isDirectory && entry.name.toLowerCase() === '_hd.w3mod') continue;
       if (entry.isDirectory) await walk(path);
       else if (entry.isFile) index.set(normalizeGamePath(relative(root, path)), path);
     }
@@ -23,11 +27,19 @@ export async function indexGameRoot(root: string): Promise<Map<string, string>> 
   return index;
 }
 
-/** Every game path the catalog's models may request, plus the team colour sets for the sets being synced. */
+/**
+ * Every game path the catalog's models may request, plus the team colour sets for the sets being synced. Paths that
+ * differ only in casing or separators count once, keeping the first spelling.
+ */
 export function neededGamePaths(models: ModelTextureRefs[], sets: TextureSet[] = ['sd', 'hd']): string[] {
-  const paths = new Set<string>(sets.flatMap(teamTexturePaths));
-  for (const refs of models) for (const path of modelGamePaths(refs)) paths.add(path);
-  return [...paths];
+  const paths = new Map<string, string>();
+  const add = (path: string) => {
+    const normalized = normalizeGamePath(path);
+    if (!paths.has(normalized)) paths.set(normalized, path);
+  };
+  for (const path of sets.flatMap(teamTexturePaths)) add(path);
+  for (const refs of models) for (const path of modelGamePaths(refs)) add(path);
+  return [...paths.values()];
 }
 
 const swapExtension = (path: string) => path.replace(/\.(blp|dds)$/i, (_match, ext: string) => (ext.toLowerCase() === 'blp' ? '.dds' : '.blp'));
@@ -79,9 +91,21 @@ export interface SyncOptions {
   write?: boolean;
 }
 
-export interface SyncResult { manifest: GameTextureMap; uploaded: string[]; unchanged: string[]; missing: string[]; dropped: string[] }
+export interface SyncResult {
+  manifest: GameTextureMap;
+  /** Entries whose key is new or changed since the previous manifest. */
+  uploaded: string[];
+  /** Entries whose key matches the previous manifest. They are uploaded too; this list is for reporting only. */
+  unchanged: string[];
+  missing: string[];
+  dropped: string[];
+}
 
-/** Uploads the game textures the catalog needs and rewrites the manifest. Entries for sets not being synced are kept. */
+/**
+ * Uploads the game textures the catalog needs and rewrites the manifest. Entries for sets not being synced are kept.
+ * Every planned file is uploaded on every run: the manifest may have been written by a `--local` run, so a matching key
+ * does not prove the object is in this store, and content-addressed keys make re-uploads harmless.
+ */
 export async function syncGameTextures(options: SyncOptions): Promise<SyncResult> {
   const { contentRoot, roots, store, manifestPath, write = true } = options;
   const sets = (['sd', 'hd'] as const).filter((set) => roots[set]);
@@ -100,13 +124,9 @@ export async function syncGameTextures(options: SyncOptions): Promise<SyncResult
     const bytes = await Deno.readFile(item.file);
     const key = gameKey(item.set, await sha256Hex(bytes), item.path);
     manifest[item.entry] = key;
-    if (previous[item.entry] === key) {
-      unchanged.push(item.entry);
-      continue;
-    }
     const extension = item.path.split('.').pop()?.toLowerCase() ?? '';
     await store.put(key, bytes, GAME_CONTENT_TYPES[extension] ?? 'application/octet-stream');
-    uploaded.push(item.entry);
+    (previous[item.entry] === key ? unchanged : uploaded).push(item.entry);
   }
 
   const dropped = Object.keys(previous).filter((entry) => synced(entry) && !(entry in manifest));
@@ -137,7 +157,8 @@ if (import.meta.main) {
     const result = await syncGameTextures({ contentRoot: 'src/content/resources', roots, store, manifestPath: DEFAULT_MANIFEST, write: !dryRun });
     for (const path of result.missing) console.warn(`warning: not found in the game folders: ${path}`);
     for (const entry of result.dropped) console.log(`no longer needed (left in the store): ${entry}`);
-    console.log(`${result.uploaded.length} uploaded, ${result.unchanged.length} unchanged${dryRun ? ' (dry run; manifest not written).' : `; wrote ${DEFAULT_MANIFEST}.`}`);
+    const summary = `${result.uploaded.length} new or changed, ${result.unchanged.length} unchanged`;
+    console.log(dryRun ? `${summary} (dry run; nothing uploaded, manifest not written).` : `${summary} (all uploaded); wrote ${DEFAULT_MANIFEST}.`);
   } catch (error) {
     console.error(`error: ${error instanceof Error ? error.message : String(error)}`);
     Deno.exit(1);
