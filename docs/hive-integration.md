@@ -19,6 +19,14 @@ including any future automation (roadmap sub-project 5).
 - Authors and Hive staff can ask for a resource to be removed at any time;
   removals happen promptly and without argument.
 
+## Game textures
+
+To render models as they appear in game, wc3.dev hosts the base-game
+textures that catalog models reference, and nothing more: no game models,
+sounds, or other files. These are Blizzard Entertainment's assets. Blizzard
+or its representatives can ask for them to be removed, and removal happens
+promptly; models then render with stand-in textures.
+
 ## Automated access
 
 No automated access to Hive exists today. Before any is built:
