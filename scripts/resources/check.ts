@@ -1,8 +1,10 @@
 import { basename, join, relative } from 'jsr:@std/path@^1';
 import { z } from 'astro/zod';
 import { assetUrlFrom } from '../../src/lib/asset-url.ts';
+import { unhostedGameTextures, type GameTextureMap } from '../../src/lib/game-textures.ts';
 import { resourceSchema } from '../../src/lib/resource-schema.ts';
 import { isSlug } from './keys.ts';
+import { readManifest } from './manifest.ts';
 
 async function* jsonFiles(dir: string): AsyncGenerator<string> {
   const entries = [];
@@ -69,6 +71,30 @@ export async function checkResources(
   return errors;
 }
 
+/** Models whose game textures are not hosted yet. Warnings only: a model still renders, with stand-in textures. */
+export async function gameTextureWarnings(root: string, manifest: GameTextureMap): Promise<string[]> {
+  const warnings: string[] = [];
+  for await (const path of jsonFiles(root)) {
+    let data;
+    try {
+      data = resourceSchema.parse(JSON.parse(await Deno.readTextFile(path)));
+    } catch {
+      continue; // checkResources reports invalid files.
+    }
+    if (data.type !== 'model') continue;
+    const unhosted = unhostedGameTextures(manifest, {
+      textures: data.textures,
+      replaceables: data.replaceables,
+      ownFiles: data.files.map((file) => file.key.split('/').at(-1) ?? ''),
+    });
+    if (unhosted.length) {
+      const file = relative(root, path).replaceAll('\\', '/');
+      warnings.push(`${file}: ${unhosted.length} game ${unhosted.length === 1 ? 'texture' : 'textures'} not hosted (run deno task game:sync): ${unhosted.join(', ')}`);
+    }
+  }
+  return warnings;
+}
+
 if (import.meta.main) {
   const remote = Deno.args.includes('--remote');
   const remoteBase = remote ? Deno.env.get('ASSET_BASE_URL') : undefined;
@@ -78,6 +104,9 @@ if (import.meta.main) {
   }
   const errors = await checkResources('src/content/resources', { remoteBase });
   for (const error of errors) console.error(error);
+  // Test fixtures reference textures that are deliberately never hosted.
+  const warnings = (await gameTextureWarnings('src/content/resources', await readManifest())).filter((warning) => !warning.startsWith('_fixtures/'));
+  for (const warning of warnings) console.warn(`warning: ${warning}`);
   if (errors.length) Deno.exit(1);
   console.log('All resources are valid.');
 }

@@ -1,7 +1,9 @@
 import { basename, dirname, join } from 'jsr:@std/path@^1';
 import { authoredSchema, HOSTED_TYPES, type HostedType, type Resource, resourceSchema } from '../../src/lib/resource-schema.ts';
+import { unhostedGameTextures } from '../../src/lib/game-textures.ts';
 import { decodeTexture } from './images.ts';
 import { isSlug, sha256Hex, storeKey } from './keys.ts';
+import { DEFAULT_MANIFEST, readManifest } from './manifest.ts';
 import { readModelMeta } from './model-meta.ts';
 import { encodePng, pngSize } from './png.ts';
 import { type FileFormat, sniff } from './sniff.ts';
@@ -16,7 +18,7 @@ export const ALLOWED_FORMATS: Record<HostedType, FileFormat[]> = {
   script: ['jass', 'lua', 'ts'],
 };
 
-const CONTENT_TYPES: Record<FileFormat, string> = {
+export const CONTENT_TYPES: Record<FileFormat, string> = {
   mdx: 'application/octet-stream', mdl: 'text/plain; charset=utf-8', blp: 'application/octet-stream',
   dds: 'image/vnd-ms.dds', tga: 'image/x-tga', png: 'image/png', wav: 'audio/wav', mp3: 'audio/mpeg',
   ogg: 'audio/ogg', flac: 'audio/flac', jass: 'text/plain; charset=utf-8', lua: 'text/plain; charset=utf-8',
@@ -38,6 +40,8 @@ export interface AddOptions {
   update?: boolean;
   /** Write the resource JSON; false for dry runs. Defaults to true. */
   write?: boolean;
+  /** The game-texture manifest used to warn about unhosted game textures. Defaults to the repo manifest. */
+  manifestPath?: string;
 }
 
 export interface AddResult { path: string; resource: Resource; warnings: string[] }
@@ -86,7 +90,7 @@ export async function addResource(options: AddOptions): Promise<AddResult> {
   type PlannedFile = { name: string; bytes: Uint8Array; format: FileFormat; role: string };
   const plannedFiles: PlannedFile[] = [];
   let plannedPreview: { name: string; bytes: Uint8Array; width: number; height: number } | undefined;
-  let meta: { animations: string[]; textures: string[] } | undefined;
+  let meta: { animations: string[]; textures: string[]; replaceables: string[] } | undefined;
   let durationSec = authored.type === 'audio' ? authored.durationSec : undefined;
 
   const authoredPreview = await Deno.readFile(join(folder, 'preview.png')).catch(() => null);
@@ -132,6 +136,17 @@ export async function addResource(options: AddOptions): Promise<AddResult> {
   if (plannedFiles.length === 0) throw new Error('No resource files found next to resource.json.');
   if (type === 'audio' && durationSec === undefined) throw new Error('Set durationSec in resource.json; it can only be read from WAV files.');
   if (!plannedPreview && type !== 'audio' && type !== 'script') warnings.push('No preview image: add preview.png to show a thumbnail.');
+  if (type === 'model' && meta) {
+    const unhosted = unhostedGameTextures(await readManifest(options.manifestPath ?? DEFAULT_MANIFEST), {
+      textures: meta.textures,
+      replaceables: meta.replaceables,
+      ownFiles: names,
+    });
+    if (unhosted.length) {
+      const noun = unhosted.length === 1 ? 'game texture is' : 'game textures are';
+      warnings.push(`${unhosted.length} ${noun} not hosted yet: ${unhosted.join(', ')}. Run deno task game:sync.`);
+    }
+  }
 
   // Pass 2: every file has passed validation, so it is now safe to upload.
   const upload = async (fileName: string, bytes: Uint8Array, format: FileFormat) => {
@@ -152,7 +167,7 @@ export async function addResource(options: AddOptions): Promise<AddResult> {
     ...authored,
     files,
     preview,
-    ...(type === 'model' ? meta ?? { animations: [], textures: [] } : {}),
+    ...(type === 'model' ? meta ?? { animations: [], textures: [], replaceables: [] } : {}),
     ...(type === 'audio' ? { durationSec } : {}),
     added: existing?.added ?? today,
     ...(existing ? { updated: today } : {}),
