@@ -71,6 +71,7 @@ function initCatalog(): void {
   // Tags from the URL outside the rendered top-20 list have no checkbox; keep filtering by them until Clear filters.
   let extraTags = initial.tags.filter((tag) => !knownTags.has(tag));
 
+  const pathname = location.pathname;
   let historyTimer: ReturnType<typeof setTimeout> | undefined;
   const update = () => {
     const state = readForm(form, extraTags);
@@ -79,6 +80,8 @@ function initCatalog(): void {
     // on a replaceState call per keystroke in the author field.
     clearTimeout(historyTimer);
     historyTimer = setTimeout(() => {
+      // If the user navigated away before this fired, don't stamp a stale query onto the new page.
+      if (location.pathname !== pathname) return;
       // Keep the router's own history state; only the query changes.
       history.replaceState(history.state, '', location.pathname + serializeFilters(state) + location.hash);
     }, 200);
