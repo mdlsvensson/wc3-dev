@@ -111,8 +111,9 @@ export function makeTexturedMdx(options: { sequences?: string[]; textures?: stri
   result.materials.push(material);
 
   const geoset = new Geoset();
-  geoset.vertices = new Float32Array([-50, 0, 0, 50, 0, 0, 50, 0, 100, -50, 0, 100]);
-  geoset.normals = new Float32Array([0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0]);
+  // The quad faces +X, the front of a Warcraft III model and the viewer's default camera direction.
+  geoset.vertices = new Float32Array([0, -50, 0, 0, 50, 0, 0, 50, 100, 0, -50, 100]);
+  geoset.normals = new Float32Array([1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0]);
   geoset.faceTypeGroups = new Uint32Array([4]);
   geoset.faceGroups = new Uint32Array([6]);
   geoset.faces = new Uint16Array([0, 1, 2, 0, 2, 3]);
@@ -121,8 +122,8 @@ export function makeTexturedMdx(options: { sequences?: string[]; textures?: stri
   geoset.matrixIndices = new Uint32Array([0]);
   geoset.uvSets = [new Float32Array([0, 1, 1, 1, 1, 0, 0, 0])];
   geoset.materialId = 0;
-  geoset.extent.min.set([-50, 0, 0]);
-  geoset.extent.max.set([50, 0, 100]);
+  geoset.extent.min.set([0, -50, 0]);
+  geoset.extent.max.set([0, 50, 100]);
   geoset.extent.boundsRadius = 80;
   result.geosets.push(geoset);
 
@@ -133,8 +134,8 @@ export function makeTexturedMdx(options: { sequences?: string[]; textures?: stri
   bone.geosetId = 0;
   result.bones.push(bone);
   result.pivotPoints.push(new Float32Array([0, 0, 0]));
-  result.extent.min.set([-50, 0, 0]);
-  result.extent.max.set([50, 0, 100]);
+  result.extent.min.set([0, -50, 0]);
+  result.extent.max.set([0, 50, 100]);
   result.extent.boundsRadius = 80;
   return result.saveMdx();
 }
