@@ -7,6 +7,8 @@ const TUTORIALS_DIR = '/src/content/tutorials/';
 
 const CALLOUTS: Record<string, string> = { tip: 'Tip', note: 'Note', caution: 'Caution' };
 const CHECKPOINT_TITLE = 'Checkpoint: your map now…';
+/** Screenshots are at most as wide as the lesson column (820px), less the gutters on small screens. */
+const SHOT_SIZES = '(min-width: 900px) 820px, calc(100vw - 40px)';
 /** Every container directive a lesson may use; any other is an error. */
 const CONTAINERS = ['steps', ...Object.keys(CALLOUTS), 'checkpoint'];
 /** Every leaf directive a lesson may use; any other is an error. */
@@ -79,7 +81,7 @@ function shot(alt: string, attributes: Record<string, string | null | undefined>
   const caption = attributes?.caption;
   const figcaption = caption ? [element('paragraph', 'figcaption', {}, [text(caption)])] : [];
   if (isFile(fileURLToPath(new URL(src, fileURL)))) {
-    return element('blockquote', 'figure', { className: ['shot'] }, [{ type: 'image', url: src, alt }, ...figcaption]);
+    return element('blockquote', 'figure', { className: ['shot'] }, [{ type: 'image', url: src, alt, data: { hProperties: { sizes: SHOT_SIZES } } }, ...figcaption]);
   }
   return element('blockquote', 'figure', { className: ['shot', 'shot-missing'] }, [
     // The placeholder is for authors; keep its capture note out of the search index.
@@ -111,16 +113,16 @@ export function tutorialDirectives({ fileURL }: PluginFactoryContext): MdastPlug
       const label = first?.type === 'paragraph' && first.data?.directiveLabel ? first : undefined;
       const body = label ? rest : node.children;
       const custom = label && label.children.length > 0 ? label : undefined;
-      // The <aside> is named by its title, so a landmark list reads "Tip", "Caution: Save first", and so on.
-      const aside = (className: string[], fallback: string) =>
-        element('blockquote', 'aside', { className, ariaLabel: custom ? ctx.textContent(custom) : fallback }, [
+      // The <aside> is named by its kind and title, so a landmark list reads "Tip", "Caution: Save first", and so on.
+      const aside = (className: string[], fallback: string, kind: string) =>
+        element('blockquote', 'aside', { className, ariaLabel: custom ? `${kind}: ${ctx.textContent(custom)}` : fallback }, [
           element('paragraph', 'p', { className: ['tutorial-callout-title'] }, custom ? custom.children : [text(fallback)]),
           ...body,
         ]);
       if (node.name === 'steps') return element('blockquote', 'div', { className: ['tutorial-steps'] }, body);
-      if (node.name === 'checkpoint') return aside(['tutorial-checkpoint'], CHECKPOINT_TITLE);
+      if (node.name === 'checkpoint') return aside(['tutorial-checkpoint'], CHECKPOINT_TITLE, 'Checkpoint');
       const calloutTitle = CALLOUTS[node.name];
-      if (calloutTitle) return aside(['tutorial-callout', `tutorial-callout-${node.name}`], calloutTitle);
+      if (calloutTitle) return aside(['tutorial-callout', `tutorial-callout-${node.name}`], calloutTitle, calloutTitle);
       // Starlight would restore an unknown container as a bare <div>, silently losing its meaning.
       throw new Error(`Unknown container directive ":::${node.name}" in ${fileURLToPath(fileURL)}; use one of ${CONTAINERS.map((name) => `:::${name}`).join(', ')}`);
     },

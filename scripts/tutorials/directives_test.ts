@@ -48,7 +48,7 @@ Deno.test('callouts and checkpoints carry a title, default or custom', async () 
   const tip = await html(':::tip\nHold Shift.\n:::');
   assert.match(tip, /<aside class="tutorial-callout tutorial-callout-tip" aria-label="Tip">\s*<p class="tutorial-callout-title">Tip<\/p>\s*<p>Hold Shift.<\/p>/);
   const caution = await html(':::caution[Save *first*]\nBack up your map.\n:::');
-  assert.match(caution, /<aside class="tutorial-callout tutorial-callout-caution" aria-label="Save first">\s*<p class="tutorial-callout-title">Save <em>first<\/em><\/p>\s*<p>Back up your map.<\/p>/);
+  assert.match(caution, /<aside class="tutorial-callout tutorial-callout-caution" aria-label="Caution: Save first">\s*<p class="tutorial-callout-title">Save <em>first<\/em><\/p>\s*<p>Back up your map.<\/p>/);
   assert.match(await html(':::note\nA note.\n:::'), /tutorial-callout-note/);
   const checkpoint = await html(':::checkpoint\nThe river blocks the way.\n:::');
   assert.match(checkpoint, /<aside class="tutorial-checkpoint" aria-label="Checkpoint: your map now…">\s*<p class="tutorial-callout-title">Checkpoint: your map now…<\/p>\s*<p>The river blocks the way.<\/p>/);
