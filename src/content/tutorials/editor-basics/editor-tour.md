@@ -91,8 +91,9 @@ Doodads. When a click does nothing, check which layer you are on.
 
 ::shot[A composite of five captures of the palette window, one per layer, side by side: Terrain (T), Doodads (D), Units (U), Regions (R) and Cameras (C), each on the empty tour map]{src="./editor-tour/palettes.png"}
 
-Chapter 2 uses the Terrain layer, chapter 3 uses Doodads, Units and Regions.
-This track does not use cameras.
+Chapter 2 uses the Terrain layer, and chapter 3 uses Doodads, Units and
+Regions; later chapters come back to the Units layer. This track does not
+use cameras.
 
 ## The other editors
 

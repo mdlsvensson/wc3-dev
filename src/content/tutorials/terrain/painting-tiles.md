@@ -110,7 +110,7 @@ goes in the top-right square and the spawn in the bottom-left one.
    block of grass about 24 tiles across, from the rough dirt band on the
    north and east edges in towards the middle of the map. Leave it as plain
    grass, with no rough dirt inside it, so the clearing reads as open, tidy
-   ground. This is where the Town Hall, farms and towers will stand.
+   ground. This is where the Town Hall, Farms and towers will stand.
 3. Select **Dirt** and a medium circle brush. Starting in the bottom-left
    corner, a little way in from the edge, paint a path about three or four
    tiles wide towards the village. Let it bend a little, but keep it heading

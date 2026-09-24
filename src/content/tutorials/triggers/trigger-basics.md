@@ -9,13 +9,13 @@ goals:
   - Write and test a first trigger
 ---
 
-Your map has a village, a hero, towers and an enemy player, but nothing
-happens when it starts. Rules are made with triggers, built by picking from
-lists, with no programming. In this chapter you write the triggers that turn
-Defend the Village into a game: a countdown, five waves of invaders, and a
-way to win and to lose. This lesson shows you around the Trigger Editor,
-explains how a trigger is put together, clears out the melee setup, and ends
-with a first trigger that greets the player.
+Your map has a village, a hero, a tower the Peasants can build, and an enemy
+player, but nothing happens when it starts. Rules are made with triggers,
+built by picking from lists, with no programming. In this chapter you write
+the triggers that turn Defend the Village into a game: a countdown, five
+waves of invaders, and a way to win and to lose. This lesson tours the
+Trigger Editor, explains how a trigger is built, clears out the melee setup,
+and ends with a first trigger that greets the player.
 
 ## The Trigger Editor
 
@@ -23,7 +23,7 @@ Open the Trigger Editor with :menu[Module > Trigger Editor], or press
 :kbd[F4]. You met it briefly in chapter 1, when you switched off the melee
 setup.
 
-::shot[The Trigger Editor for Defend the Village, with the trigger list on the left showing the Initialization category open and the disabled Melee Initialization trigger selected, and its events and actions on the right]{src="./trigger-basics/trigger-editor.png"}
+::shot[The Trigger Editor for Defend the Village with the disabled Melee Initialization trigger selected, and with the trigger list and the trigger pane (comment box, Enabled, Initially On, Events/Conditions/Actions) outlined and labelled]{src="./trigger-basics/trigger-editor.png"}
 
 - **The trigger list** on the left is a tree. At the top is the map itself.
   Below it are categories, which are folders that keep triggers in order, and
@@ -39,17 +39,21 @@ setup.
 
 Triggers are saved with the map: press :kbd[Ctrl+S] as usual.
 
+In the Trigger Editor, :kbd[Ctrl+E] adds an event, :kbd[Ctrl+D] a condition
+and :kbd[Ctrl+R] an action. Each editor window has its own shortcuts: in the
+Object Editor, :kbd[Ctrl+D] switched to raw data.
+
 ## Events, conditions and actions
 
 Every trigger answers three questions: when, whether, and what. Take a rule
-from the end of this chapter, "when a unit dies, if it is the town hall, the
+from the end of this chapter, "when a unit dies, if it is the Town Hall, the
 player loses":
 
 - **Events** say when the trigger runs: "when a unit dies". An event is
   something that happens in the game, such as a unit dying, a timer running
   out or the map starting. A trigger can have several events, and any one of
   them starts it.
-- **Conditions** say whether it goes on: "if it is the town hall". Each time
+- **Conditions** say whether it goes on: "if it is the Town Hall". Each time
   an event starts the trigger, the game checks the conditions. If every one of
   them is true, the actions run; if any is false, the trigger stops there. A
   trigger with no conditions always goes on.
@@ -65,8 +69,8 @@ editor shows it, so you can compare your trigger with the lesson.
 
 ## The melee setup
 
-Now that you know how a trigger is built, look at the one every new map
-starts with. Select `Melee Initialization` in the list.
+Now look at the trigger every new map starts with: select `Melee
+Initialization`.
 
 Its only event is **Map initialization**, which happens once, while the map
 is loading and before the game begins. Its actions set up a standard melee
@@ -89,8 +93,8 @@ game:
 - `Melee Game - Enforce victory/defeat conditions (for all players)` ends the
   game for a player who loses all their buildings.
 
-Every one of these is something Defend the Village does its own way, or not
-at all. You kept the trigger disabled so far; now you can delete it.
+Defend the Village does each of these its own way, or not at all. The
+trigger has been disabled since chapter 1; now delete it.
 
 :::steps
 1. Right-click `Melee Initialization` in the list and choose **Delete**. If
@@ -106,18 +110,17 @@ at all. You kept the trigger disabled so far; now you can delete it.
 :::note[No melee rules]
 Without `Melee Initialization`, nothing in the map gives players resources or
 ends the game. That is why Player 12 has no AI and why chapter 5 needed a cheat
-for gold. The triggers in this chapter take over each job: the next lesson
-gives the player their gold, and the last one decides who wins.
+for gold. This chapter's triggers take over: the next lesson gives the
+player gold, and the last one decides who wins.
 :::
 
 ## A first trigger
 
 Your first trigger shows a message when the game starts. You might expect it
-to use **Map initialization**, as the melee setup did, but that runs while
-the loading screen is still up, and a message shown then never reaches the
-screen. Instead, the trigger uses an event from the **Time**
-category: **Elapsed Game Time**, set to 0 seconds, which happens the moment
-the game begins.
+to use **Map initialization**, as the melee setup did, but that runs during
+the loading screen, and a message shown then is never seen. Instead, the
+trigger uses **Time - Elapsed Game Time**, set to 0 seconds, which happens
+the moment the game begins.
 
 All your triggers go in one category of their own, so start with that.
 
@@ -128,20 +131,20 @@ All your triggers go in one category of their own, so start with that.
 2. With the new category selected, right-click it and choose **New
    Trigger**, or press :kbd[Ctrl+T]. A trigger appears inside the category,
    with its name ready to edit. Type `Welcome` and press :kbd[Enter].
-3. With `Welcome` selected, press :kbd[Ctrl+E] to add an event. A dialog
-   opens with a list of events. Choose **Time - Elapsed Game Time**.
+3. With `Welcome` selected, press :kbd[Ctrl+E]. A dialog opens with a list
+   of events. Choose **Time - Elapsed Game Time**.
 4. The line in the dialog reads `Time - Elapsed game time is 5.00 seconds`.
    Click the number, set it to `0`, and click **OK** twice.
    <!-- verify: the default value of the Elapsed Game Time event (5.00 seconds) and that clicking a value in the dialog's line opens a dialog to change it -->
-5. Press :kbd[Ctrl+R] to add an action. Choose **Game - Text Message
+5. Press :kbd[Ctrl+R] and choose **Game - Text Message
    (Auto-Timed)**. Its line reads `Game - Display to (All players) the text:
    Text`.
-   <!-- verify: the action is listed as "Game - Text Message (Auto-Timed)" and its default line reads "Game - Display to (All players) the text: Text"; also whether the event and action dialogs show their line without the category prefix (e.g. "Elapsed game time is 5.00 seconds"), with the prefix only in the tree -->
+   <!-- verify: the action is listed as "Game - Text Message (Auto-Timed)" and its default line reads "Game - Display to (All players) the text: Text"; also whether the event and action dialogs show their line without the category prefix (e.g. "Elapsed game time is 5.00 seconds"), with the prefix only in the tree — if the dialog omits the prefix, drop it from every "Its line reads" in wave-timer, spawning-waves and win-and-lose too -->
 6. Leave **(All players)** as it is. Click **Text**, type `Defend the
    village! The first wave arrives soon.` and click **OK** twice.
 :::
 
-::shot[The Configure Event dialog over the Welcome trigger, with Time - Elapsed Game Time chosen and its line reading Elapsed game time is 5.00 seconds]{src="./trigger-basics/new-trigger.png"}
+::shot[The Configure Event dialog over the Welcome trigger, with Time - Elapsed Game Time chosen and its line reading Time - Elapsed game time is 5.00 seconds]{src="./trigger-basics/new-trigger.png"}
 
 The finished trigger looks like this in the editor:
 
@@ -158,7 +161,7 @@ If a line is wrong, double-click it to open its dialog again. Now test it:
 :::steps
 1. Save the map with :kbd[Ctrl+S], then choose :menu[File > Test Map], or
    press :kbd[Ctrl+F9].
-   <!-- verify: File > Test Map and Ctrl+F9 work from the Trigger Editor window -->
+   <!-- verify: File > Test Map and Ctrl+F9 work from the Object Editor and Trigger Editor windows, not only the main window -->
 2. As soon as the game starts, the message appears on the left of the screen,
    above the interface, and fades after a few seconds.
 3. Press :kbd[F10], choose **End Game**, then **Exit Program** to return to

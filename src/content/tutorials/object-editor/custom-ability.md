@@ -143,7 +143,6 @@ and the Gnoll Poacher still owes you the Potion of Healing from chapter 3.
 
 :::steps
 1. Choose :menu[File > Test Map], or press :kbd[Ctrl+F9].
-   <!-- verify: File > Test Map and Ctrl+F9 also work from the Object Editor window -->
 2. Select the Captain. A hero starts with one skill point: click the **Hero
    Abilities** button, the one with a plus sign, and hold the pointer over
    each ability. Shield Throw's learn tooltip shows your text.
@@ -159,7 +158,7 @@ and the Gnoll Poacher still owes you the Potion of Healing from chapter 3.
    editor.
 :::
 
-::shot[Warcraft III running Defend the Village in a Test Map game, with the Village Captain in the forest clearing casting Shield Throw at a stunned Gnoll, and the Shield Throw button's tooltip showing the level 1 text]{src="./custom-ability/shield-throw-test.png"}
+::shot[Warcraft III running Defend the Village in a Test Map game, with a Gnoll stunned by Shield Throw in the forest clearing and the pointer over the Shield Throw button, showing its level 1 tooltip]{src="./custom-ability/shield-throw-test.png"}
 
 The village has no altar to revive the Captain, so if he falls in a test,
 end the game and test again.

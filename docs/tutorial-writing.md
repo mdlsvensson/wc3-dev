@@ -41,16 +41,19 @@ The capture note in `::shot[…]` is also the image's alt text: describe what
 the screenshot shows and in which state ("The New Map dialog with Width and
 Height set to 96 and the Lordaeron Summer tileset selected"). A missing file
 renders as a placeholder showing the note. `caption` is optional and shown
-under the image.
+under the image. The `caption` attribute is plain text: Markdown in it is
+shown as written. A `::shot` must be on a line of its own.
 
-- Those five container directives are the only ones. Any other name
-  (`:::warning`, `:::danger`) is an error in both the build and
-  `tutorial:check`.
+- Spell directive names exactly. Those five container directives and
+  `::shot` are the only ones: any other `:::name` (`:::warning`,
+  `:::danger`) or `::name` fails both the build and `tutorial:check`.
 - `:::steps` takes no label (one is dropped); put a heading above it instead.
-  The `caption` attribute is plain text: Markdown in it is shown as written.
 - Separate keys with `+`. `:kbd[Ctrl++]` shows Ctrl and +.
 - A `::shot` src must stay inside the lesson's folder (`./<lesson>/…`, no
   `..`).
+- After you add a PNG, `deno task dev` may keep showing the cached
+  placeholder until the lesson file changes or the server restarts. Builds
+  always pick the image up.
 - Use inline links (`[text](/path/)`), not reference-style links
   (`[text][ref]`): only inline links to the framework docs are marked to
   reload the page, which those pages need.
@@ -99,18 +102,24 @@ runs from the north-west edge through the centre to the south-east edge; the
 path crosses it at the only ford (shallow water), in the centre square. A
 forest lies west of the river, and trees frame the map edges on a band of
 rough dirt.
+The cobbles are the **Cobble Path** tile, borrowed from the Village tileset.
 
 **Players and forces:** Player 1 (Red), User, "Defender", force "Villagers".
 Player 12 (Brown), Computer, "Invaders", force "Invaders", start location
-near the spawn. Fixed player settings. No other slots.
+a few tiles north of `Spawn`, outside it. Fixed player settings. No other
+slots.
+Both players are Human, with Fixed Start Location ticked; Use Custom Forces
+is ticked.
 
 **Village (Player 1):** Town Hall in the centre of the plateau, 4 Farms, a
-Lumber Mill, 5 Peasants, the start location. No gold mine; gold comes from
-the Setup trigger (500 gold, 200 lumber).
+Lumber Mill, 5 Peasants. No gold mine; gold comes from the `Setup` trigger
+(500 gold, 200 lumber).
+Player 1's start location is on the cobbled path just south of the Town Hall.
 
 **Creep camps (Neutral Hostile), off the wave route:** gnoll camp in the
 western forest (2 Gnolls, 1 Gnoll Poacher that drops a Potion of Healing);
-murloc camp on the river bank north of the ford (2 Murloc Tiderunners).
+murloc camp on the village's bank of the river, north-west of the ford
+(2 Murloc Tiderunners).
 
 **Regions:** `Spawn` at the south-west end of the path; `Village` around the
 Town Hall.
@@ -120,6 +129,7 @@ Town Hall.
   Maren, Tobin; Strength 22, Agility 14, Intelligence 16; abilities Shield
   Throw, Divine Shield, Devotion Aura, Resurrection. Placed for Player 1 next
   to the Town Hall.
+  Proper Names Used: 3.
 - Shield Throw: copied from Storm Bolt; 3 levels; damage 60/120/180; stun
   1/1.5/2 seconds; cooldown 8 seconds; 60 mana.
 - Village Tower: copied from the Guard Tower; Combat - Attack 1 - Damage Base
@@ -128,9 +138,14 @@ Town Hall.
   the Village Tower replaces the Scout Tower in its Techtree - Structures
   Built and takes the Scout Tower's button position, because the build menu
   is full.
+  Hotkey `T` (the Scout Tower's); tooltips of its own: "Build Village Tower"
+  and "A sturdy tower that attacks invaders on its own. Cheap and quick to
+  build."
 
 **Triggers** (category "Defend the Village"; `Melee Initialization` is disabled in
 chapter 1 and deleted in chapter 6):
+- The empty Initialization category is deleted along with Melee
+  Initialization.
 - Variables: `WaveNumber` (Integer, 0), `WaveUnitType` (Unit-Type array,
   size 5), `WaveTimer` (Timer), `WaveWindow` (Timer Window).
 - Welcome: Time - Elapsed game time is 0.00 seconds (text and timer windows

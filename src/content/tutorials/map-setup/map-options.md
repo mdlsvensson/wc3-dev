@@ -53,7 +53,7 @@ description "Nondescript".
 The loading screen is on screen while the game loads the map, which can take
 several seconds. That makes it a good place for the one thing a new player
 needs to know before the map starts. Defend the Village uses it to explain
-the goal: the waves, the towers and the captain's Shield Throw, which you make
+the goal: the waves, the towers and the Captain's Shield Throw, which you make
 in chapter 5.
 
 :::steps
@@ -99,7 +99,7 @@ Further down are settings for the map's look and sound: weather that covers
 the whole map, terrain fog, the lighting and sound environments, and the
 **Water Tinting Color** that the water lesson in chapter 2 mentioned. They are
 all optional, and this track keeps every one at its default.
-<!-- verify: the Map Options dialog in Reforged includes global weather, terrain fog, custom light and sound environments, and the water tint -->
+<!-- verify: the Map Options dialog in Reforged includes global weather, terrain fog, and custom light and sound environments -->
 
 When you close the dialog, click **Cancel** if you only looked, or **OK** if
 you changed something on purpose.

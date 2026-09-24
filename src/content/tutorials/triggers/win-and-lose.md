@@ -20,7 +20,7 @@ beaten. Then you play the whole map from start to finish.
 The village is lost when the Town Hall dies: one particular unit, the one
 you placed in chapter 3. You choose it by clicking it on the map, and the
 editor fills in its name, such as `Town Hall 0001 <gen>`. If yours has a
-different number, that is fine: the editor uses the right one.
+different number, the editor uses the right one.
 
 :::steps
 1. Select the **Defend the Village** category, press :kbd[Ctrl+T] and name the
@@ -29,7 +29,7 @@ different number, that is fine: the editor uses the right one.
 3. Click the unit in its line. In the dialog, click **Select Unit**. The
    editor switches to the main window: click the Town Hall. Back in the
    dialog, the unit is `Town Hall 0001 <gen>`, or your own number.
-   <!-- verify: the unit parameter dialog has a button (label?) that switches to the main window to click a placed unit, and returns with its name -->
+   <!-- verify: the unit parameter dialog has a Select Unit button that switches to the main window to click a placed unit, and returns with its name -->
 4. If the event in the line is not **Dies**, click it and choose **Dies**.
    The line reads `Unit - Town Hall 0001 <gen> Dies`. Click **OK**.
    <!-- verify: the default event of Unit - Specific Unit Event and its line format -->
@@ -71,9 +71,9 @@ It needs two conditions, and both must be true:
 2. Press :kbd[Ctrl+E] and choose **Unit - Player-Owned Unit Event**. Set the
    player to **Player 12 (Brown)** and the event to **Dies**. The line reads
    `Unit - A unit owned by Player 12 (Brown) Dies`.
-3. Press :kbd[Ctrl+D] to add a condition and choose **Integer Comparison**.
-   Set the first value to `WaveNumber`, leave **Equal to**, and set the
-   second value to `5`.
+3. Press :kbd[Ctrl+D] and choose **Integer Comparison**. Set the first
+   value to `WaveNumber`, leave **Equal to**, and set the second value to
+   `5`.
 4. Add a second **Integer Comparison**. Click its first value and choose the
    function **Count Units In Unit Group**.
 5. Click its unit group and choose **Units Owned By Player Matching
@@ -113,12 +113,12 @@ to the end.
 2. Use the minute before the first wave. Have the Peasants build Village
    Towers at the top of the ramp, and take the Captain to clear the creep
    camps for experience and the Potion of Healing.
-3. Hold the ford through all five waves. When the last invader dies, the
+3. Hold the ramp through all five waves. When the last invader dies, the
    victory dialog appears.
 4. Test Map again, and this time let the waves through. When the Town Hall
    falls, the defeat dialog appears with "The village has fallen."
-5. Leave the game from its dialog, or press :kbd[F10], and choose **Exit
-   Program** to return to the editor.
+5. Leave the game from its dialog, or press :kbd[F10], choose **End Game**,
+   then **Exit Program**, to return to the editor.
    <!-- verify: the buttons of the victory and defeat dialogs in a Reforged Test Map game, and how to leave the game from them -->
 :::
 

@@ -72,7 +72,7 @@ halves are **Standard Units** and **Custom Units**.
 5. Click the **Units** tab again.
 :::
 
-::shot[The Units tab with Standard Units, Human, Melee and Heroes opened in the tree and the Paladin selected, and Custom Units closed and empty above or below it]{src="./object-editor-tour/object-tree.png"}
+::shot[The Units tab with Standard Units, Human, Melee and Heroes opened in the tree and the Paladin selected, and the empty Custom Units folder visible in the tree]{src="./object-editor-tour/object-tree.png"}
 
 You can change a standard object's fields directly. The change applies only to
 this map, never to the game itself or to your other maps, but it applies to

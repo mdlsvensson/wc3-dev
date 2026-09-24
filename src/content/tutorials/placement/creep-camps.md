@@ -12,7 +12,7 @@ goals:
 The village is built, and in chapter 5 it gets a hero: the Village Captain.
 A hero grows stronger by gaining experience, and the classic way to gain it is
 to fight creeps: groups of monsters that guard parts of the map. In this
-lesson you place two small creep camps for the captain to clear between waves,
+lesson you place two small creep camps for the Captain to clear between waves,
 and make one of the creeps drop a healing potion when it dies. The camps go
 where the invaders will not meet them, so that they are still there when the
 player comes for them.
@@ -22,7 +22,7 @@ player comes for them.
 Creeps are not owned by any of the players in the game. They belong to a
 special player called **Neutral Hostile**, which is at war with everyone. A
 creep attacks any unit that comes close, whoever owns it: the player's
-Peasants, the captain, and the invaders from Player 12 alike. When nothing is
+Peasants, the Captain, and the invaders from Player 12 alike. When nothing is
 near, creeps stand guard at their camp, and if they chase something too far
 they walk back to it.
 
@@ -43,8 +43,8 @@ difference is the owner.
 ## Two camps
 
 The map gets two camps. A gnoll camp waits in the clearing you left in the
-western forest, and a murloc camp sits on the river bank a good way north of
-the ford.
+western forest, and a murloc camp sits on the village's bank of the river, a
+good way north-west of the ford.
 
 Where you put them matters more than what is in them. Creeps attack the
 invaders just as they attack the player, so a camp beside the path would fight
@@ -64,6 +64,8 @@ path up to the ramp. Eight or ten tiles from the path is a safe distance.
 4. Turn on the pathing view with :kbd[P] and check that each camp stands on
    walkable ground, not inside the trees or the deep water. Turn it off.
 5. Save the map with :kbd[Ctrl+S].
+6. Set the player list back to **Player 1 (Red)** and the race list to
+   **Human**.
 :::
 
 ::shot[The terrain view zoomed out over the west and centre of the map, with the gnoll camp of two Gnolls and a Gnoll Poacher in the forest clearing and two Murloc Tiderunners on the river bank north-west of the ford, both well away from the dirt path]{src="./creep-camps/creep-camps.png"}
@@ -96,7 +98,7 @@ The Gnoll Poacher gets one drop: a Potion of Healing, every time.
 
 The editor can also keep item tables for the whole map, which many units can
 share. That is worth it on a map with dozens of camps. This map has one drop,
-so a table on the unit itself is simpler. Once the captain has joined the
+so a table on the unit itself is simpler. Once the Captain has joined the
 village in chapter 5, you will see the potion fall when the gnoll camp is
 cleared.
 
@@ -117,4 +119,4 @@ exactly what the camps are for.
 
 If you want more challenge later, add a creep to a camp or swap one for a
 tougher kind, such as a Gnoll Brute. Change one camp at a time, and test it
-with the captain before you change the next.
+with the Captain before you change the next.

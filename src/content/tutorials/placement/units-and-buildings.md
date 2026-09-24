@@ -11,7 +11,7 @@ goals:
 
 The village has its fences, crates and lamp posts, but nobody lives there yet.
 In this lesson you build it for Player 1: a Town Hall on the cobbled square,
-farms and a lumber mill around it, and peasants to work. Because you switched
+Farms and a Lumber Mill around it, and Peasants to work. Because you switched
 off the melee setup in chapter 1, the game adds nothing of its own when the map
 starts: what you place here is exactly what the player gets. You also give
 Player 1 a start location, so the game knows where to point the camera, and
@@ -37,7 +37,6 @@ You place and select units the same way as doodads: pick one in the palette
 and click in the terrain view to place it, press :kbd[Esc] to stop placing,
 click a placed unit to select it and drag to move it, and press :kbd[Delete]
 to remove it.
-<!-- verify: Esc (or a right-click) stops placing in the Units layer, as in the Doodads layer -->
 
 ## Build the village
 
@@ -61,7 +60,7 @@ so the village does not need one.
 3. Click on the cobbled square in the centre of the plateau. The Town Hall
    appears in red.
    <!-- verify: the editor refuses to place a building where it does not fit (over a cliff edge, in water, on a tree or doodad that blocks it), and how it shows this -->
-4. Click **Farm** and place four farms near the edges of the plateau, away from
+4. Click **Farm** and place four Farms near the edges of the plateau, away from
    the cobbled path. Leave space between them and the Town Hall.
 5. Click **Lumber Mill** and place it near the edge of the plateau too.
 6. Under the units, click **Peasant** and place five Peasants close to the Town
