@@ -12,7 +12,7 @@ const { chapter } = Astro.props;
   <p>{chapter.summary}</p>
   <ol>
     {chapter.lessons.map((lesson) => (
-      <li><a href={lesson.href}>{lesson.data.title}</a><span>{formatMinutes(lesson.data.minutes)}</span></li>
+      <li><a href={lesson.href}>{lesson.data.title}</a> <span>{formatMinutes(lesson.data.minutes)}</span></li>
     ))}
   </ol>
 </article>
