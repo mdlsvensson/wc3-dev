@@ -17,8 +17,8 @@ Then it starts the timer again, until five waves have come.
 
 ## When the timer expires
 
-Spawn Wave has one event: `WaveTimer` expiring, first after Setup's 60
-seconds and then after each 45-second countdown this trigger starts.
+`Spawn Wave` has one event: `WaveTimer` expiring, after `Setup`'s 60
+seconds and then after each 45-second countdown it starts itself.
 
 :::steps
 1. Select the **Defend the Village** category, press :kbd[Ctrl+T] and name
@@ -46,11 +46,9 @@ with the wave's number.
    value to the variable `WaveNumber`, leave the operator at **+**, and set
    the second value to `1`. The line reads `Set WaveNumber = (WaveNumber +
    1)`.
-   <!-- verify: Arithmetic is listed as a function for integer values and its default operator is + -->
 3. Add the action **Unit - Create Units Facing Angle**. Its line reads
    `Unit - Create 1 Footman for Player 1 (Red) at (Center of (Playable map
    area)) facing Default building facing degrees`.
-   <!-- verify: the default line of Unit - Create Units Facing Angle, including its default facing (Default building facing) -->
 4. Click **1** and choose **Arithmetic** again: `WaveNumber` **+** `3`.
 5. Click **Footman** and choose the variable `WaveUnitType`. Click its
    index and choose the variable `WaveNumber`.
@@ -81,14 +79,13 @@ into text, and **Concatenate Strings** joins two pieces of text.
 In the editor the text shows as `((Wave  + (String(WaveNumber))) +  is
 coming!)`, with your spaces doubling up; in the game it reads "Wave 1 is
 coming!".
-<!-- verify: how Concatenate Strings and Convert Integer To String display in a line: (A + B) and (String(WaveNumber)) -->
 
 ## Send it to the village
 
-Player 12 has no AI, so the new units stand at the spawn until something
-gives them an order. The order is attack-move: walk to a place and attack
-every enemy met on the way. Attack-moving to the centre of the Village
-region takes the wave along the path, through the ford and up the ramp.
+Player 12 has no AI, so new units stand still until given an order.
+Attack-move means: walk to a place, attacking every enemy on the way.
+Attack-moving to the centre of Village takes the wave through the ford and
+up the ramp.
 
 **Unit Group - Pick Every Unit In Unit Group And Do Action** runs one
 action for each unit in a group, and inside it **Picked unit** means the
@@ -100,18 +97,18 @@ survivors of earlier waves get the order too.
    Action**.
 2. Click the unit group and choose the function **Units Owned By Player**,
    then set its player to **Player 12 (Brown)**.
-   <!-- verify: the function is listed as "Units Owned By Player" and displays as "(Units owned by Player 12 (Brown))" -->
-3. Click the action part and choose **Unit - Issue Order Targeting A
-   Point**.
-4. Leave the unit as **(Picked unit)**. Click the order and choose
-   **Attack-Move To**.
-   <!-- verify: Issue Order Targeting A Point's unit parameter defaults to (Picked unit) inside Pick Every Unit, and its order list includes Attack-Move To -->
-5. Click the point and make it the centre of `Village <gen>`: choose the
-   function **Center Of Region** if the point is not already one, then
-   choose `Village <gen>` as its region. Click **OK** until the dialog
-   closes.
-   <!-- verify: the function name "Center Of Region" and the default point of Issue Order Targeting A Point -->
+3. Click **Do nothing**, the action part, and choose **Unit - Issue Order
+   Targeting A Point**.
+4. Click the unit and choose the function **Picked Unit**. Click the order
+   and choose **Attack-Move To**.
+   <!-- verify: Pick Every Unit's default action shows as (Do nothing); Issue Order Targeting A Point defaults to Order (Triggering unit) to Move To (Center of (Playable map area)); Picked Unit is listed as a function -->
+5. The point is already **(Center of (Playable map area))**. Click
+   **(Playable map area)**, choose `Village <gen>`, and click **OK** until the
+   dialog closes.
 :::
+
+Check that the line says `Order (Picked unit)`: with any other unit, the
+waves never move.
 
 ::shot[The Pick every unit in (Units owned by Player 12 (Brown)) action in the Spawn Wave trigger, ordering (Picked unit) to Attack-Move To the centre of the Village region]{src="./spawning-waves/attack-move-action.png"}
 
@@ -127,7 +124,6 @@ whose **Else** actions run if not.
 1. Add the action **If / Then / Else, Multiple Functions**. It appears with
    three parts below it: **If - Conditions**, **Then - Actions** and **Else -
    Actions**.
-   <!-- verify: the If / Then / Else, Multiple Functions action's name and the labels of its three parts in Reforged -->
 2. Right-click **If - Conditions** and choose **New Condition**. Choose
    **Integer Comparison**, set the first value to `WaveNumber`, the operator
    to **Less than**, and the second value to `5`.
@@ -139,6 +135,8 @@ whose **Else** actions run if not.
    <!-- verify: the action's name "Countdown Timer - Show/Hide Timer Window" and its line "Countdown Timer - Hide WaveWindow" -->
 5. Save the map with :kbd[Ctrl+S].
 :::
+
+::shot[The Spawn Wave trigger in the Trigger Editor with the If / Then / Else, Multiple Functions action expanded: WaveNumber Less than 5 under If - Conditions, Start WaveTimer as a One-shot timer that will expire in 45.00 seconds under Then - Actions, and Hide WaveWindow under Else - Actions]{src="./spawning-waves/next-wave-action.png"}
 
 The finished trigger:
 
@@ -172,8 +170,7 @@ Now watch the waves come.
 :::steps
 1. Save the map, then choose :menu[File > Test Map], or press :kbd[Ctrl+F9].
 2. When the timer window reaches zero, "Wave 1 is coming!" appears and four
-   Gnolls appear at the spawn in brown. They walk along the path, wade
-   through the ford and head up the ramp.
+   brown Gnolls set off from the spawn, through the ford and up the ramp.
 3. Build a Village Tower or two at the top of the ramp, and meet the wave
    with the Captain.
 4. Every 45 seconds another wave comes, one unit bigger each time. After
@@ -184,5 +181,4 @@ Now watch the waves come.
 
 ::shot[Warcraft III running Defend the Village in a Test Map game, with the first wave of four brown Gnolls wading through the ford towards the village, the message "Wave 1 is coming!" on screen and the Next wave timer window counting down again]{src="./spawning-waves/wave-in-game.png"}
 
-The waves keep coming, but no one can win or lose yet. The last lesson adds
-both.
+No one can win or lose yet; the last lesson adds both.

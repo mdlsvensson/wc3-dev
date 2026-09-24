@@ -36,7 +36,7 @@ different number, that is fine: the editor uses the right one.
 5. Press :kbd[Ctrl+R] and choose **Game - Defeat**. Leave the player as
    **Player 1 (Red)**, click the message and type `The village has fallen.`
    Click **OK** until the dialog closes.
-   <!-- verify: Game - Defeat's default line, "Game - Defeat Player 1 (Red) with the message: Defeat!" -->
+   <!-- verify: Game - Defeat's default message ("Defeat!") -->
 :::
 
 - Events
@@ -47,8 +47,8 @@ different number, that is fine: the editor uses the right one.
 
 ::shot[The Defeat trigger in the Trigger Editor, with the event Unit - Town Hall 0001 Dies and the action Game - Defeat Player 1 (Red) with the message: The village has fallen.]{src="./win-and-lose/defeat-trigger.png"}
 
-This is why chapter 3 asked you to keep the Town Hall. If you ever delete it
-and place a new one, open this event and select the new one.
+This is why chapter 3 asked you to keep the Town Hall: a replacement would
+have to be selected here again.
 
 ## Victory
 
@@ -65,7 +65,6 @@ It needs two conditions, and both must be true:
   corpse for a while and still belongs to Player 12, so the condition counts
   only the units that are alive. The unit that has just died is not alive,
   so it is not counted either.
-<!-- verify: units owned by a player include dead units until their corpses are removed, and a unit is no longer alive when its Dies event runs -->
 
 :::steps
 1. Add a trigger named `Victory` to the category.
@@ -77,18 +76,16 @@ It needs two conditions, and both must be true:
    second value to `5`.
 4. Add a second **Integer Comparison**. Click its first value and choose the
    function **Count Units In Unit Group**.
-   <!-- verify: the function is listed as "Unit Group - Count Units In Unit Group" and displays as "(Number of units in …)" -->
 5. Click its unit group and choose **Units Owned By Player Matching
    Condition**. Set the player to **Player 12 (Brown)**.
 6. Click the condition and choose **Boolean Comparison**. Click its first
    value, choose **Unit Is Alive**, and set the unit to **(Matching unit)**.
    Leave **Equal to** and **True**.
-   <!-- verify: Boolean Comparison, Unit - Unit Is Alive and Event Response - Matching Unit, and how the nested condition displays -->
+   <!-- verify: the boolean function's list name ("Unit Is Alive" or "Is Unit Alive") -->
 7. Leave the comparison as **Equal to**, set the second value to `0`, and
    click **OK**.
 8. Press :kbd[Ctrl+R] and choose **Game - Victory**. Leave the player as
    **Player 1 (Red)** and the rest as it is.
-   <!-- verify: Game - Victory's default line reads "Game - Victory Player 1 (Red) (Show dialogs, Show scores)" -->
 9. Save the map with :kbd[Ctrl+S].
 :::
 
