@@ -14,14 +14,17 @@ installer and runner.
 | `deno install --frozen` | Install dependencies using `deno.lock` | Registry access for uncached packages |
 | `deno task build` | Evaluate Pkl, apply map settings, compile, inject objects, package the selected map | Pkl, source map |
 | `deno task build -minify` | Same build with Lua minification enabled | Pkl, source map |
+| `deno task build --entry <file>` | Same build with another entry point instead of `src/main.ts` (e.g. a library testbed) | Pkl, source map |
 | `deno task test` | Compile and launch the staged map directory | Pkl, source map, Warcraft III |
+| `deno task test --entry <file>` | Same launch with another entry point | Pkl, source map, Warcraft III |
 | `deno task test:unit` | Automated regression suite | No Pkl or game required |
 | `deno task test:assets:pkl` | Real Pkl configuration and asset CLI integration test | Pkl; no game required |
 | `deno task test:settings:pkl` | Real Pkl map-settings schema integration test | Pkl; no game required |
 | `deno task settings:check` | Validate map settings without writing map files | Source map; Pkl when `map-settings.pkl` exists |
 | `deno task assets:check` | Validate asset paths, ownership, and planned changes | Source map; Pkl when `assets.pkl` exists |
 | `deno task assets:sync` | Sync imports into the source map | Same as check; close the map in World Editor first |
-| `deno task typecheck` | Check tools and gameplay types | Current generated gameplay inputs |
+| `deno task typecheck` | Check tools and gameplay types (syncs map libraries first when needed) | Current generated gameplay inputs |
+| `deno task lib:sync` | Copy the map libraries in `config.json` `libraries` into `.lib/` and map them in `tsconfig.json` `paths` | Registry access unless linked; see [Using the library](/framework/docs/library/) |
 | `deno task lint` | Deno/custom lint followed by JSON/config validation | No Pkl or game required |
 | `deno task lint:json` | JSON/config validation only | No Pkl or game required |
 | `deno task objects:eval` | Regenerate `src/generated/objects.json` | Pkl |
@@ -56,6 +59,7 @@ replaces the entire array, not individual entries.
 | `launchArgs` | String array, `-launch -windowmode windowed` | Arguments appended after the generated `-loadfile` argument |
 | `winePath` | Optional string | Wine executable; enables the Wine launch branch |
 | `winePrefix` | Optional string | `WINEPREFIX` environment value for the launched process |
+| `libraries` | Optional string array, e.g. `["@mdlsvensson/wc3-lib"]` | JSR packages compiled into the map; each must also be a `deno.json` dependency. See [Using the library](/framework/docs/library/) |
 
 Keep `outputFolder` separate from both your source-map folder and the staging
 directory, normally under `dist/`. Changing it does not move staging or the Lua
@@ -84,6 +88,8 @@ also require platform-appropriate Deno/Pkl executables and independent validatio
 | `<outputFolder>/<mapFolder>` | `build` | Ignored with the default output folder |
 | `tsconfig.build.<pid>.json` | Compiler orchestration | Ignored; normally removed automatically |
 | `project.log` | CLI logging | Ignored; useful for diagnosing builds |
+| `.lib/<@scope>/<name>/` | `lib:sync`, `build`, `test`, `typecheck` | Ignored; TypeScript sources of each map library |
+| `tsconfig.json` `paths` entries into `./.lib/` | `lib:sync` | Tracked; version-less, change only when a library's entry points do |
 | `node_modules/` | Deno dependency installation | Ignored |
 
 Do not edit generated JSON or declarations as the source of a fix. Change Pkl or
@@ -97,6 +103,9 @@ such as `FourCC(objects.units.vanguard.id)` without evaluating them. Pkl rawcode
 constraints are stricter than the lint rule: Pkl requires alphanumeric IDs with
 category-specific prefixes, while lint accepts four printable ASCII characters.
 
-Generated files, map assets, and build output are excluded from normal linting.
+In `src/`, three more rules catch TypeScriptToLua 1.31 hazards: `lua-no-finally`, `lua-loop-closure`
+and `lua-truthiness` (see [Using the library](/framework/docs/library/#writing-code-for-lua)).
+
+Generated files, map assets, `.lib/` and build output are excluded from normal linting.
 `deno task lint` also validates JSON syntax and the merged project configuration.
 
