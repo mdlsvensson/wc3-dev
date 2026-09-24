@@ -20,7 +20,6 @@ Nothing you do here matters: you create the real map in the next lesson.
 
 The main window is where you shape the map itself. The editor calls it the
 Terrain Editor, even though you also place trees, units and regions in it.
-<!-- verify: the main window is listed as Terrain Editor (F3) in the Module menu -->
 
 ::shot[The World Editor main window with an empty map open, with the menu bar, toolbar, terrain view, minimap, palette window and status bar each outlined and labelled]{src="./editor-tour/main-window.png"}
 
@@ -50,7 +49,8 @@ Try each one on the map in front of you.
 
 :::steps
 1. Click once in the terrain view so that it has keyboard focus, then hold
-   the arrow keys. The view scrolls across the map.
+   the arrow keys. The view scrolls across the map. If the click paints the
+   ground, press :kbd[Ctrl+Z] to undo it.
    <!-- verify: whether the view also scrolls when the pointer reaches its edge (edge scrolling), as it does in the game -->
 2. Roll the mouse wheel over the terrain view. Rolling forward zooms in,
    rolling back zooms out.
@@ -84,14 +84,12 @@ You switch with the :menu[Layer] menu, the toolbar, or a single key.
 | **Regions** | :kbd[R] | Named rectangles that triggers use to find places on the map |
 | **Cameras** | :kbd[C] | Saved camera positions, used for cinematics and fixed views |
 
-<!-- verify: the Layer menu item names and their shortcut keys T, D, U, R and C in the Reforged editor -->
-
 Press each key in turn and watch the palette window change. The layer also
 decides what a click in the terrain view does: on the Units layer you can
 select and move units, but you cannot pick up a tree until you switch to
 Doodads. When a click does nothing, check which layer you are on.
 
-::shot[The palette window for each of the five layers side by side: Terrain, Doodads, Units, Regions and Cameras]{src="./editor-tour/palettes.png"}
+::shot[A composite of five captures of the palette window, one per layer, side by side: Terrain (T), Doodads (D), Units (U), Regions (R) and Cameras (C), each on the empty tour map]{src="./editor-tour/palettes.png"}
 
 Chapter 2 uses the Terrain layer, chapter 3 uses Doodads, Units and Regions.
 This track does not use cameras.
@@ -111,13 +109,13 @@ from the :menu[Module] menu, and each has a function key.
   here.
 - **Campaign Editor** (:kbd[F7]) bundles several maps into a campaign, the
   way the game's story is told.
-- **AI Editor** (:kbd[F8]) builds the scripts that computer players follow,
+- **AI Editor** (:kbd[F8]) builds the plans that computer players follow,
   such as when to expand and what to build.
 - **Object Manager** (:kbd[F11]) lists everything used on the map, such as
   each unit type and how many are placed, and where it is used.
 - **Asset Manager** (:kbd[F12]) is where you import your own files, such as
   custom models, icons and sounds, into the map.
-<!-- verify: every name and key in the Module menu: Trigger Editor F4, Sound Editor F5, Object Editor F6, Campaign Editor F7, AI Editor F8, Object Manager F11, and whether F12 is called Asset Manager or Import Manager in Reforged -->
+<!-- verify: F12 is "Asset Manager" in the Reforged Module menu -->
 
 ::shot[The Module menu open in the main window, listing the other editors with their function keys]{src="./editor-tour/module-menu.png"}
 

@@ -40,9 +40,9 @@ paths and the trees of the human kingdom, a good fit for a village.
 ::shot[The Create New Map dialog with Width and Height set to 96, Lordaeron Summer selected as the tileset and Grass as the initial tile]{src="./create-your-map/new-map-dialog.png"}
 
 The dialog also shows a **Playable Map Area** that is a little smaller than 96 ×
-96. A narrow border around the edge of every map is outside the camera's reach:
-players can see it at the edges of the screen, but cannot scroll into it or
-walk there. Keep that in mind when you place things near the edge.
+96. The game draws a narrow border around the edge of every map as a dark
+edge: players cannot scroll into it or walk there. Keep that in mind when you
+place things near the edge.
 <!-- verify: the New Map dialog shows the playable map area, and its size for a 96 × 96 map -->
 
 The new map opens in the main window: a square of grass, seen from above.
@@ -55,7 +55,8 @@ disk.
 :::steps
 1. Choose :menu[File > Save Map As].
 2. Go to your own maps folder, `Documents\Warcraft III\Maps\My Maps`, the one
-   you made in the first lesson.
+   you made in the first lesson. If it is not there, click **New folder** in
+   the dialog and name it `My Maps`.
 3. Name the map `DefendTheVillage` and click **Save**. The editor adds the
    `.w3x` extension, so the file is `DefendTheVillage.w3x`.
    <!-- verify: the Save Map As dialog adds .w3x by default in Reforged, with no extra save-format choice needed -->
@@ -81,13 +82,13 @@ You switch the trigger off rather than delete it for now. Chapter 6 explains
 :::steps
 1. Open the Trigger Editor with :menu[Module > Trigger Editor], or press
    :kbd[F4].
-2. In the list on the left, open the **Melee Initialization** category and
-   select the `Melee Initialization` trigger inside it. Its events and actions
-   appear on the right.
-   <!-- verify: a new map's trigger list has a category named "Melee Initialization" containing the trigger of the same name -->
+2. In the list on the left, open the **Initialization** category and select
+   the `Melee Initialization` trigger inside it. Its events and actions appear
+   on the right.
+   <!-- verify: a new map's trigger list has a category named "Initialization" containing Melee Initialization -->
 3. Above the actions, untick **Enabled**. The trigger's icon in the list
    changes to show that it is disabled.
-   <!-- verify: the checkbox label "Enabled" in the trigger panel, and how a disabled trigger looks in the list -->
+   <!-- verify: how a disabled trigger's icon looks in the trigger list -->
 4. Close the Trigger Editor and save the map with :kbd[Ctrl+S].
 :::
 
@@ -96,21 +97,22 @@ You switch the trigger off rather than delete it for now. Chapter 6 explains
 :::caution[Untick Enabled, not Initially On]
 Next to **Enabled** is a box called **Initially On**. Leave it alone and
 untick **Enabled** only: a disabled trigger is left out of the map entirely,
-while **Initially On** controls something else. If the melee
-setup stays on, later tests give Player 1 an extra town hall and workers, and
+while a trigger that is not initially on stays in the map, waiting for another
+trigger to turn it on. If the melee setup stays on, later tests give Player 1 an extra town hall and workers, and
 the melee rules can end a test before your own triggers ever run.
 :::
 
 ## Test it
 
-Test Map starts Warcraft III with the map open in the editor, so you can play
-it straight away. You will do this after almost every lesson, to see your
+Test Map starts Warcraft III and loads the map that is open in the editor, so
+you can play it straight away. You will do this after almost every lesson, to see your
 changes the way a player will.
 
 :::steps
 1. Save the map with :kbd[Ctrl+S].
 2. Choose :menu[File > Test Map], or press :kbd[Ctrl+F9]. The game starts and
    loads your map. This can take a little while, especially the first time.
+   <!-- verify: Test Map runs a map with no start locations yet (no error), and where the camera starts -->
 3. Look around with the arrow keys and the minimap. There is nothing but grass
    and the dark border at the edge of the map: no units and no buildings yet.
 4. To return to the editor, press :kbd[F10] to open the game menu, choose
