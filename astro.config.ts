@@ -8,6 +8,8 @@ export default defineConfig({
   site: 'https://wc3.dev',
   output: 'static',
   trailingSlash: 'always',
+  // Lesson screenshots (the only astro:assets images) get a srcset of WebP widths, never wider than the original.
+  image: { layout: 'constrained' },
   env: {
     schema: {
       // Where resource files are served from (the asset store). Required for builds that render resource files.

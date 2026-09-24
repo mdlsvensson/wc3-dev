@@ -1,6 +1,7 @@
 import { fromFileUrl, join } from 'jsr:@std/path@^1';
 import { extract } from 'jsr:@std/front-matter@^1/yaml';
 import { z } from 'astro/zod';
+import { markdownToMdast, type MdastNode } from 'satteri';
 import { chapters } from '../../src/data/tutorials.ts';
 import { lessonSchema, TUTORIAL_SLUG, tutorialPageSchema } from '../../src/lib/tutorial-schema.ts';
 
@@ -15,15 +16,34 @@ export interface TutorialReport {
   verify: VerifyNote[];
 }
 
-const FENCE = /^(```|~~~)[\s\S]*?^\1[^\n]*$/gm;
-const SHOT = /^::shot\[([^\]]*)\](?:\{([^}]*)\})?[ \t]*$/gm;
-const ATTRIBUTE = /(\w+)="([^"]*)"/g;
 const VERIFY = /<!--\s*verify:\s*([\s\S]*?)\s*-->/g;
 const IMAGE = /\.(png|jpe?g|webp)$/i;
-/** An opening container directive; closing `:::` lines have no name. */
-const CONTAINER = /^:{3,}([A-Za-z][\w-]*)/gm;
 /** Container directives `src/markdown/tutorial-directives.ts` renders; the build rejects any other. */
 const CONTAINERS = ['steps', 'tip', 'note', 'caution', 'checkpoint'];
+/** The only leaf directive; the build rejects any other. */
+const LEAVES = ['shot'];
+
+type Node = MdastNode & { name?: string; attributes?: Record<string, string | null | undefined> | null; value?: string; depth?: number; children?: Node[] };
+
+/** The text a node renders, like Sätteri's `ctx.textContent`. */
+const textContent = (node: Node): string => typeof node.value === 'string' ? node.value : (node.children ?? []).map(textContent).join('');
+
+/** What the lesson body contains, found by parsing it as the build does (so fenced code never counts). */
+interface Scan { sections: number; unknown: string[]; shots: { note: string; src: string }[]; verify: string[] }
+
+function scan(body: string): Scan {
+  const found: Scan = { sections: 0, unknown: [], shots: [], verify: [] };
+  const visit = (node: Node) => {
+    if (node.type === 'heading' && node.depth === 2) found.sections++;
+    else if (node.type === 'containerDirective' && !CONTAINERS.includes(node.name!)) found.unknown.push(`:::${node.name}`);
+    else if (node.type === 'leafDirective' && !LEAVES.includes(node.name!)) found.unknown.push(`::${node.name}`);
+    else if (node.type === 'leafDirective') found.shots.push({ note: textContent(node), src: node.attributes?.src ?? '' });
+    else if (node.type === 'html') for (const [, note] of node.value!.matchAll(VERIFY)) found.verify.push(note.replace(/\s+/g, ' '));
+    for (const child of node.children ?? []) visit(child);
+  };
+  visit(markdownToMdast(body, { features: { directive: true }, position: false }) as Node);
+  return found;
+}
 
 const describe = (error: unknown) =>
   error instanceof z.ZodError ? z.prettifyError(error).replaceAll('\n', ' ') : error instanceof Error ? error.message : String(error);
@@ -37,13 +57,13 @@ async function sortedEntries(dir: string): Promise<Deno.DirEntry[]> {
 const exists = (path: string) => Deno.stat(path).then(() => true, () => false);
 
 /** Checks one Markdown file; returns its parsed frontmatter, or undefined when it has errors. */
-async function checkPage(
+async function checkPage<Data>(
   report: TutorialReport,
   dir: string,
   page: string,
-  schema: typeof lessonSchema | typeof tutorialPageSchema,
+  schema: z.ZodType<Data>,
   needsSection: boolean,
-): Promise<Record<string, unknown> | undefined> {
+): Promise<Data | undefined> {
   const name = page.split('/').at(-1)!;
   const file = `${page}.md`;
   if (!TUTORIAL_SLUG.test(name)) report.errors.push(`${file}: file name must be a lowercase kebab-case slug`);
@@ -55,24 +75,21 @@ async function checkPage(
     report.errors.push(`${file}: frontmatter: ${describe(error)}`);
     return undefined;
   }
-  const prose = body.replace(FENCE, '');
-  if (needsSection && !/^## /m.test(prose)) report.errors.push(`${file}: a lesson needs at least one "## " section heading`);
-  for (const [, directive] of prose.matchAll(CONTAINER)) {
-    if (!CONTAINERS.includes(directive)) {
-      report.errors.push(`${file}: unknown directive ":::${directive}"; use one of ${CONTAINERS.map((known) => `:::${known}`).join(', ')}`);
-    }
+  const found = scan(body);
+  if (needsSection && found.sections === 0) report.errors.push(`${file}: a lesson needs at least one "## " section heading`);
+  for (const directive of found.unknown) {
+    const known = [...CONTAINERS.map((name) => `:::${name}`), ...LEAVES.map((name) => `::${name}`)];
+    report.errors.push(`${file}: unknown directive "${directive}"; use one of ${known.join(', ')}`);
   }
-  for (const [, note, attributeText = ''] of prose.matchAll(SHOT)) {
+  for (const { note, src } of found.shots) {
     report.shots++;
-    const attributes = Object.fromEntries([...attributeText.matchAll(ATTRIBUTE)].map(([, key, value]) => [key, value]));
-    const src = attributes.src ?? '';
-    if (!src.startsWith(`./${name}/`) || !IMAGE.test(src)) {
-      report.errors.push(`${file}: screenshot "${note}" must be a .png, .jpg or .webp in ./${name}/ (got "${src}")`);
+    if (!src.startsWith(`./${name}/`) || !IMAGE.test(src) || src.split(/[/\\]/).includes('..')) {
+      report.errors.push(`${file}: screenshot "${note}" must be a .png, .jpg or .webp in ./${name}/, without ".." (got "${src}")`);
     } else if (!(await exists(join(dir, src)))) {
       report.missing.push({ page, src, note });
     }
   }
-  for (const [, note] of prose.matchAll(VERIFY)) report.verify.push({ page, note: note.replace(/\s+/g, ' ') });
+  for (const note of found.verify) report.verify.push({ page, note });
   const parsed = schema.safeParse(attrs);
   if (!parsed.success) {
     report.errors.push(`${file}: ${describe(parsed.error)}`);
@@ -102,7 +119,7 @@ export async function checkTutorials(root: string, chapterSlugs: readonly string
       report.lessons++;
       const data = await checkPage(report, dir, page, lessonSchema, true);
       if (!data) continue;
-      const order = data.order as number;
+      const { order } = data;
       const other = orders.get(order);
       if (other) report.errors.push(`${page}.md: order ${order} is also used by ${other}`);
       else orders.set(order, page);

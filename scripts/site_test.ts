@@ -197,6 +197,17 @@ async function lessonIds(): Promise<string[]> {
 const readRoute = (path: string) => Deno.readTextFile(new URL(`${path.replace(/^\//, '')}index.html`, root));
 const between = (html: string, start: string, end: string) => html.slice(html.indexOf(start), html.indexOf(end, html.indexOf(start)));
 
+/** Fails when a directive reached the page as text: an unknown one (`:key[F9]`), or a stray `:::` fence. */
+function assertNoRawDirectives(html: string, path: string): void {
+  const text = between(html, '<main', '</main>')
+    .replace(/<script\b[\s\S]*?<\/script>/g, '')
+    .replace(/<style\b[\s\S]*?<\/style>/g, '')
+    .replace(/<[^>]*>/g, ' ');
+  // Prose such as "Hint:yes" has no space or bracket before the colon, so it is not a directive.
+  const raw = text.match(/(^|[\s(])::?[a-z][\w-]*[\[{]|:::/m);
+  assert(!raw, `Raw directive text "${raw?.[0].trim()}" on ${path}`);
+}
+
 Deno.test('the tutorial track chains every lesson from the overview to the closing page', async () => {
   const landing = await readRoute('/learn/');
   assert(!landing.includes('name="wc3-tab"'), 'The track overview is a section page, not a tab');
@@ -214,7 +225,7 @@ Deno.test('the tutorial track chains every lesson from the overview to the closi
     const current = [...outline.matchAll(/<a href="([^"]+)" aria-current="page"/g)].map((match) => match[1]);
     assert.deepEqual(current, [path], `The outline marks exactly the current lesson (${path})`);
     const main = between(html, '<main', '</main>');
-    assert(!/:::|::shot|:(kbd|menu)\[/.test(main), `Raw directive text on ${path}`);
+    assertNoRawDirectives(html, path);
     for (const [, attributes] of main.matchAll(/<h2([^>]*)>/g)) assert.match(attributes, /\bid="/, `A heading without an id on ${path}`);
     previous = path;
     path = html.match(/<a class="pager-next" rel="next" href="([^"]+)"/)?.[1];
@@ -223,6 +234,7 @@ Deno.test('the tutorial track chains every lesson from the overview to the closi
   assert.deepEqual(visited.map((route) => route.slice('/learn/'.length, -1)).sort(), await lessonIds());
   const closing = await readRoute('/learn/next/');
   assert.match(closing, /<meta name="wc3-tab"/);
+  assertNoRawDirectives(closing, '/learn/next/');
   assert.equal(closing.match(/<a class="pager-prev" rel="prev" href="([^"]+)"/)?.[1], previous);
   assert(!closing.includes('class="pager-next"'), 'The closing page ends the track');
 });

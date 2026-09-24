@@ -9,6 +9,10 @@ const CALLOUTS: Record<string, string> = { tip: 'Tip', note: 'Note', caution: 'C
 const CHECKPOINT_TITLE = 'Checkpoint: your map now…';
 /** Every container directive a lesson may use; any other is an error. */
 const CONTAINERS = ['steps', ...Object.keys(CALLOUTS), 'checkpoint'];
+/** Every leaf directive a lesson may use; any other is an error. */
+const LEAVES = ['shot'];
+/** An author note marking an editor fact to confirm; `tutorial:check` lists them. */
+const VERIFY = /<!--\s*verify:[\s\S]*?-->/g;
 
 export function isTutorialFile(fileURL: URL | undefined): fileURL is URL {
   return fileURL !== undefined && fileURLToPath(fileURL).replaceAll('\\', '/').includes(TUTORIALS_DIR);
@@ -44,7 +48,11 @@ function keys(combination: string, fileURL: URL): MdastNode {
 function menuPath(path: string): MdastNode {
   const children: Child[] = [];
   path.split('>').map((item) => item.trim()).filter(Boolean).forEach((item, index) => {
-    if (index > 0) children.push(element('emphasis', 'span', { className: ['menu-sep'], ariaHidden: 'true' }, [text('›')]));
+    if (index > 0) {
+      // Screen readers hear " > " rather than the decorative chevron.
+      children.push(element('emphasis', 'span', { className: ['menu-sep'], ariaHidden: 'true' }, [text('›')]));
+      children.push(element('emphasis', 'span', { className: ['visually-hidden'] }, [text(' > ')]));
+    }
     children.push(element('emphasis', 'span', {}, [text(item)]));
   });
   return element('emphasis', 'span', { className: ['menu-path'] }, children);
@@ -74,7 +82,8 @@ function shot(alt: string, attributes: Record<string, string | null | undefined>
     return element('blockquote', 'figure', { className: ['shot'] }, [{ type: 'image', url: src, alt }, ...figcaption]);
   }
   return element('blockquote', 'figure', { className: ['shot', 'shot-missing'] }, [
-    element('paragraph', 'div', { className: ['shot-placeholder'] }, [
+    // The placeholder is for authors; keep its capture note out of the search index.
+    element('paragraph', 'div', { className: ['shot-placeholder'], dataPagefindIgnore: '' }, [
       element('emphasis', 'span', { className: ['shot-flag'] }, [text('Screenshot needed')]),
       element('emphasis', 'span', { className: ['shot-note'] }, [text(alt)]),
     ]),
@@ -93,26 +102,32 @@ export function tutorialDirectives({ fileURL }: PluginFactoryContext): MdastPlug
     },
     leafDirective(node, ctx) {
       if (node.name === 'shot') return shot(ctx.textContent(node), node.attributes, fileURL);
+      // A misspelled `::shot` would otherwise vanish from the page without a trace.
+      throw new Error(`Unknown leaf directive "::${node.name}" in ${fileURLToPath(fileURL)}; use one of ${LEAVES.map((name) => `::${name}`).join(', ')}`);
     },
-    containerDirective(node) {
+    containerDirective(node, ctx) {
       // A `:::name[label]` label arrives as a first paragraph flagged `directiveLabel`.
       const [first, ...rest] = node.children;
       const label = first?.type === 'paragraph' && first.data?.directiveLabel ? first : undefined;
       const body = label ? rest : node.children;
-      const title = (fallback: string) =>
-        element('paragraph', 'p', { className: ['tutorial-callout-title'] }, label && label.children.length > 0 ? label.children : [text(fallback)]);
+      const custom = label && label.children.length > 0 ? label : undefined;
+      // The <aside> is named by its title, so a landmark list reads "Tip", "Caution: Save first", and so on.
+      const aside = (className: string[], fallback: string) =>
+        element('blockquote', 'aside', { className, ariaLabel: custom ? ctx.textContent(custom) : fallback }, [
+          element('paragraph', 'p', { className: ['tutorial-callout-title'] }, custom ? custom.children : [text(fallback)]),
+          ...body,
+        ]);
       if (node.name === 'steps') return element('blockquote', 'div', { className: ['tutorial-steps'] }, body);
-      if (node.name === 'checkpoint') return element('blockquote', 'aside', { className: ['tutorial-checkpoint'] }, [title(CHECKPOINT_TITLE), ...body]);
+      if (node.name === 'checkpoint') return aside(['tutorial-checkpoint'], CHECKPOINT_TITLE);
       const calloutTitle = CALLOUTS[node.name];
-      if (calloutTitle) {
-        return element('blockquote', 'aside', { className: ['tutorial-callout', `tutorial-callout-${node.name}`] }, [title(calloutTitle), ...body]);
-      }
+      if (calloutTitle) return aside(['tutorial-callout', `tutorial-callout-${node.name}`], calloutTitle);
       // Starlight would restore an unknown container as a bare <div>, silently losing its meaning.
       throw new Error(`Unknown container directive ":::${node.name}" in ${fileURLToPath(fileURL)}; use one of ${CONTAINERS.map((name) => `:::${name}`).join(', ')}`);
     },
     html(node) {
-      // Author notes marking editor facts to confirm; `tutorial:check` lists them.
-      if (/^\s*<!--\s*verify:/.test(node.value)) return { raw: '' };
+      // Drop only the note, so HTML or text beside it on the same line survives.
+      const kept = node.value.replace(VERIFY, '');
+      if (kept !== node.value) return { raw: kept };
     },
     link(node, ctx) {
       // Starlight pages don't use the shell's client router; load them in full.

@@ -64,3 +64,48 @@ Deno.test('structural problems are errors', async () => {
   expect(/^terrain\/: chapter has no lessons/);
   expect(/^next\.md: /);
 });
+
+Deno.test('shots, sections and verify notes are found as the build parses them', async () => {
+  const body = [
+    'Setext section',
+    '--------------',
+    '',
+    '::shot[The [Spawn] region]{src="./parse/spawn.png"}',
+    '',
+    ':::steps',
+    '1. Place a unit.',
+    '',
+    "   ::shot[Inside a step]{src='./parse/step.png' caption=\"Placed.\"}",
+    ':::',
+    '',
+    '> ::shot[Quoted]{src=./parse/quote.png}',
+    '',
+    '````md',
+    '```',
+    '::shot[Inside a fence]{src="./parse/fence.png"}',
+    '```',
+    '````',
+    '',
+    'Text <!-- verify: an inline note --> after it.',
+  ].join('\n');
+  const root = await fixture({ 'basics/parse.md': lesson(1, body), 'next.md': '---\ntitle: Where to go next\nsummary: Onward.\n---\n' });
+  const report = await checkTutorials(root, ['basics']);
+  assert.deepEqual(report.errors, []);
+  assert.deepEqual(report.missing.map(({ src, note }) => [src, note]), [
+    ['./parse/spawn.png', 'The [Spawn] region'],
+    ['./parse/step.png', 'Inside a step'],
+    ['./parse/quote.png', 'Quoted'],
+  ]);
+  assert.equal(report.shots, 3);
+  assert.deepEqual(report.verify, [{ page: 'basics/parse', note: 'an inline note' }]);
+});
+
+Deno.test('an unknown leaf directive is an error', async () => {
+  const root = await fixture({
+    'basics/typo.md': lesson(1, '## Start\n\n::shto[A typo]{src="./typo/a.png"}'),
+    'next.md': '---\ntitle: Where to go next\nsummary: Onward.\n---\n',
+  });
+  const report = await checkTutorials(root, ['basics']);
+  assert.deepEqual(report.errors, ['basics/typo.md: unknown directive "::shto"; use one of :::steps, :::tip, :::note, :::caution, :::checkpoint, ::shot']);
+  assert.equal(report.shots, 0);
+});
