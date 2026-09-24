@@ -61,10 +61,8 @@ attacks, but that script is started by the melee setup, which you switched
 off in chapter 1. So Player 12 has no AI at all. It builds nothing and plans
 nothing, and its units stand where they are, fighting only what comes near,
 until something gives them an order. In chapter 6 the triggers give those
-orders: they create each wave and send it to the village. That is the point
-of a computer player without an AI: your triggers, not the game, decide
-everything the enemy does.
-<!-- verify: with Melee Initialization disabled, a Computer player runs no AI script, and its units only act on their own to attack enemies that come near -->
+orders: they create each wave and send it to the village. Your triggers,
+not the game, decide everything the enemy does.
 
 :::steps
 1. Choose :menu[Scenario > Player Properties].
@@ -73,10 +71,10 @@ everything the enemy does.
 3. In the row for **Player 12 (Brown)**, set **Name** to `Invaders`,
    **Controller** to **Computer** and **Race** to **Human**.
    <!-- verify: the Player Properties layout in Reforged (one row per player with Name, Controller, Race and Fixed Start Location) and whether it has more than one tab -->
-4. If the rows have a **Fixed Start Location** box, tick it for both
-   players, so each always starts at their own marker.
-5. Leave every other row as it is. None of them has a start location, so
-   none of them is in the map.
+4. Tick **Fixed Start Location** for both players, so each always starts at
+   their own marker.
+5. The dialog lists only players with a start location, so Player 1 and
+   Player 12 are the only rows.
 6. Click **OK** and save the map.
 :::
 
@@ -123,7 +121,7 @@ Each force has a set of boxes that apply between the players inside it:
   all do.
 - **Share Vision** lets each of them see what the others' units see.
 - **Share Unit Control** lets them give orders to each other's units.
-<!-- verify: the force flag labels in Reforged (Allied, Allied Victory, Share Vision, Share Unit Control, Share Advanced Unit Control) -->
+<!-- verify: the force flag labels in Reforged (Allied, Allied Victory, Share Vision, Share Unit Control) -->
 
 With one player in each force, these boxes change nothing here, so leave
 them as they are.
@@ -133,7 +131,6 @@ them as they are.
 Test Map goes straight into the game without a lobby, so it shows the
 loading screen but not the slots. To see the map the way a player first
 meets it, open it from the game's own custom game screen as well.
-<!-- verify: Test Map skips the lobby and loads the map directly -->
 
 :::steps
 1. Save the map, then choose :menu[File > Test Map], or press :kbd[Ctrl+F9].
@@ -144,9 +141,9 @@ meets it, open it from the game's own custom game screen as well.
    the editor.
 3. Start Warcraft III from the Battle.net app, choose **Single Player**, then
    **Custom Game**.
-   <!-- verify: the Reforged main menu path to a single-player custom game (Single Player > Custom Game) -->
+   <!-- verify: the Reforged main menu path to play a local custom map alone (Single Player > Custom Game, or Single Player > Skirmish), and whether the map list shows the My Maps folder -->
 4. In the map list, open the `My Maps` folder and select Defend the Village.
-   Your name, description, suggested players and the minimap preview appear
+   The map's name, description, suggested players and minimap preview appear
    beside the list.
 5. Look at the slots: you in the Villagers team as Human, and the Invaders
    computer in its own team. You cannot change the teams or races, because
