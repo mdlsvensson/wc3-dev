@@ -1,0 +1,18 @@
+---
+import { formatMinutes, type TrackChapter } from '../../lib/tutorials';
+interface Props { chapter: TrackChapter }
+const { chapter } = Astro.props;
+---
+<article class="chapter-card">
+  <header>
+    <span class="chapter-number">Chapter {chapter.number}</span>
+    <h2>{chapter.title}</h2>
+    <span class="chapter-minutes">{formatMinutes(chapter.minutes)}</span>
+  </header>
+  <p>{chapter.summary}</p>
+  <ol>
+    {chapter.lessons.map((lesson) => (
+      <li><a href={lesson.href}>{lesson.data.title}</a> <span>{formatMinutes(lesson.data.minutes)}</span></li>
+    ))}
+  </ol>
+</article>

@@ -1,14 +1,41 @@
 ---
 import { ArrowRight, ArrowUpRight } from 'lucide-astro';
 import Shell from '../../layouts/Shell.astro';
+import ChapterCard from '../../components/learn/ChapterCard.astro';
+import TrackOutline from '../../components/learn/TrackOutline.astro';
+import { TRACK } from '../../data/tutorials';
+import { closingLink, getClosingPage, getTrack } from '../../lib/learn';
+import { formatMinutes } from '../../lib/tutorials';
 import '../../styles/home.css';
+import '../../styles/learn.css';
+
+const track = await getTrack();
+const closing = await closingLink();
+const closingPage = await getClosingPage();
+const first = track.lessons[0];
+const total = track.lessons.reduce((sum, lesson) => sum + lesson.data.minutes, 0);
 ---
-<Shell title="Learn" description="Step-by-step tutorials for modding Warcraft III: Reforged.">
-  <div class="portal-workspace wrap">
-    <div class="workspace-heading"><h1>Learn to mod <span>Warcraft III.</span></h1><p>Step-by-step Reforged tutorials, from your first World Editor map to scripted systems, are being written.</p></div>
+<Shell title="Learn" description="Getting started with Warcraft III: Reforged modding, from your first World Editor map to a playable game.">
+  <TrackOutline slot="side" track={track} closing={closing} />
+  <div class="learn-landing wrap">
+    <div class="workspace-heading">
+      <p class="eyebrow">{TRACK.title}</p>
+      <h1>Learn to mod <span>Warcraft III.</span></h1>
+      <p class="track-intro">Build <strong>Defend the Village</strong>, a small map where you hold a village against five waves of gnolls and ogres. You start from an empty map and finish with a playable game, using only the World Editor. All you need is Warcraft III: Reforged; no programming.</p>
+    </div>
+    <ul class="track-stats">
+      <li><strong>{track.chapters.length}</strong> chapters</li>
+      <li><strong>{track.lessons.length}</strong> lessons</li>
+      <li>About <strong>{formatMinutes(total)}</strong></li>
+    </ul>
     <div class="actions">
-      <a class="button primary" href="/framework/docs/installation/" data-astro-reload>Start with the w3ts framework <ArrowRight size={18} /></a>
+      {first && <a class="button primary track-start" href={first.href}>Start the track <ArrowRight size={18} /></a>}
       <a class="button secondary" href="https://www.hiveworkshop.com/">Hive Workshop <ArrowUpRight size={18} /></a>
     </div>
+    <div class="chapter-grid">{track.chapters.map((chapter) => <ChapterCard chapter={chapter} />)}</div>
+    <section class="docs-callout track-next">
+      <div><h2>{closingPage.data.title}</h2><p>{closingPage.data.summary}</p></div>
+      <a class="button secondary" href={closing.href}>Read on <ArrowRight size={18} /></a>
+    </section>
   </div>
 </Shell>

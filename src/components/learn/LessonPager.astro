@@ -1,0 +1,20 @@
+---
+import { ArrowLeft, ArrowRight } from 'lucide-astro';
+import type { PagerLink } from '../../lib/tutorials';
+interface Props { previous?: PagerLink; next?: PagerLink }
+const { previous, next } = Astro.props;
+---
+<nav class="lesson-pager" aria-label="Previous and next">
+  {previous && (
+    <a class="pager-prev" rel="prev" href={previous.href}>
+      <span class="pager-label"><ArrowLeft size={14} aria-hidden="true" /> Previous</span>
+      <span class="pager-title">{previous.title}</span>
+    </a>
+  )}
+  {next && (
+    <a class="pager-next" rel="next" href={next.href}>
+      <span class="pager-label">Next <ArrowRight size={14} aria-hidden="true" /></span>
+      <span class="pager-title">{next.title}</span>
+    </a>
+  )}
+</nav>
