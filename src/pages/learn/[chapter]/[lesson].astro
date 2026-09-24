@@ -1,0 +1,33 @@
+---
+import { render } from 'astro:content';
+import Shell from '../../../layouts/Shell.astro';
+import LessonHeader from '../../../components/learn/LessonHeader.astro';
+import LessonPager from '../../../components/learn/LessonPager.astro';
+import TrackOutline from '../../../components/learn/TrackOutline.astro';
+import { closingLink, getTrack } from '../../../lib/learn';
+import { pager, sectionHeadings } from '../../../lib/tutorials';
+import '../../../styles/learn.css';
+
+export async function getStaticPaths() {
+  const track = await getTrack();
+  const closing = await closingLink();
+  return track.lessons.map((lesson) => ({
+    params: { chapter: lesson.chapter, lesson: lesson.slug },
+    props: { track, lesson, closing },
+  }));
+}
+
+type Props = Awaited<ReturnType<typeof getStaticPaths>>[number]['props'];
+const { track, lesson, closing } = Astro.props as Props;
+const { Content, headings } = await render(lesson.entry);
+const chapter = track.chapters[lesson.chapterNumber - 1];
+const { previous, next } = pager(track, lesson.id, closing);
+---
+<Shell title={lesson.data.title} description={lesson.data.summary} tab>
+  <TrackOutline slot="side" track={track} closing={closing} currentId={lesson.id} headings={sectionHeadings(headings)} />
+  <article class="lesson wrap">
+    <LessonHeader lesson={lesson} chapterTitle={chapter.title} />
+    <div class="lesson-body"><Content /></div>
+    <LessonPager previous={previous} next={next} />
+  </article>
+</Shell>
