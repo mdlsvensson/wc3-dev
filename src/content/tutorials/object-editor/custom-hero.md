@@ -28,7 +28,7 @@ abilities. Everything you then change applies only to the copy.
    select **Paladin**.
 3. Press :kbd[Ctrl+C] to copy it, then :kbd[Ctrl+V] to paste. You can also
    right-click the Paladin and use **Copy** and **Paste** from the menu.
-   <!-- verify: Ctrl+C and Ctrl+V (and the right-click menu's copy and paste commands and their labels) copy a standard unit into Custom Units in the Reforged Object Editor -->
+   <!-- verify: the right-click menu's copy and paste labels in the Object Editor tree (probably Copy Unit and Paste Unit) -->
 4. Open **Custom Units**. The copy is there, under **Human**, **Melee**,
    **Heroes**, still called Paladin. Select it.
    <!-- verify: a pasted copy appears under Custom Units in the same race and category folders as the original, with the same name -->
@@ -40,7 +40,6 @@ abilities. Everything you then change applies only to the copy.
 
 There is a second way to do the same thing: :menu[Edit > New Custom Unit]
 opens a dialog where you type the name and pick the unit to base it on.
-<!-- verify: Edit > New Custom Unit in the Reforged Object Editor, and that its dialog asks for a name and a base unit -->
 Either way you get a new object with its own code. Press :kbd[Ctrl+D] to see
 it: the Captain's code starts with a capital `H`, such as `H000`, which marks
 it as a hero. Press :kbd[Ctrl+D] again to go back to names.
@@ -51,8 +50,8 @@ A hero has two kinds of name. **Text - Name** is the kind of unit, which you
 just set: every Village Captain is a Village Captain. **Text - Proper Names**
 is a list of personal names, and each Captain the game creates takes one of
 them at random, the way every Paladin in a melee game has a name of his own.
-The player sees the proper name above the hero's portrait and the unit name
-under it.
+The player sees the proper name in the unit panel at the bottom of the
+screen, above an experience bar that shows the level and the unit name.
 
 :::steps
 1. With the Village Captain selected, double-click **Text - Proper Names**. The
@@ -60,11 +59,11 @@ under it.
 2. Delete them all and type `Aldric,Maren,Tobin`, with a comma between the
    names and no spaces. Click **OK**.
    <!-- verify: the Text - Proper Names dialog in Reforged takes a comma-separated list -->
-3. Find **Text - Proper Names Used**, if the Captain has it, and set it to
-   `3`, the number of names in the list.
+3. Find **Text - Proper Names Used** and set it to `3`, the number of names
+   in the list.
    <!-- verify: the field name "Text - Proper Names Used" (raw upru) and that it should match the number of proper names -->
 4. Double-click **Text - Tooltip - Basic** and replace the text with
-   `Village Captain`.
+   `Summon Village Captain`. The Paladin's reads "Summon Paladin".
 5. Double-click **Text - Tooltip - Extended** and replace the text with `The
    captain of the village guard. Strong in melee, and trained to protect the
    villagers around him.`
@@ -73,10 +72,11 @@ under it.
 ::shot[The Village Captain's Text fields: Name set to Village Captain, Proper Names set to Aldric,Maren,Tobin and the two tooltips replaced, all in the changed-field colour]{src="./custom-hero/hero-names.png"}
 
 The tooltips are what a player reads on a building's button when it offers the
-unit for training. The Captain is placed on the map rather than trained, so
-this map never shows them, but a finished unit should not describe itself as a
-Paladin. The Paladin's tooltips contain codes such as `|cffffcc00` and `|r`,
-which colour the hotkey letter gold; plain text works just as well.
+unit, such as the altar where heroes are summoned. The Captain is placed on
+the map rather than summoned, so this map never shows them, but a finished
+unit should not describe itself as a Paladin. The Paladin's tooltips contain
+codes such as `|cffffcc00` and `|r`, which colour the hotkey letter gold;
+plain text works just as well.
 <!-- verify: the Paladin's Text - Tooltip - Basic contains |cffffcc00 … |r colour codes around the hotkey letter -->
 
 ## Stats
@@ -87,19 +87,19 @@ speed, and **Intelligence** adds mana. A hero also gets extra attack damage
 from its primary attribute, which for the Paladin, and so the Captain, is
 Strength.
 
-The Captain starts a little quicker and a little less magical than the
-Paladin: Strength 22, Agility 14, Intelligence 16.
+The Paladin starts with Strength 22, Agility 13 and Intelligence 17. The
+Captain keeps his strength but is a little quicker and a little less magical:
+Strength 22, Agility 14, Intelligence 16.
 
 :::steps
-1. With the Village Captain selected, find **Stats - Starting Strength** and
-   set it to `22`. If it already shows 22, leave it.
+1. With the Village Captain selected, find **Stats - Starting Strength**. It
+   already shows `22`, the Paladin's value, so leave it.
 2. Set **Stats - Starting Agility** to `14`.
 3. Set **Stats - Starting Intelligence** to `16`.
-   <!-- verify: the field names Stats - Starting Strength, Stats - Starting Agility and Stats - Starting Intelligence, and the Paladin's defaults (22, 13, 17) -->
-4. Leave **Stats - Hit Points Maximum (Base)** and the **per Level** fields as
-   they are.
+4. Leave **Stats - Hit Points Maximum (Base)** and the **Stats - Strength per
+   Level**, **Agility per Level** and **Intelligence per Level** fields as they
+   are.
 5. Save the map with :kbd[Ctrl+S].
-   <!-- verify: Ctrl+S saves the map from the Object Editor window -->
 :::
 
 ::shot[The Village Captain's Stats fields with Starting Strength 22, Starting Agility 14 and Starting Intelligence 16, and Hit Points Maximum (Base) unchanged]{src="./custom-hero/hero-stats.png"}
@@ -107,11 +107,11 @@ Paladin: Strength 22, Agility 14, Intelligence 16.
 The hit points you see in the game are higher than **Stats - Hit Points
 Maximum (Base)**, because each point of Strength adds to it. That is why the
 field stays: Strength already gives the Captain the Paladin's toughness.
-<!-- verify: a hero's in-game maximum hit points are the base value plus a bonus per point of Strength -->
 
 The Object Editor has no field for the level a hero starts at. That belongs
 to the placed unit: the **Level** in its **Unit Properties**, which you saw in
 chapter 3. The Captain starts at level 1 and earns the rest.
+<!-- verify: no Object Editor field sets a hero's starting level (Stats - Level does not) -->
 
 The Captain keeps the Paladin's model, the field **Art - Model File**. New
 models are out of scope for this track, but when you want one, the
@@ -131,8 +131,9 @@ Custom units appear in the palette with the standard ones of their race.
    the pointer over it to check the name.
 4. Click on the open patch you left beside the Town Hall in chapter 3.
 5. Save the map, then choose :menu[File > Test Map], or press :kbd[Ctrl+F9].
-6. When the game has loaded, click the Captain. The name above his portrait
-   is Aldric, Maren or Tobin, with **Level 1 Village Captain** below it.
+6. When the game has loaded, click the Captain. The unit panel shows his
+   proper name, Aldric, Maren or Tobin, above an experience bar that reads
+   **Level 1 Village Captain**.
    <!-- verify: how the Reforged in-game info panel shows a hero's proper name, level and unit name -->
 7. Look at his attributes in the panel at the bottom of the screen:
    Strength 22, Agility 14, Intelligence 16.
