@@ -111,6 +111,24 @@ them. See `docs/hive-integration.md` for the rules on third-party content.
   Configure the store with no public listing, a CORS allowlist for the site's
   origins, and hotlink protection.
 
+### Tutorials
+
+The "Getting started with Warcraft III: Reforged modding" track lives at
+`/learn/`. Its lessons build one map, "Defend the Village", using only the
+World Editor.
+
+- Lessons are `src/content/tutorials/<chapter>/<lesson>.md`; the chapters and
+  their order are listed in `src/data/tutorials.ts`, and `next.md` is the
+  closing page.
+- `docs/tutorial-writing.md` covers the frontmatter, the lesson directives
+  (`:kbd`, `:menu`, `:::steps`, callouts, `:::checkpoint`, `::shot`), the house
+  style, and the facts every lesson shares about the map.
+- `deno task tutorial:check` validates the lessons, then lists the screenshots
+  still to capture and the editor facts marked `<!-- verify: … -->` to confirm.
+- To add a screenshot, save a PNG at the path its `::shot` names (for example
+  `src/content/tutorials/editor-basics/create-your-map/new-map-dialog.png`) and
+  rebuild: its placeholder becomes an optimised image.
+
 Add documentation as Markdown with `title` and `description` frontmatter, then
 add its slug to the sidebar in `astro.config.ts`.
 

@@ -1,18 +1,26 @@
 import { defineConfig, envField } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { satteri } from '@astrojs/markdown-satteri';
 import { jass } from './src/syntax/jass';
+import { tutorialDirectives } from './src/markdown/tutorial-directives';
 
 export default defineConfig({
   site: 'https://wc3.dev',
   output: 'static',
   trailingSlash: 'always',
+  // Lesson screenshots (the only astro:assets images) get a srcset of WebP widths, never wider than the original.
+  image: { layout: 'constrained' },
   env: {
     schema: {
       // Where resource files are served from (the asset store). Required for builds that render resource files.
       ASSET_BASE_URL: envField.string({ context: 'server', access: 'public', optional: true, url: true }),
     },
   },
-  markdown: { shikiConfig: { langs: [jass], themes: { light: 'github-light', dark: 'github-dark' } } },
+  markdown: {
+    // Sätteri is Astro 7's default Markdown engine; the tutorial directives apply only under src/content/tutorials/.
+    processor: satteri({ mdastPlugins: [tutorialDirectives] }),
+    shikiConfig: { langs: [jass], themes: { light: 'github-light', dark: 'github-dark' } },
+  },
   integrations: [starlight({
     title: 'wc3.dev / framework',
     description: 'TypeScript gameplay, Pkl object data, and Deno tooling for Warcraft III.',

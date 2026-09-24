@@ -9,9 +9,10 @@
     "fixtures:store": "deno run -A scripts/resources/fixture-store.ts",
     "build:fixtures": "RESOURCE_FIXTURES=1 ASSET_BASE_URL=http://127.0.0.1:4322/ deno task build",
     "test": "deno task build:test && deno test -A scripts/",
-    "test:unit": "deno test -A scripts/shell_test.ts scripts/resources/ scripts/previewers/",
+    "test:unit": "deno test -A scripts/shell_test.ts scripts/resources/ scripts/previewers/ scripts/tutorials/",
     "resource:add": "deno run -A scripts/resources/add.ts",
     "resource:check": "deno run -A scripts/resources/check.ts",
+    "tutorial:check": "deno run -A scripts/tutorials/check.ts",
     "game:sync": "deno run -A scripts/resources/game-sync.ts",
     "assets:serve": "mkdir -p .asset-store && deno run --allow-net --allow-read jsr:@std/http@^1/file-server .asset-store --host 127.0.0.1 --port 4322 --cors --no-dir-listing"
   },

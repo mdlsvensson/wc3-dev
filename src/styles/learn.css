@@ -1,0 +1,124 @@
+/* Tutorials: the track landing, lessons, the side-panel outline, and the Markdown directives. */
+
+/* Icons (lucide) used as masks, so they take the callout's colour. */
+:root {
+  --icon-tip: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5'/><path d='M9 18h6'/><path d='M10 22h4'/></svg>");
+  --icon-note: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><path d='M12 16v-4'/><path d='M12 8h.01'/></svg>");
+  --icon-caution: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3'/><path d='M12 9v4'/><path d='M12 17h.01'/></svg>");
+  --icon-checkpoint: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528'/></svg>");
+  --icon-camera: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z'/><circle cx='12' cy='13' r='3'/></svg>");
+}
+
+/* Landing */
+.learn-landing { padding-block: 40px 64px; }
+.learn-landing .workspace-heading h1 { margin-top: 10px; }
+.lesson-header .eyebrow, .learn-landing .eyebrow { text-transform: uppercase; }
+.track-intro { max-width: 68ch; }
+.track-intro strong { color: var(--ink); }
+.track-stats { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin: 18px 0 24px; padding: 0; list-style: none; color: var(--muted); font-size: .85rem; letter-spacing: .04em; }
+.track-stats strong { color: var(--ink); }
+.chapter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 16px; margin-block: 40px; }
+.chapter-card { display: flex; flex-direction: column; gap: 10px; padding: 20px; background: var(--panel); border: 1px solid var(--line); }
+.chapter-card header { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 12px; }
+.chapter-number { grid-column: 1 / -1; color: var(--accent); font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.chapter-card h2 { margin: 0; font-size: 1.2rem; }
+.chapter-minutes, .chapter-card li span { color: var(--muted); font-size: .8rem; white-space: nowrap; }
+.chapter-card p { margin: 0; font-size: .92rem; }
+.chapter-card ol { margin: 4px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.chapter-card li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: .9rem; }
+.chapter-card li a:hover { color: var(--accent); }
+
+/* Lesson */
+.lesson { max-width: 820px; padding-block: 36px 64px; }
+.lesson-header { margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.lesson-header h1 { margin: 10px 0 12px; font-size: clamp(1.8rem, 4cqi, 2.6rem); line-height: 1.15; }
+.lesson-summary { margin: 0; font-size: 1.05rem; }
+.lesson-meta { display: flex; align-items: center; gap: 6px; margin: 14px 0 0; color: var(--muted); font-size: .85rem; }
+.lesson-goals { margin-top: 18px; padding: 14px 18px; background: var(--panel); border-left: 2px solid var(--accent); }
+.lesson-goals-title { margin: 0 0 6px; color: var(--ink); font-size: .9rem; font-weight: 600; }
+.lesson-goals ul { margin: 0; padding-left: 1.2rem; color: var(--muted); }
+.lesson-body { line-height: 1.7; }
+.lesson-body h2 { margin: 2.2em 0 .6em; font-size: 1.45rem; scroll-margin-top: 16px; }
+.lesson-body h3 { margin: 1.8em 0 .5em; font-size: 1.1rem; scroll-margin-top: 16px; }
+.lesson-body li { color: var(--muted); }
+/* portal.css zeroes paragraph margins; lessons are prose, so separate a paragraph from the block before it. */
+.lesson-body p + p, .lesson-body :is(table, .expressive-code, ul, ol, figure, aside, div, blockquote) + p { margin-top: 1em; }
+.lesson-body :is(ul, ol) { margin: 1em 0; }
+.lesson-body li > :is(ul, ol) { margin: .35em 0; }
+.lesson-body li + li { margin-top: .35em; }
+.lesson-body ul, .lesson-body ol { padding-left: 1.4rem; }
+.lesson-body strong { color: var(--ink); }
+.lesson-body a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.lesson-body :not(pre) > code { padding: .1em .35em; border-radius: 3px; background: var(--panel); color: var(--ink); font-family: var(--font-code); font-size: .9em; overflow-wrap: anywhere; white-space: break-spaces; }
+.lesson-body .expressive-code { margin: 1.2em 0; }
+/* A wide table scrolls on its own instead of widening the lesson. */
+.lesson-body table { display: block; overflow-x: auto; margin: 1.2em 0; border-collapse: collapse; font-size: .92rem; }
+.lesson-body :is(th, td) { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.lesson-body th { color: var(--ink); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* Directives */
+/* The outer <kbd> only groups a combination; each key inside is the keycap (and overrides .shell kbd). */
+kbd.keys { padding: 0; border: 0; background: none; color: inherit; font: inherit; white-space: nowrap; }
+kbd.keys kbd { display: inline-block; min-width: 1.6em; padding: .05em .45em; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; background: #0f191f; color: var(--ink); font: .82em/1.5 var(--font-code); text-align: center; }
+.menu-path { color: var(--ink); font-weight: 600; }
+.menu-sep { margin: 0 .35em; color: var(--accent); font-weight: 400; }
+
+/* Only the steps themselves are numbered; a list nested inside a step keeps its own markers. */
+.tutorial-steps > ol { padding-left: 0; list-style: none; counter-reset: step; }
+.tutorial-steps > ol > li { position: relative; min-height: 1.8rem; padding-left: 2.6rem; counter-increment: step; }
+.tutorial-steps > ol > li::before { content: counter(step); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border: 1px solid var(--accent); border-radius: 50%; color: var(--accent); font-size: .8rem; font-weight: 600; }
+
+.tutorial-callout, .tutorial-checkpoint { position: relative; margin: 1.5em 0; padding: 14px 18px 14px 48px; background: var(--panel); border-left: 3px solid var(--callout); }
+.tutorial-callout::before, .tutorial-checkpoint::before { content: ""; position: absolute; left: 16px; top: 17px; width: 18px; height: 18px; background: var(--callout); mask: var(--callout-icon) center / contain no-repeat; }
+.tutorial-callout > :last-child, .tutorial-checkpoint > :last-child { margin-bottom: 0; }
+.tutorial-callout-title { margin: 0 0 .3em; color: var(--ink); font-weight: 600; }
+.lesson-body .tutorial-callout-title + p { margin-top: 0; }
+.lesson-body .tutorial-callout-title + :is(ul, ol) { margin-top: .3em; }
+.tutorial-callout-tip { --callout: #8fcf8a; --callout-icon: var(--icon-tip); }
+.tutorial-callout-note { --callout: #86b7e8; --callout-icon: var(--icon-note); }
+.tutorial-callout-caution { --callout: #f0a44b; --callout-icon: var(--icon-caution); }
+.tutorial-checkpoint { --callout: var(--accent); --callout-icon: var(--icon-checkpoint); border: 1px solid var(--accent); border-left-width: 3px; }
+
+.shot { margin: 1.6em 0; }
+.tutorial-callout code, .tutorial-checkpoint code { background: #0f191f; }
+.shot img { display: block; max-width: 100%; width: auto; height: auto; border: 1px solid var(--line); }
+.shot figcaption { margin-top: 8px; color: var(--muted); font-size: .85rem; }
+.shot-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; aspect-ratio: 16 / 9; padding: 24px; border: 1px dashed var(--line); background: repeating-linear-gradient(135deg, #15222a 0 12px, #172630 12px 24px); text-align: center; }
+.shot-flag { display: flex; align-items: center; gap: 8px; color: var(--accent); font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.shot-flag::before { content: ""; width: 18px; height: 18px; background: currentColor; mask: var(--icon-camera) center / contain no-repeat; }
+.shot-note { max-width: 52ch; color: var(--muted); font-size: .9rem; }
+
+/* Previous and next */
+.lesson-pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); }
+.lesson-pager a { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); }
+.lesson-pager a:hover { border-color: var(--accent); }
+.pager-next { grid-column: 2; align-items: flex-end; text-align: right; }
+.pager-label { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+.pager-title { color: var(--ink); font-weight: 600; }
+@container (max-width: 520px) {
+  .lesson-pager { grid-template-columns: 1fr; }
+  .pager-next { grid-column: auto; }
+}
+
+/* Side-panel outline */
+.track-outline { display: flex; flex-direction: column; gap: 2px; font-size: .88rem; }
+.track-outline .panel-title a:hover { color: var(--ink); }
+.track-outline summary { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 2px; color: var(--ink); cursor: pointer; list-style: none; }
+.track-outline summary::-webkit-details-marker { display: none; }
+.track-outline summary::after { content: "›"; margin-left: auto; color: var(--muted); transition: transform .15s; }
+.track-outline details[open] > summary::after { transform: rotate(90deg); }
+.track-outline summary:hover { background: #1f2e37; }
+.outline-number { display: grid; place-items: center; flex-shrink: 0; width: 1.4rem; height: 1.4rem; border: 1px solid var(--line); border-radius: 50%; color: var(--muted); font-size: .72rem; }
+.track-outline ol { margin: 0; padding: 0 0 4px 30px; list-style: none; }
+.track-outline li a { display: block; padding: 5px 8px; border-radius: 2px; color: var(--muted); }
+.track-outline li a:hover { background: #1f2e37; color: var(--ink); }
+.track-outline a[aria-current="page"] { background: #1b2931; box-shadow: inset 2px 0 0 var(--accent); color: var(--accent); }
+.track-outline .outline-headings { padding: 2px 0 6px 12px; }
+.outline-headings a { padding: 3px 8px; font-size: .82rem; }
+.outline-headings a[aria-current="location"] { box-shadow: inset 2px 0 0 var(--muted); color: var(--ink); }
+.outline-closing { margin-top: 6px; padding: 7px 8px; border-top: 1px solid var(--line); color: var(--muted); }
+.outline-closing:hover { color: var(--ink); }
+.outline-closing[aria-current="page"] { color: var(--accent); }
+.track-outline a:focus-visible, .track-outline summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .track-outline summary::after { transition: none; } }
