@@ -1989,10 +1989,10 @@ The [resource catalog](/resources/) collects models, icons, textures, sounds
 and scripts you can preview in the browser. Every resource links to where it
 was published, so you can read its terms and get it from its author.
 
-## Scripting with the w3ts framework
+## Scripting with the wc3.dev-framework
 
 Triggers take you a long way. When you want to write gameplay as code, the
-[w3ts framework](/framework/) lets you build maps in TypeScript, with object
+[wc3.dev-framework](/framework/) lets you build maps in TypeScript, with object
 data in Pkl and a Deno toolchain. Its [documentation](/framework/docs/) starts
 with installation and a first map.
 ```
@@ -2056,7 +2056,7 @@ under the image.
   `##` sections. Procedures go in `:::steps`. Each procedure section has at
   least one screenshot. 500–1,200 words.
 - No scripting: no JASS, Lua or TypeScript, and no "Custom Script" actions.
-  Point to [the w3ts framework](/framework/) only in the closing page.
+  Point to [the wc3.dev-framework](/framework/) only in the closing page.
 - Links are plain Markdown. Link other lessons as `/learn/<chapter>/<lesson>/`,
   and only to pages that exist. Link to Hive Workshop at
   `https://www.hiveworkshop.com/` unless you know an exact page exists.

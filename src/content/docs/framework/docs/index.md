@@ -20,8 +20,8 @@ Keep these references nearby:
 | [Architecture](/framework/docs/architecture/) | Source ownership, build flow, scripts, compiler integration |
 | [Command reference](/framework/docs/reference/) | Deno tasks, configuration, output files, editor setup |
 | [Troubleshooting](/framework/docs/troubleshooting/) | Diagnosing errors and recovering a working build |
-| [Contributing](https://github.com/mdlsvensson/w3ts-framework/blob/master/CONTRIBUTING.md) | Checks, dependency updates, release playtesting |
-| [Changelog](https://github.com/mdlsvensson/w3ts-framework/blob/master/CHANGELOG.md) | Alpha features and limitations |
+| [Contributing](https://github.com/mdlsvensson/wc3-dev-framework/blob/main/CONTRIBUTING.md) | Checks, dependency updates, release playtesting |
+| [Changelog](https://github.com/mdlsvensson/wc3-dev-framework/blob/main/CHANGELOG.md) | Alpha features and limitations |
 
 All commands run from the repository root. Shell examples use PowerShell on Windows.
 

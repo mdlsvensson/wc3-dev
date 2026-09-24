@@ -143,7 +143,7 @@ Shared font definitions live in `src/styles/fonts.css`.
 
 ## Documentation migration
 
-All eight Markdown pages from `w3ts-framework/docs` are now hosted here. The former
+All eight Markdown pages from `wc3.dev-framework/docs` are now hosted here. The former
 `docs/README.md` becomes `/framework/docs/`. Internal links use the website routes;
 contributing and changelog links point to the framework source repository.
 The framework's MIT license is retained in `LICENSE` for the migrated material.
