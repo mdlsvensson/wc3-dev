@@ -11,6 +11,8 @@
 
 /* Landing */
 .learn-landing { padding-block: 40px 64px; }
+.learn-landing .workspace-heading h1 { margin-top: 10px; }
+.lesson-header .eyebrow, .learn-landing .eyebrow { text-transform: uppercase; }
 .track-intro { max-width: 68ch; }
 .track-intro strong { color: var(--ink); }
 .track-stats { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin: 18px 0 24px; padding: 0; list-style: none; color: var(--muted); font-size: .85rem; letter-spacing: .04em; }
@@ -46,14 +48,15 @@
 .lesson-body code { padding: .1em .35em; border-radius: 3px; background: var(--panel); color: var(--ink); font-family: var(--font-code); font-size: .9em; }
 
 /* Directives */
-kbd.keys { font: inherit; white-space: nowrap; }
+/* The outer <kbd> only groups a combination; each key inside is the keycap (and overrides .shell kbd). */
+kbd.keys { padding: 0; border: 0; background: none; color: inherit; font: inherit; white-space: nowrap; }
 kbd.keys kbd { display: inline-block; min-width: 1.6em; padding: .05em .45em; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; background: #0f191f; color: var(--ink); font: .82em/1.5 var(--font-code); text-align: center; }
 .menu-path { color: var(--ink); font-weight: 600; }
 .menu-sep { margin: 0 .35em; color: var(--accent); font-weight: 400; }
 
 .tutorial-steps ol { padding-left: 0; list-style: none; counter-reset: step; }
 .tutorial-steps li { position: relative; min-height: 1.8rem; padding-left: 2.6rem; counter-increment: step; }
-.tutorial-steps li::before { content: counter(step); position: absolute; left: 0; top: .1em; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border: 1px solid var(--accent); border-radius: 50%; color: var(--accent); font-size: .8rem; font-weight: 600; }
+.tutorial-steps li::before { content: counter(step); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border: 1px solid var(--accent); border-radius: 50%; color: var(--accent); font-size: .8rem; font-weight: 600; }
 
 .tutorial-callout, .tutorial-checkpoint { position: relative; margin: 1.5em 0; padding: 14px 18px 14px 48px; background: var(--panel); border-left: 3px solid var(--callout); }
 .tutorial-callout::before, .tutorial-checkpoint::before { content: ""; position: absolute; left: 16px; top: 17px; width: 18px; height: 18px; background: var(--callout); mask: var(--callout-icon) center / contain no-repeat; }
