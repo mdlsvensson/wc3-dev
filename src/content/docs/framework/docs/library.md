@@ -22,7 +22,8 @@ your code starts it:
 deno add --frozen=false jsr:@mdlsvensson/wc3-lib
 ```
 
-(`--frozen=false` lets `deno add` update the template's frozen `deno.lock`.) Then list the package
+(`--frozen=false` lets `deno add` update the template's frozen `deno.lock`. Deno only resolves
+versions published at least a day ago; to take a newer one right away, add `--minimum-dependency-age=0`.) Then list the package
 in `config.json`, so the build compiles it into the map:
 
 ```json
