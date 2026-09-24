@@ -57,6 +57,7 @@ export default defineConfig({
         { label: 'Make your first map', slug: 'framework/docs/map-making' },
         { label: 'Import assets', slug: 'framework/docs/assets' },
         { label: 'Map settings', slug: 'framework/docs/map-settings' },
+        { label: 'Using the library', slug: 'framework/docs/library' },
       ] },
       { label: 'Reference', items: [
         { label: 'Pkl object data', slug: 'framework/docs/object-data' },
