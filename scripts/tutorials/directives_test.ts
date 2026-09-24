@@ -29,7 +29,7 @@ Deno.test('keys and menu paths', async () => {
   assert.match(await html('Press :kbd[Ctrl + F9].'), /<kbd class="keys"><kbd>Ctrl<\/kbd>\+<kbd>F9<\/kbd><\/kbd>/);
   assert.match(
     await html('Open :menu[Scenario > Map Options].'),
-    /<span class="menu-path"><span>Scenario<\/span><span class="menu-sep" aria-hidden="true">›<\/span><span>Map Options<\/span><\/span>/,
+    /<span class="menu-path"><span>Scenario<\/span><span class="menu-sep" aria-hidden="true">›<\/span><span class="visually-hidden"> &gt; <\/span><span>Map Options<\/span><\/span>/,
   );
 });
 
@@ -46,12 +46,12 @@ Deno.test('steps wrap their ordered list', async () => {
 
 Deno.test('callouts and checkpoints carry a title, default or custom', async () => {
   const tip = await html(':::tip\nHold Shift.\n:::');
-  assert.match(tip, /<aside class="tutorial-callout tutorial-callout-tip">\s*<p class="tutorial-callout-title">Tip<\/p>\s*<p>Hold Shift.<\/p>/);
+  assert.match(tip, /<aside class="tutorial-callout tutorial-callout-tip" aria-label="Tip">\s*<p class="tutorial-callout-title">Tip<\/p>\s*<p>Hold Shift.<\/p>/);
   const caution = await html(':::caution[Save *first*]\nBack up your map.\n:::');
-  assert.match(caution, /<aside class="tutorial-callout tutorial-callout-caution">\s*<p class="tutorial-callout-title">Save <em>first<\/em><\/p>\s*<p>Back up your map.<\/p>/);
+  assert.match(caution, /<aside class="tutorial-callout tutorial-callout-caution" aria-label="Save first">\s*<p class="tutorial-callout-title">Save <em>first<\/em><\/p>\s*<p>Back up your map.<\/p>/);
   assert.match(await html(':::note\nA note.\n:::'), /tutorial-callout-note/);
   const checkpoint = await html(':::checkpoint\nThe river blocks the way.\n:::');
-  assert.match(checkpoint, /<aside class="tutorial-checkpoint">\s*<p class="tutorial-callout-title">Checkpoint: your map now…<\/p>\s*<p>The river blocks the way.<\/p>/);
+  assert.match(checkpoint, /<aside class="tutorial-checkpoint" aria-label="Checkpoint: your map now…">\s*<p class="tutorial-callout-title">Checkpoint: your map now…<\/p>\s*<p>The river blocks the way.<\/p>/);
 });
 
 Deno.test('an empty label falls back to the default title', async () => {
@@ -65,8 +65,13 @@ Deno.test('an unknown container directive is an error in lessons only', async ()
     /Unknown container directive ":::warning" in .*water\.md; use one of :::steps, :::tip, :::note, :::caution, :::checkpoint/,
   );
   assert(!(await html(':::warning\nNot ours.\n:::', docsURL)).includes('tutorial-callout'), 'Docs keep Starlight\'s own handling');
-  // Unknown text and leaf directives are not errors: prose like "Hint:yes" parses as one, and Starlight prints it back.
-  await html('Hint:yes, carry on.\n\n::unknown[x]');
+  // Unknown text directives are not errors: prose like "Hint:yes" parses as one, and Starlight prints it back.
+  await html('Hint:yes, carry on.');
+});
+
+Deno.test('an unknown leaf directive is an error in lessons only', async () => {
+  await assert.rejects(() => render('::shto[A typo]{src="./water/river.png"}'), /Unknown leaf directive "::shto" in .*water\.md; use one of ::shot/);
+  await html('::unknown[x]', docsURL);
 });
 
 Deno.test('a captured screenshot becomes an image Astro optimises', async () => {
@@ -80,6 +85,7 @@ Deno.test('a captured screenshot becomes an image Astro optimises', async () => 
 Deno.test('a missing screenshot renders a placeholder with its capture note', async () => {
   const result = await render('::shot[The Terrain Palette with Shallow Water selected]{src="./water/palette.png"}');
   assert.match(result.code, /<figure class="shot shot-missing">/);
+  assert.match(result.code, /<div class="shot-placeholder" data-pagefind-ignore="">/);
   assert.match(result.code, /<span class="shot-flag">Screenshot needed<\/span><span class="shot-note">The Terrain Palette with Shallow Water selected<\/span>/);
   assert(!result.code.includes('<img'));
   assert.deepEqual(result.metadata.localImagePaths, []);
@@ -102,6 +108,10 @@ Deno.test('verify notes are removed and docs links reload the page', async () =>
   const output = await html('Press F9.\n\n<!-- verify: F9 opens the Help -->\n\nSee [the docs](/framework/docs/installation/) and [resources](/resources/).');
   assert(!output.includes('verify'), 'Verify notes never reach the page');
   assert(!(await html('Press F9.\n\n  <!-- verify: indented note -->\n')).includes('verify'), 'Indented verify notes are removed too');
+  const trailing = await html('<!-- verify: a note --> Text after it stays.\n\nInline <!-- verify: x --> note, <!-- verify: y --> twice.');
+  assert(!trailing.includes('verify'));
+  assert.match(trailing, /Text after it stays\./);
+  assert.match(trailing, /Inline\s+note,\s+twice\./);
   assert.match(output, /<a href="\/framework\/docs\/installation\/" data-astro-reload="">the docs<\/a>/);
   assert.match(output, /<a href="\/resources\/">resources<\/a>/);
   assert.match(await html('[Docs](/framework/docs/ "Read the docs")'), /<a href="\/framework\/docs\/" title="Read the docs" data-astro-reload="">Docs<\/a>/);

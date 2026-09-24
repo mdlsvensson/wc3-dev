@@ -41,11 +41,21 @@
 .lesson-body h2 { margin: 2.2em 0 .6em; font-size: 1.45rem; scroll-margin-top: 16px; }
 .lesson-body h3 { margin: 1.8em 0 .5em; font-size: 1.1rem; scroll-margin-top: 16px; }
 .lesson-body li { color: var(--muted); }
+/* portal.css zeroes paragraph margins; lessons are prose, so separate a paragraph from the block before it. */
+.lesson-body p + p, .lesson-body :is(table, .expressive-code, ul, ol, figure, aside, div, blockquote) + p { margin-top: 1em; }
+.lesson-body :is(ul, ol) { margin: 1em 0; }
+.lesson-body li > :is(ul, ol) { margin: .35em 0; }
 .lesson-body li + li { margin-top: .35em; }
 .lesson-body ul, .lesson-body ol { padding-left: 1.4rem; }
 .lesson-body strong { color: var(--ink); }
 .lesson-body a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
-.lesson-body code { padding: .1em .35em; border-radius: 3px; background: var(--panel); color: var(--ink); font-family: var(--font-code); font-size: .9em; }
+.lesson-body :not(pre) > code { padding: .1em .35em; border-radius: 3px; background: var(--panel); color: var(--ink); font-family: var(--font-code); font-size: .9em; overflow-wrap: anywhere; }
+.lesson-body .expressive-code { margin: 1.2em 0; }
+/* A wide table scrolls on its own instead of widening the lesson. */
+.lesson-body table { display: block; overflow-x: auto; margin: 1.2em 0; border-collapse: collapse; font-size: .92rem; }
+.lesson-body :is(th, td) { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.lesson-body th { color: var(--ink); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 
 /* Directives */
 /* The outer <kbd> only groups a combination; each key inside is the keycap (and overrides .shell kbd). */
@@ -54,14 +64,17 @@ kbd.keys kbd { display: inline-block; min-width: 1.6em; padding: .05em .45em; bo
 .menu-path { color: var(--ink); font-weight: 600; }
 .menu-sep { margin: 0 .35em; color: var(--accent); font-weight: 400; }
 
-.tutorial-steps ol { padding-left: 0; list-style: none; counter-reset: step; }
-.tutorial-steps li { position: relative; min-height: 1.8rem; padding-left: 2.6rem; counter-increment: step; }
-.tutorial-steps li::before { content: counter(step); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border: 1px solid var(--accent); border-radius: 50%; color: var(--accent); font-size: .8rem; font-weight: 600; }
+/* Only the steps themselves are numbered; a list nested inside a step keeps its own markers. */
+.tutorial-steps > ol { padding-left: 0; list-style: none; counter-reset: step; }
+.tutorial-steps > ol > li { position: relative; min-height: 1.8rem; padding-left: 2.6rem; counter-increment: step; }
+.tutorial-steps > ol > li::before { content: counter(step); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border: 1px solid var(--accent); border-radius: 50%; color: var(--accent); font-size: .8rem; font-weight: 600; }
 
 .tutorial-callout, .tutorial-checkpoint { position: relative; margin: 1.5em 0; padding: 14px 18px 14px 48px; background: var(--panel); border-left: 3px solid var(--callout); }
 .tutorial-callout::before, .tutorial-checkpoint::before { content: ""; position: absolute; left: 16px; top: 17px; width: 18px; height: 18px; background: var(--callout); mask: var(--callout-icon) center / contain no-repeat; }
 .tutorial-callout > :last-child, .tutorial-checkpoint > :last-child { margin-bottom: 0; }
 .tutorial-callout-title { margin: 0 0 .3em; color: var(--ink); font-weight: 600; }
+.lesson-body .tutorial-callout-title + p { margin-top: 0; }
+.lesson-body .tutorial-callout-title + :is(ul, ol) { margin-top: .3em; }
 .tutorial-callout-tip { --callout: #8fcf8a; --callout-icon: var(--icon-tip); }
 .tutorial-callout-note { --callout: #86b7e8; --callout-icon: var(--icon-note); }
 .tutorial-callout-caution { --callout: #f0a44b; --callout-icon: var(--icon-caution); }

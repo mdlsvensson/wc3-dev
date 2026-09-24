@@ -1,3 +1,4 @@
+import { closePanelOverlay } from '../shell/panel.ts';
 import { activeIndex } from './outline-state.ts';
 
 /** How far below the top of the workspace a heading counts as "being read". */
@@ -19,8 +20,16 @@ function revealCurrentLesson(): void {
   else if (box.bottom > view.bottom) panel.scrollTop += Math.min(box.bottom - view.bottom, box.top - view.top);
 }
 
+/** On tablets and phones the panel overlays the lesson; jumping to a heading closes it (a no-op on desktop). */
+function onOutlineClick(event: Event): void {
+  if (event.target instanceof Element && event.target.closest('.outline-headings a')) closePanelOverlay();
+}
+
 function bind(): void {
   revealCurrentLesson();
+  const outline = document.querySelector('.track-outline');
+  outline?.addEventListener('click', onOutlineClick);
+  cleanup = () => outline?.removeEventListener('click', onOutlineClick);
   const main = document.getElementById('main');
   const pairs = [...document.querySelectorAll<HTMLAnchorElement>('.track-outline .outline-headings a')]
     .map((link) => ({ link, heading: document.getElementById(decodeURIComponent(link.hash.slice(1))) }))
@@ -45,6 +54,7 @@ function bind(): void {
   main.addEventListener('scroll', onScroll, { passive: true });
   update();
   cleanup = () => {
+    outline?.removeEventListener('click', onOutlineClick);
     main.removeEventListener('scroll', onScroll);
     if (frame) cancelAnimationFrame(frame);
   };
