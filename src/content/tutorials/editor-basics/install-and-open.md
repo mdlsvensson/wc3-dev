@@ -10,8 +10,8 @@ goals:
 ---
 
 The World Editor is the map-making tool that comes with Warcraft III. Blizzard
-built the game's own campaigns and melee maps with it, and every custom map you
-have played started in it too. Over this track you use it to build one small
+built the game's own campaigns and melee maps with it, and almost every custom
+map you have played started in it too. Over this track you use it to build one small
 map from scratch: Defend the Village, where the player holds a village on a
 plateau against five waves of gnolls and ogres. By the end you will have shaped
 terrain, placed a village, made your own hero, ability and tower, and written
@@ -44,7 +44,6 @@ the game folder. The app can take you straight there.
    menu, then choose **Show in Explorer**. A File Explorer window opens on the
    game folder, which is `C:\Program Files (x86)\Warcraft III` unless you chose
    another location when you installed the game.
-   <!-- verify: the default Reforged install folder is C:\Program Files (x86)\Warcraft III -->
 3. Open the `_retail_` folder, then the `x86_64` folder inside it.
 4. Double-click `World Editor.exe`. The editor takes a little while to load the
    first time. When it is ready, its main window opens with an empty map.
@@ -65,8 +64,9 @@ see **Pin to Start**.
 
 Warcraft III: Reforged can draw the game with its new Reforged graphics or
 with the original Classic graphics. The editor has no switch of its own: it
-uses whatever mode the game is set to. You change it in the game, not in the
-editor.
+uses whatever mode the game is set to.
+<!-- verify: the World Editor has no graphics-mode setting or launch option of its own and always follows the game's setting -->
+You change it in the game, not in the editor.
 
 :::steps
 1. Start Warcraft III from the Battle.net app.
@@ -80,9 +80,10 @@ editor.
 
 ::shot[The Warcraft III Options screen with the Graphics Mode setting visible, set to Reforged]{src="./install-and-open/graphics-setting.png"}
 
-The mode only changes how the editor draws the map on your screen. Nothing
-about it is stored in the map file: the terrain, units and triggers are the
-same in both, and every player sees your map in the mode their own game uses.
+The mode only changes how the editor draws the map on your screen. The
+terrain, units and triggers are the same in both, and players see your map in
+the mode their own game uses.
+<!-- verify: whether a map can be limited to Classic or Reforged graphics (Map Options, w3i "supported modes") -->
 The screenshots in this track use Reforged graphics. If your computer
 struggles with the editor, Classic graphics load faster and use less memory,
 and everything in the track works the same way.
@@ -93,17 +94,21 @@ Warcraft III keeps your maps in your Documents folder, in
 `Documents\Warcraft III\Maps`. The game lists every map in this folder when
 you start a custom game, and the editor's save dialog opens here, so this is
 where your own maps belong.
-<!-- verify: the Reforged user maps folder is Documents\Warcraft III\Maps, and the editor's save dialog opens there by default -->
+<!-- verify: the editor's Save Map As dialog opens in Documents\Warcraft III\Maps by default -->
 
 Inside it you will find a few folders the game manages for you. The one to know
 about is `Download`: when you join someone else's game online, their map is
 saved there. Keep your own maps out of it, and do not edit the maps in it, so
 you never mix up your work with other people's.
-<!-- verify: maps downloaded from online lobbies are saved in Documents\Warcraft III\Maps\Download -->
 
-Make a folder of your own for the maps you build, for example
-`Documents\Warcraft III\Maps\My Maps`. You will save Defend the Village there
-in the last lesson of this chapter.
+Make a folder of your own for the maps you build. You will save Defend the
+Village there in the last lesson of this chapter.
+
+:::steps
+1. In File Explorer, open `Documents\Warcraft III\Maps`.
+2. Right-click an empty space in the folder and choose **New > Folder**.
+3. Name the new folder `My Maps`.
+:::
 
 ::shot[File Explorer showing Documents\Warcraft III\Maps, with the Download folder and a new My Maps folder]{src="./install-and-open/maps-folder.png"}
 
