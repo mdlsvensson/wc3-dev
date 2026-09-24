@@ -133,16 +133,18 @@ Town Hall.
 chapter 1 and deleted in chapter 6):
 - Variables: `WaveNumber` (Integer, 0), `WaveUnitType` (Unit-Type array,
   size 5), `WaveTimer` (Timer), `WaveWindow` (Timer Window).
-- Welcome: Map initialization → display "Defend the village! The first wave
+- Welcome: Time - Elapsed game time is 0.00 seconds (text and timer windows
+  created at Map initialization are not shown) → display "Defend the village! The first wave
   arrives soon."
-- Setup: Map initialization → WaveUnitType[1–5] = Gnoll, Gnoll Poacher,
+- Setup: Time - Elapsed game time is 0.00 seconds → WaveUnitType[1–5] = Gnoll, Gnoll Poacher,
   Gnoll Brute, Ogre Warrior, Ogre Mauler; Player 1 gold 500 and lumber 200;
   start WaveTimer (one-shot, 60 seconds); timer window "Next wave", stored in
   WaveWindow.
 - Spawn Wave: WaveTimer expires → WaveNumber + 1; create WaveNumber + 3 of
   WaveUnitType[WaveNumber] for Player 12 at the centre of Spawn; message
   "Wave N is coming!"; order Player 12's units to attack-move to the centre of
-  Village; if WaveNumber < 5, start WaveTimer (one-shot, 45 seconds).
+  Village; if WaveNumber < 5, start WaveTimer (one-shot, 45 seconds), else
+  hide WaveWindow.
 - Defeat: the Town Hall dies → defeat Player 1, "The village has fallen."
 - Victory: a unit owned by Player 12 dies, WaveNumber = 5, and no living
   units owned by Player 12 remain → victory for Player 1.
