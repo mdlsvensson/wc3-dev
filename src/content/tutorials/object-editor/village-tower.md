@@ -74,7 +74,7 @@ Tower needs neither.
 
 ::shot[The Village Tower's fields with Gold Cost 100, Lumber Cost 30, Build Time 30, a lowered Attack 1 Damage Base, and empty Techtree - Requirements and Techtree - Upgrades To, in the changed-field colour]{src="./village-tower/tower-fields.png"}
 
-## Let peasants build it
+## Let Peasants build it
 
 A unit's **Techtree - Structures Built** field lists the buildings it can
 build. Here you change the standard Peasant rather than a copy, because every
@@ -117,7 +117,7 @@ Structures Built** field.
 
 The Peasants can build the tower, but the player has no gold to pay for it
 yet: with the melee setup switched off, the game starts at zero, and the
-Setup trigger that gives the player gold arrives in chapter 6. For now, use a
+`Setup` trigger that gives the player gold arrives in chapter 6. For now, use a
 cheat. Warcraft III has cheat codes for single-player games, and a Test Map
 game counts as one. `greedisgood` followed by a number gives you that much
 gold and lumber.
@@ -141,7 +141,7 @@ gold and lumber.
 ::shot[Warcraft III running Defend the Village in a Test Map game, with a Peasant's build menu open and the Village Tower button's tooltip showing 100 gold and 30 lumber, and a finished Village Tower at the top of the ramp]{src="./village-tower/tower-in-game.png"}
 
 The cheat is only for testing, and it changes nothing in the map. When the
-map is finished, the player's gold comes from the Setup trigger in
+map is finished, the player's gold comes from the `Setup` trigger in
 [chapter 6](/learn/triggers/wave-timer/), and every tower they build is paid
 for.
 

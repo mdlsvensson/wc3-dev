@@ -32,8 +32,8 @@ that you never grab it by mistake when you select the Spawn region later.
 
 :::steps
 1. Press :kbd[U] to switch to the Units layer.
-2. Open the player list at the top of the palette and choose **Player 12
-   (Brown)**.
+2. Open the player list at the top of the palette, choose **Player 12
+   (Brown)**, and set the race list back to **Human**.
 3. Click the bottom-left of the minimap to jump to the spawn corner.
 4. Find **Start Location** in the palette, where you found it for Player 1.
 5. Click on open ground a few tiles north of the Spawn region, off the dirt

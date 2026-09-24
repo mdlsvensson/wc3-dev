@@ -170,4 +170,4 @@ hides it.
 
 If the timer window does not appear, check that `Setup` has the **Elapsed
 Game Time** event and that the timer window uses `WaveTimer`, the same timer
-the first action starts.
+the **Start Timer** action starts.

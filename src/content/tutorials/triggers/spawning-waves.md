@@ -34,7 +34,7 @@ seconds and then after each 45-second countdown it starts itself.
 
 ## Create the wave
 
-The first action adds one to `WaveNumber`, so that it holds the number of
+The first action adds one to `WaveNumber`, so it holds the number of
 the wave being sent. The wave has `WaveNumber + 3` units, so the first wave has
 four and the fifth has eight, and its unit type is the box of `WaveUnitType`
 with the wave's number.
@@ -75,6 +75,8 @@ into text, and **Concatenate Strings** joins two pieces of text.
 4. Set the outer join's second part to ` is coming!`, with a space before
    it. Click **OK** until the dialog closes.
 :::
+
+::shot[The Text Message action's text built as Concatenate Strings: an inner join of "Wave " and Convert Integer To String(WaveNumber), then " is coming!"]{src="./spawning-waves/wave-message.png"}
 
 In the editor the text shows as `((Wave  + (String(WaveNumber))) +  is
 coming!)`, with your spaces doubling up; in the game it reads "Wave 1 is
@@ -162,7 +164,7 @@ Some GUI functions make something new each time they run: `Center of Spawn
 group, and nothing cleans them up. Modders call that a leak. Five waves leak
 a handful, which is harmless, but a map that leaks every second for an hour
 slows down. [Hive Workshop](https://www.hiveworkshop.com/) has guides on
-cleaning up leaks for when it matters.
+cleaning them up.
 :::
 
 Now watch the waves come.

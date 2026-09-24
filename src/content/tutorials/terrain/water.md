@@ -31,8 +31,6 @@ You draw water the way you drew cliffs, so the tips from the last lesson apply
 here too: use a square brush for straight banks, keep the shape simple, and
 use :kbd[Ctrl+Z] freely.
 
-::shot[The Apply Cliff group of the Terrain Palette with the pointer over the Deep Water tool, its tooltip showing, and the Shallow Water tool beside it]{src="./water/water-tools.png"}
-
 ## The river
 
 The river runs from the north-west edge of the map to the south-east edge,
@@ -88,7 +86,7 @@ enough that a wave does not jam up in it.
 :::tip[Why only one crossing]
 One ford turns the whole map into a funnel. Every wave comes the same way, so
 you can build Village Towers where they cover the ford and the ramp, and meet
-the invaders there with your captain before they reach the Town Hall. With
+the invaders there with your Captain before they reach the Town Hall. With
 two crossings, the player would have to split their defence and guess which
 way each wave will come.
 :::

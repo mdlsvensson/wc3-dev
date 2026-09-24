@@ -45,9 +45,9 @@ Hive Workshop, the resource catalog, and the w3ts framework.
 
 ## Curriculum: "Defend the Village"
 
-The map: a village in a Lordaeron Summer clearing, one human player (with a
-second optional user slot) against waves of creeps that walk from a spawn
-region to the village. The player wins by surviving every wave and loses if
+The map: a village in a Lordaeron Summer clearing, one human player against a
+computer invader, whose waves of creeps walk from a spawn region to the
+village. The player wins by surviving every wave and loses if
 the town hall falls.
 
 | # | Chapter (`slug`) | Lessons (`slug`: title) | Checkpoint: your map now… |
@@ -56,7 +56,7 @@ the town hall falls.
 | 2 | Terraining (`terrain`) | `painting-tiles`: Painting tiles · `height-and-cliffs`: Height, cliffs and ramps · `water`: Water and the river · `finishing-touches`: Finishing touches | …has a village clearing on a plateau, a river with a ford, and a path from the spawn |
 | 3 | Placing units and doodads (`placement`) | `doodads`: Doodads and the village · `units-and-buildings`: Units, buildings and start locations · `creep-camps`: Creep camps and item drops · `regions`: Regions | …has a village, a start location, creep camps, and the Spawn and Village regions |
 | 4 | Map setup (`map-setup`) | `map-options`: Description, options and loading screen · `players-and-forces`: Players and forces | …shows its own name, description and loading screen, with the players and forces set |
-| 5 | Object Editor (`object-editor`) | `object-editor-tour`: A tour of the Object Editor · `custom-hero`: A custom hero · `custom-ability`: A custom ability · `village-tower`: A village tower | …has the Defender hero with a custom ability, and a buildable village tower |
+| 5 | Object Editor (`object-editor`) | `object-editor-tour`: A tour of the Object Editor · `custom-hero`: A custom hero · `custom-ability`: A custom ability · `village-tower`: A village tower | …has the Village Captain hero with a custom ability, and a buildable village tower |
 | 6 | GUI triggers (`triggers`) | `trigger-basics`: Events, conditions and actions · `wave-timer`: Variables and a wave timer · `spawning-waves`: Spawning waves · `win-and-lose`: Winning and losing | …is a playable game: waves spawn on a timer, attack the village, and end in victory or defeat |
 | – | Where to go next (`next`) | A single page, not a chapter | – |
 
