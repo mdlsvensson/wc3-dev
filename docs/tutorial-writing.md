@@ -89,12 +89,16 @@ Loading screen: title "Defend the Village", subtitle "Hold the ford", text
 and use the Captain's Shield Throw to stop them before they reach the town
 hall."
 
-**Layout:** the village sits on a plateau one cliff level up in the
-north-east, reached by a single ramp facing south-west. A dirt path runs
-from the spawn in the south-west corner to the ramp. A deep river runs from
-the north-west edge to the south-east edge between them; the path crosses it
-at the only ford (shallow water). A forest lies west of the river, trees
-frame the map edges.
+**Layout:** picture the minimap as a three-by-three grid. The village sits
+on a plateau one cliff level up in the top-right square, reached by a single
+ramp on the plateau's straight south edge, just east of its south-west
+corner (ramps need a straight edge). A cobbled path runs from the ramp to a
+small square at the plateau's centre, where the Town Hall stands. A dirt
+path runs from the spawn in the bottom-left square to the ramp. A deep river
+runs from the north-west edge through the centre to the south-east edge; the
+path crosses it at the only ford (shallow water), in the centre square. A
+forest lies west of the river, and trees frame the map edges on a band of
+rough dirt.
 
 **Players and forces:** Player 1 (Red), User, "Defender", force "Villagers".
 Player 12 (Brown), Computer, "Invaders", force "Invaders", start location
