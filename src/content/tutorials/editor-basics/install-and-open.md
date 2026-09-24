@@ -52,7 +52,7 @@ the game folder. The app can take you straight there.
 
 ::shot[The Battle.net app on the Warcraft III page, with the options menu next to the Play button open and Show in Explorer highlighted]{src="./install-and-open/battle-net-options.png"}
 
-::shot[File Explorer in the game's _retail_\x86_64 folder, with World Editor.exe selected]{src="./install-and-open/editor-exe.png"}
+::shot[File Explorer in the game's `_retail_\x86_64` folder, with `World Editor.exe` selected]{src="./install-and-open/editor-exe.png"}
 
 You will open the editor often, so give it a shortcut. In File Explorer,
 right-click `World Editor.exe` and choose **Pin to Start**, or, while the
