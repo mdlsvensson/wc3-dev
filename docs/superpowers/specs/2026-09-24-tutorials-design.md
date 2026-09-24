@@ -80,6 +80,9 @@ src/content/tutorials/
 
 - A lesson's chapter is its folder; its slug is its file name. URLs are
   `/learn/<chapter>/<lesson>/`; the closing page is `/learn/next/`.
+- Two content collections read this folder: `tutorials` (lessons,
+  `*/*.md`) and `tutorialPages` (top-level pages such as `next.md`, `*.md`),
+  each with its own schema.
 - Screenshots live in a folder named after the lesson, beside it, and are
   referenced relative to the lesson file.
 
@@ -124,6 +127,7 @@ which prints them back as text, and the site test catches that.
 | `:::steps` wrapping an ordered list | The list, styled as numbered steps |
 | `:::tip`, `:::note`, `:::caution` (optional `[Title]`) | A callout `<aside class="tutorial-callout">` with an icon and a title, the same syntax as the Starlight docs, styled for the shell |
 | `:::checkpoint` | A "Checkpoint: your map now…" box closing a chapter's last lesson |
+| `<!-- verify: … -->` | Nothing: an author's note marking an editor fact to confirm in the editor. Removed from the output and listed by `tutorial:check` |
 | `::shot[alt text]{src="./lesson/file.png" caption="…"}` | See Screenshots |
 
 ### Screenshots
@@ -191,8 +195,9 @@ GETTING STARTED
 - The current lesson is marked `aria-current="page"` and lists its `h2`
   headings as anchor links.
 - **Scroll-spy:** a small client module highlights the heading whose section
-  is in view (`IntersectionObserver` on the headings in `.app-scroll`). It is
-  bound on `astro:page-load` and disconnected on `astro:before-swap`. Without
+  is in view (`aria-current="location"`), from a passive scroll listener on
+  `.app-scroll` throttled with `requestAnimationFrame`. It is bound on
+  `astro:page-load` and removed on `astro:before-swap`. Without
   JavaScript the outline still works as plain links.
 
 ## Modules
@@ -202,7 +207,7 @@ GETTING STARTED
 | `src/lib/tutorial-schema.ts` | Zod frontmatter schemas (lesson, closing page) |
 | `src/lib/tutorials.ts` | Pure track logic: order lessons by chapter then `order`, previous/next, chapter minutes, outline model |
 | `src/data/tutorials.ts` | Chapter list |
-| `src/content.config.ts` | Adds the `tutorials` collection (glob loader, id `<chapter>/<slug>`) |
+| `src/content.config.ts` | Adds the `tutorials` (id `<chapter>/<slug>`) and `tutorialPages` collections |
 | `src/markdown/tutorial-directives.ts` | The Sätteri plugins for the directives |
 | `astro.config.ts` | Registers the plugins on the Markdown processor |
 | `src/components/learn/{TrackOutline,LessonHeader,LessonPager,ChapterCard}.astro` | View building blocks |
@@ -224,8 +229,18 @@ Reads `src/content/tutorials/` directly (no Astro build) and:
 3. Lists every `::shot` whose file is missing, grouped by lesson, with its
    capture note, and ends with a count ("14 of 83 screenshots captured").
    Missing screenshots are warnings, never errors.
+4. Lists every `<!-- verify: … -->` note, grouped by lesson, as a checklist
+   for the owner's pass through the editor.
 
 It exits non-zero only for errors. CI runs it next to `resource:check`.
+
+## Dependencies
+
+- `@astrojs/markdown-satteri` (0.4.1, already installed with Astro) becomes a
+  direct dependency so `astro.config.ts` can register the directive plugins
+  with `satteri({ mdastPlugins })`.
+- `sharp` (0.35.4, Astro's supported range) becomes a direct dependency: it is
+  Astro's image service, and no page optimised images before.
 
 ## Testing
 
@@ -249,11 +264,11 @@ It exits non-zero only for errors. CI runs it next to `resource:check`.
 - **Editor accuracy.** Lessons are written without access to the World
   Editor. The owner verifies each lesson's steps while capturing its
   screenshots; the capture notes double as a checklist.
-- **Sätteri plugins and Astro's image pipeline.** Whether an mdast plugin can
-  hand a `::shot` image to Astro's image optimisation (for example by emitting
-  an `image` node) is probed during planning. The fallback is resolving the
-  image in the lesson page (`import.meta.glob` over the tutorial images with
-  `getImage()`) and emitting a marker the page fills in.
+- **Sätteri plugins and Astro's image pipeline:** resolved by a probe during
+  planning. A leaf-directive visitor that returns an `image` node inside a
+  `figure` is collected by Astro and emitted as an optimised WebP with width
+  and height; unknown directives fall through to Starlight's restoration and
+  print as text.
 - **Plugin scoping.** The directive plugins must not change any Starlight
   docs page. A build test asserts that no page under `/framework/docs/`
   contains the tutorial classes (`menu-path`, `shot`, `tutorial-callout`).
