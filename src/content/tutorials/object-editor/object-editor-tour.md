@@ -38,7 +38,6 @@ Across the top of the window is a row of tabs, one for each kind of object:
   stun from a Storm Bolt, with their icons and visual effects.
 - **Upgrades** holds the upgrades researched in buildings, such as the
   Blacksmith's weapon and armour upgrades.
-<!-- verify: the Reforged Object Editor's tabs and their order: Units, Items, Destructibles, Doodads, Abilities, Buffs/Effects, Upgrades -->
 
 ::shot[The Object Editor window on the Units tab, with the row of tabs across the top, the object tree on the left and the Peasant's field list on the right]{src="./object-editor-tour/object-editor.png"}
 
@@ -50,7 +49,6 @@ it, with the field's name in one column and its value in the other.
 
 The tree on the left of every tab is split in two. On the Units tab the two
 halves are **Standard Units** and **Custom Units**.
-<!-- verify: the Units tab tree's two top-level entries are labelled "Standard Units" and "Custom Units" -->
 
 - **Standard Units** are the units that come with the game. They are sorted by
   race: **Human**, **Orc**, **Undead**, **Night Elf**, and the neutral units
@@ -60,7 +58,7 @@ halves are **Standard Units** and **Custom Units**.
   **Heroes** and **Special**.
 - **Custom Units** holds the units you make yourself, sorted the same way.
   It is empty on a new map.
-<!-- verify: the Units tab tree's layout under Standard Units in Reforged: race folders (Human, Orc, Undead, Night Elf, Neutral Hostile, Neutral Passive, and any others), then Melee and Campaign, then Units, Buildings, Heroes and Special -->
+<!-- verify: the race folders under Standard Units in Reforged and their order -->
 
 :::steps
 1. On the **Units** tab, open **Standard Units**, then **Human**, then
@@ -93,17 +91,17 @@ this chapter, because that change is meant for every Peasant on the map.
 Every object has dozens of fields, and their names follow a pattern: a group,
 then the field, such as **Text - Name**, **Stats - Hit Points Maximum (Base)**
 or **Stats - Gold Cost**. The group tells you what kind of value it is: **Art**
-fields set the model, icon and sounds, **Combat** fields set attacks and
-armour, **Stats** fields set costs, hit points and speed, **Techtree** fields
-set what the unit can build and what it needs first, and **Text** fields hold
-names and tooltips. The list is sorted by name, so each group's fields sit
+fields set the model and icon, **Combat** fields set attacks and armour,
+**Movement** fields set speed, **Stats** fields set costs, hit points and
+mana, **Techtree** fields set what the unit can build and what it needs
+first, and **Text** fields hold names and tooltips. The list is sorted by name, so each group's fields sit
 together.
 
 To change a field, double-click it. A small dialog opens with the current
 value; type a new one and click **OK**. A field you have changed stands out
 from the rest in a different colour, so you can always see what differs from
 the original.
-<!-- verify: double-clicking a field opens a dialog to edit its value, and changed fields are shown in a different colour (which colour, e.g. magenta) in the Reforged Object Editor -->
+<!-- verify: the colour of changed fields in the Reforged Object Editor (magenta by default?) -->
 
 Try it on a standard unit, and put it back afterwards.
 
@@ -123,7 +121,6 @@ Try it on a standard unit, and put it back afterwards.
 Resetting is how you undo a change you no longer want, however long ago you
 made it. On a custom object, resetting a field sets it back to the value of
 the object it was copied from.
-<!-- verify: resetting a field on a custom object restores the base object's value -->
 
 ## Raw data
 
@@ -137,7 +134,7 @@ them. The field list shows each field's code next to its name, and the values
 show as they are stored, without the editor's translation: a list of
 abilities, for example, becomes a list of ability codes. Press :kbd[Ctrl+D]
 again to switch back.
-<!-- verify: the menu label "View > Display Values As Raw Data" and the Ctrl+D shortcut, and how raw data mode shows field names (e.g. "unam (Name)") and object names in the tree (e.g. "hpea (Peasant)") -->
+<!-- verify: how raw data mode shows field and object names (e.g. "unam (Name)", "hpea (Peasant)") -->
 
 ::shot[The Units tab in raw data view with the Peasant selected: the tree showing object codes such as hpea, and the field list showing field codes such as unam next to their values]{src="./object-editor-tour/raw-data.png"}
 
@@ -145,7 +142,7 @@ Custom objects get codes too. The editor gives each one a new code when you
 make it, built from a letter and three digits, such as `H000` for a first
 custom hero, `h000` for a custom unit or building, and `A000` for a custom
 ability.
-<!-- verify: the codes the Reforged editor gives new custom objects (H000 for a hero copied from the Paladin, h000 or h001 for a unit copied from a human building, A000 for an ability) -->
+<!-- verify: the second custom unit's code when H000 already exists (h000 or h001) -->
 
 You will see rawcodes all over the modding world, because they are
 unambiguous. Two objects can share a name, and names change when a map is

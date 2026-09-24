@@ -46,10 +46,9 @@ already has 3 levels, and Shield Throw keeps them.
 Fields that change with the level appear once per level, starting with the
 level: **Level 1 - Data - Damage**, **Level 2 - Data - Damage**, and so on.
 Fields without a level, such as **Text - Name**, apply to every level.
-<!-- verify: how the Reforged Object Editor lists per-level ability fields (one row per level, named "Level 1 - Data - Damage" and so on) -->
 
 Shield Throw is a lighter Storm Bolt: less damage and a shorter stun, but
-cheaper and more often:
+cheaper, and ready again sooner:
 
 | Field | Level 1 | Level 2 | Level 3 |
 | --- | --- | --- | --- |
@@ -59,14 +58,13 @@ cheaper and more often:
 | **Stats - Cooldown** | 8 | 8 | 8 |
 | **Stats - Mana Cost** | 60 | 60 | 60 |
 
-The two durations are the stun's length in seconds: **Duration - Normal**
-for ordinary units and **Duration - Hero** for heroes. Storm Bolt stuns heroes
-for less time; Shield Throw stuns both the same. **Stats - Cooldown** is the
-number of seconds before the ability can be used again.
+The two durations are the stun's length in seconds: **Stats - Duration -
+Normal** for ordinary units and **Stats - Duration - Hero** for heroes. Storm
+Bolt stuns heroes for less time; Shield Throw stuns both the same. **Stats -
+Cooldown** is the number of seconds before the ability can be used again.
 
 :::steps
 1. With Shield Throw selected, check that **Stats - Levels** is `3`.
-   <!-- verify: the field name "Stats - Levels" and that Storm Bolt has 3 levels -->
 2. Set **Level 1 - Data - Damage** to `60`, **Level 2 - Data - Damage** to
    `120` and **Level 3 - Data - Damage** to `180`.
 3. Set **Stats - Duration - Normal** to `1`, `1.5` and `2` for levels 1, 2
@@ -74,7 +72,6 @@ number of seconds before the ability can be used again.
 4. Set **Stats - Duration - Hero** to the same three values.
 5. Set **Stats - Cooldown** to `8` for all three levels.
 6. Set **Stats - Mana Cost** to `60` for all three levels.
-   <!-- verify: Storm Bolt's field names in Reforged: Data - Damage, Stats - Duration - Normal, Stats - Duration - Hero, Stats - Cooldown, Stats - Mana Cost -->
 7. Save the map with :kbd[Ctrl+S].
 :::
 
@@ -91,7 +88,6 @@ a longer extended text:
   is one of each for the whole ability.
 - **Text - Tooltip - Normal** and **Text - Tooltip - Normal - Extended** show on
   the button that casts it. There is one of each per level.
-<!-- verify: the tooltip field names in Reforged (Text - Tooltip - Learn, Text - Tooltip - Learn - Extended, Text - Tooltip - Normal, Text - Tooltip - Normal - Extended) and which of them are per level -->
 
 Storm Bolt's tooltips contain codes in angle brackets, such as
 `<AHtb,DataA1>`, which the game replaces with a value from an ability. They
@@ -104,7 +100,6 @@ go too.
 :::steps
 1. Set **Text - Tooltip - Learn** to `Learn Shield Throw - [Level %d]`. The
    game replaces `%d` with the level the player is about to learn.
-   <!-- verify: %d in Text - Tooltip - Learn is replaced by the level being learned -->
 2. Set **Text - Tooltip - Learn - Extended** to `Throws the captain's shield
    at an enemy unit, dealing damage and stunning it. Level 1: 60 damage, 1
    second stun. Level 2: 120 damage, 1.5 second stun. Level 3: 180 damage, 2
@@ -152,7 +147,6 @@ and the Gnoll Poacher still owes you the Potion of Healing from chapter 3.
 2. Select the Captain. A hero starts with one skill point: click the **Hero
    Abilities** button, the one with a plus sign, and hold the pointer over
    each ability. Shield Throw's learn tooltip shows your text.
-   <!-- verify: the Reforged command card's button for learning hero abilities (a plus icon labelled Hero Abilities) -->
 3. Click **Shield Throw** to learn it.
 4. Walk the Captain down the ramp, along the path and over the ford, then
    west into the forest clearing where the gnolls wait.
