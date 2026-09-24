@@ -28,7 +28,6 @@ so short clicks make small changes.
 - **Ripple** makes waves in the ground, and **Noise** makes it randomly
   bumpy.
 - **Smooth** evens out sharp bumps and dents into soft slopes.
-<!-- verify: the Apply Height tool names in Reforged: Raise, Lower, Plateau, Ripple, Noise, Smooth -->
 
 Hills make the open ground look natural, but keep them away from the places
 where the plateau, the river and the path will go. Hills there make cliffs and
@@ -40,8 +39,12 @@ water harder to shape, and a path looks best on fairly level ground.
 3. In the open grass, away from the path and the village clearing, click a
    few times to raise a low hill. Short clicks are enough: a hill only a
    little taller than a unit looks right from the game's camera.
-4. Add two or three more hills around the map, in the corners the path does
-   not cross.
+4. Add two or three more hills elsewhere. Picture the three-by-three grid
+   from the last lesson: the path runs from the bottom-left square through the
+   middle to the top-right, and in the next lesson a river runs from the
+   top-left square through the middle to the bottom-right. The squares left
+   over (top-middle, middle-left, middle-right and bottom-middle) are the
+   places for hills.
 5. Select **Smooth** and drag it over each hill to round it off.
 6. If a hill came out too tall, use **Lower** on it, or press :kbd[Ctrl+Z].
 :::
@@ -58,7 +61,6 @@ two levels meet, the editor draws a cliff wall. Ground units cannot walk up
 or down a cliff; they must use a ramp. Units on low ground also cannot see up
 onto higher ground, while units on top can see down. That makes high ground a
 strong place to defend, which is why the village sits on a plateau.
-<!-- verify: units on a lower cliff level cannot see onto a higher cliff level without another source of vision -->
 
 The cliff tools are under **Apply Cliff**:
 
@@ -69,7 +71,7 @@ The cliff tools are under **Apply Cliff**:
 - **Ramp** turns a stretch of cliff into a slope. You use it at the end of
   this lesson.
 - **Shallow Water** and **Deep Water** are covered in the next lesson.
-<!-- verify: the Apply Cliff tool names (Raise, Lower, Level, Ramp, Shallow Water, Deep Water) and that Raise/Lower work one level up/down from the level where you first click -->
+<!-- verify: the Apply Cliff tool names (Raise, Lower, Level, Ramp, Shallow Water, Deep Water) and that Raise/Lower work one level up/down from the level where you first click (tooltips may read Raise One Level / Lower One Level) -->
 
 Next to the tools are the tileset's cliff types. Lordaeron Summer has two:
 **Grass Cliff**, a wall with grass along its top edge, and **Dirt Cliff**, a
@@ -92,17 +94,19 @@ simple block, one level up.
 3. Click inside the village clearing and, holding the button, drag across the
    whole clearing. Because every stroke is measured from where you first
    clicked, the whole area rises by the same single level, however many times
-   the brush passes over it.
+   the brush passes over it. If you let go and need another stroke, start it
+   on ground that is still low: a stroke that starts on the raised part lifts
+   the ground a second level.
 4. Tilt the camera and look at the edges. Where a corner has a notch or a
    lone raised tile, use **Level**: click on the plateau and drag over the
    stray bit to add it to the plateau, or click on the low ground and drag to
    remove it.
-5. Check that the south edge runs straight for several tiles near the
-   south-west corner, where the dirt path arrives. The ramp goes there.
+5. Check that the south edge runs straight for several tiles just east of
+   the south-west corner, where the dirt path arrives. The ramp goes there.
 6. Save the map with :kbd[Ctrl+S].
 :::
 
-::shot[The terrain view tilted to show the village clearing raised one cliff level in the north-east, with a straight grass cliff edge along its south side and the dirt path arriving at its south-west corner]{src="./height-and-cliffs/plateau.png"}
+::shot[The terrain view tilted to show the village clearing raised one cliff level in the north-east, with a straight grass cliff edge along its south side and the dirt path arriving at that edge just east of the south-west corner]{src="./height-and-cliffs/plateau.png"}
 
 Raising a cliff can repaint the tiles along its edges to match the cliff type.
 If the cobbled path or the grass near the edge has changed, touch it up with
@@ -112,14 +116,13 @@ the tile brush as in the last lesson.
 ## Ramps
 
 A ramp is the one way units can move between cliff levels. The village gets
-exactly one, so every invader has to come up the same slope. Place it at the
-plateau's south-west corner, on the straight south edge, so it leads down
-towards the path and the spawn.
+exactly one, so every invader has to come up the same slope. Place it on the
+plateau's straight south edge, just east of its south-west corner, where the
+dirt path arrives, so it leads down towards the path and the spawn.
 
 The editor only builds ramps on straight stretches of cliff that run north to
 south or east to west, one level high. It cannot make a ramp on a corner or a
 diagonal edge, which is why the plateau's edge needed to be straight there.
-<!-- verify: ramps can only be made on straight north–south or east–west cliff edges with a one-level height difference -->
 
 :::steps
 1. Under **Apply Cliff**, select the **Ramp** tool.
@@ -137,7 +140,7 @@ diagonal edge, which is why the plateau's edge needed to be straight there.
    Save the map.
 :::
 
-::shot[The terrain view tilted to show the ramp on the south edge of the village plateau near its south-west corner, with the dirt path running up it to the cobbled path on top]{src="./height-and-cliffs/ramp.png"}
+::shot[The terrain view tilted to show the ramp on the south edge of the village plateau just east of its south-west corner, with the dirt path running up it to the cobbled path on top]{src="./height-and-cliffs/ramp.png"}
 
 :::note
 Nothing stops you making more ramps later, but each one is another way into
