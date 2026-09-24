@@ -1,0 +1,37 @@
+---
+import { TRACK } from '../../data/tutorials';
+import type { PagerLink, Track } from '../../lib/tutorials';
+interface Props {
+  track: Track;
+  closing: PagerLink;
+  /** The lesson being read; its chapter opens and its headings are listed. */
+  currentId?: string;
+  headings?: { slug: string; text: string }[];
+  /** True on the closing page itself. */
+  closingCurrent?: boolean;
+}
+const { track, closing, currentId, headings = [], closingCurrent = false } = Astro.props;
+---
+<nav class="track-outline" aria-label="Tutorial track">
+  <h2 class="panel-title"><a href="/learn/">{TRACK.short}</a></h2>
+  {track.chapters.map((chapter) => (
+    <details open={chapter.lessons.some((lesson) => lesson.id === currentId)}>
+      <summary><span class="outline-number" aria-hidden="true">{chapter.number}</span>{chapter.title}</summary>
+      <ol>
+        {chapter.lessons.map((lesson) => lesson.id === currentId
+          ? (
+            <li>
+              <a href={lesson.href} aria-current="page">{lesson.data.title}</a>
+              {headings.length > 0 && (
+                <ol class="outline-headings">
+                  {headings.map((heading) => <li><a href={`#${heading.slug}`}>{heading.text}</a></li>)}
+                </ol>
+              )}
+            </li>
+          )
+          : <li><a href={lesson.href}>{lesson.data.title}</a></li>)}
+      </ol>
+    </details>
+  ))}
+  <a class="outline-closing" href={closing.href} aria-current={closingCurrent ? 'page' : undefined}>{closing.title}</a>
+</nav>
