@@ -33,6 +33,13 @@ Deno.test('keys and menu paths', async () => {
   );
 });
 
+Deno.test('a literal plus key survives, and an empty key combination is an error', async () => {
+  assert.match(await html('Zoom with :kbd[Ctrl++].'), /<kbd class="keys"><kbd>Ctrl<\/kbd>\+<kbd>\+<\/kbd><\/kbd>/);
+  assert.match(await html('Press :kbd[+].'), /<kbd class="keys"><kbd>\+<\/kbd><\/kbd>/);
+  assert.match(await html('Undo with :kbd[Ctrl + Shift + Z].'), /<kbd class="keys"><kbd>Ctrl<\/kbd>\+<kbd>Shift<\/kbd>\+<kbd>Z<\/kbd><\/kbd>/);
+  await assert.rejects(() => render('Press :kbd[].'), /:kbd needs at least one key \(.*water\.md\)/);
+});
+
 Deno.test('steps wrap their ordered list', async () => {
   assert.match(await html(':::steps\n1. First\n2. Second\n:::'), /<div class="tutorial-steps">\s*<ol>\s*<li>First<\/li>/);
 });
@@ -45,7 +52,21 @@ Deno.test('callouts and checkpoints carry a title, default or custom', async () 
   assert.match(await html(':::note\nA note.\n:::'), /tutorial-callout-note/);
   const checkpoint = await html(':::checkpoint\nThe river blocks the way.\n:::');
   assert.match(checkpoint, /<aside class="tutorial-checkpoint">\s*<p class="tutorial-callout-title">Checkpoint: your map now…<\/p>\s*<p>The river blocks the way.<\/p>/);
-  assert(!(await html(':::warning\nNot ours.\n:::')).includes('tutorial-callout'), 'Unknown containers are left for Starlight to restore');
+});
+
+Deno.test('an empty label falls back to the default title', async () => {
+  assert.match(await html(':::tip[]\nHold Shift.\n:::'), /<p class="tutorial-callout-title">Tip<\/p>/);
+  assert.match(await html(':::checkpoint[]\nDone.\n:::'), /<p class="tutorial-callout-title">Checkpoint: your map now…<\/p>/);
+});
+
+Deno.test('an unknown container directive is an error in lessons only', async () => {
+  await assert.rejects(
+    () => render(':::warning\nNot ours.\n:::'),
+    /Unknown container directive ":::warning" in .*water\.md; use one of :::steps, :::tip, :::note, :::caution, :::checkpoint/,
+  );
+  assert(!(await html(':::warning\nNot ours.\n:::', docsURL)).includes('tutorial-callout'), 'Docs keep Starlight\'s own handling');
+  // Unknown text and leaf directives are not errors: prose like "Hint:yes" parses as one, and Starlight prints it back.
+  await html('Hint:yes, carry on.\n\n::unknown[x]');
 });
 
 Deno.test('a captured screenshot becomes an image Astro optimises', async () => {
@@ -67,11 +88,21 @@ Deno.test('a missing screenshot renders a placeholder with its capture note', as
 Deno.test('a screenshot without a relative src is an error', async () => {
   await assert.rejects(() => render('::shot[No source]'), /::shot needs a src/);
   await assert.rejects(() => render('::shot[Absolute]{src="/images/a.png"}'), /::shot needs a src/);
+  await assert.rejects(() => render('::shot[Parent]{src="./../terrain/water/river.png"}'), /without "\.\."/);
+  await assert.rejects(() => render('::shot[Nested]{src="./water/../water/river.png"}'), /without "\.\."/);
+});
+
+Deno.test('a screenshot src that is a directory counts as missing', async () => {
+  const result = await render('::shot[The whole folder]{src="./water"}');
+  assert.match(result.code, /<figure class="shot shot-missing">/);
+  assert.deepEqual(result.metadata.localImagePaths, []);
 });
 
 Deno.test('verify notes are removed and docs links reload the page', async () => {
   const output = await html('Press F9.\n\n<!-- verify: F9 opens the Help -->\n\nSee [the docs](/framework/docs/installation/) and [resources](/resources/).');
   assert(!output.includes('verify'), 'Verify notes never reach the page');
+  assert(!(await html('Press F9.\n\n  <!-- verify: indented note -->\n')).includes('verify'), 'Indented verify notes are removed too');
   assert.match(output, /<a href="\/framework\/docs\/installation\/" data-astro-reload="">the docs<\/a>/);
   assert.match(output, /<a href="\/resources\/">resources<\/a>/);
+  assert.match(await html('[Docs](/framework/docs/ "Read the docs")'), /<a href="\/framework\/docs\/" title="Read the docs" data-astro-reload="">Docs<\/a>/);
 });
