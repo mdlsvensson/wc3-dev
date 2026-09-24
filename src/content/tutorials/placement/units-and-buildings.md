@@ -27,8 +27,9 @@ Every unit you place belongs to the player selected there, and it takes that
 player's colour. It starts on **Player 1 (Red)**, which is the player the
 village belongs to. Below it, a second list picks a race, such as **Human**,
 **Orc**, **Undead** or **Night Elf**, and the palette shows that race's units,
-buildings and heroes in separate groups.
-<!-- verify: the Unit Palette's controls in Reforged: a player list starting on Player 1 (Red), a race list, and the groups it shows (Units, Buildings, Heroes, and any others) -->
+buildings and heroes in separate groups. A third list picks **Melee** or
+**Campaign** units; leave it on **Melee**.
+<!-- verify: the Unit Palette's controls in Reforged: a player list starting on Player 1 (Red), a race list, a Melee/Campaign list, and the groups it shows (Units, Buildings, Heroes, Special) -->
 
 ::shot[The Unit Palette with Player 1 (Red) and Human selected, showing the Human units, buildings and heroes, with the Town Hall highlighted]{src="./units-and-buildings/unit-palette.png"}
 
@@ -52,9 +53,11 @@ so the village does not need one.
 1. Check that the player list shows **Player 1 (Red)** and the race list shows
    **Human**.
 2. Place the Town Hall first, before any other unit. The editor numbers units
-   in the order you place them, and the next section uses that number. Under
-   the buildings, click **Town Hall**. The pointer shows the building and the
-   square of ground it needs.
+   in the order you place them, so the Town Hall gets a low number, which
+   the next section explains. Under
+   the buildings, click **Town Hall** (hold the pointer over an icon to see
+   its name). The pointer shows the building and the square of ground it
+   needs.
 3. Click on the cobbled square in the centre of the plateau. The Town Hall
    appears in red.
    <!-- verify: the editor refuses to place a building where it does not fit (over a cliff edge, in water, on a tree or doodad that blocks it), and how it shows this -->
@@ -100,15 +103,12 @@ a four-digit number and the word `<gen>`, such as `Town Hall 0001 <gen>`.
 `<gen>` means the editor generated the name. Triggers use this name when they
 need one particular unit rather than any unit of a type, and in chapter 6 the
 game is lost when `Town Hall 0001 <gen>` dies.
-<!-- verify: the format of a placed unit's name in the Trigger Editor (Town Hall 0001 <gen>), and whether numbering starts at 0000 or 0001 -->
+<!-- verify: the format of a placed unit's name in the Trigger Editor (Town Hall 0001 <gen>), whether numbering starts at 0000 or 0001, and whether doodads and destructibles placed earlier share the unit counter -->
 
-Find your Town Hall's name now and write it down. Select the Town Hall and look
-at the status bar along the bottom of the main window, which shows the
-selected unit's name.
-<!-- verify: where the editor shows a placed unit's generated name and number (status bar, Unit Properties title, or elsewhere) -->
-If your number is different from `0001`, use your number wherever the track
-says `Town Hall 0001 <gen>`. In chapter 6 you can also pick the Town Hall by
-clicking it on the map, so nothing breaks if you forget.
+You do not need to look the number up now. In chapter 6 you pick the Town
+Hall by clicking it on the map, and the Trigger Editor shows its full name
+then. If yours ends in a different number from `0001`, use your number
+wherever the track says `Town Hall 0001 <gen>`.
 
 :::caution[Keep the Town Hall]
 A new Town Hall gets a new number. Once chapter 6 has a trigger that refers
@@ -137,7 +137,6 @@ the player looks first. Each player has one.
 4. When the game has loaded, the camera should be over the village. Click the
    Peasants and the buildings: they are yours. The gold and lumber counters
    show zero, because no melee setup gave you any.
-   <!-- verify: with Melee Initialization disabled, Player 1 starts with 0 gold and 0 lumber in a Test Map game -->
 5. Press :kbd[F10], choose **End Game**, then **Exit Program** to return to the
    editor.
 :::
