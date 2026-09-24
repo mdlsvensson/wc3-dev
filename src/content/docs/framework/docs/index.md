@@ -15,6 +15,7 @@ Keep these references nearby:
 
 | Guide | Covers |
 | --- | --- |
+| [Using the library](/framework/docs/library/) | Adding wc3-lib, importing only what you use, owning systems with a Scope |
 | [Object data](/framework/docs/object-data/) | Pkl modules, inheritance, rawcodes, all seven object categories |
 | [Architecture](/framework/docs/architecture/) | Source ownership, build flow, scripts, compiler integration |
 | [Command reference](/framework/docs/reference/) | Deno tasks, configuration, output files, editor setup |
