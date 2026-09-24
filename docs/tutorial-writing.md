@@ -122,8 +122,12 @@ Town Hall.
   to the Town Hall.
 - Shield Throw: copied from Storm Bolt; 3 levels; damage 60/120/180; stun
   1/1.5/2 seconds; cooldown 8 seconds; 60 mana.
-- Village Tower: copied from the Guard Tower; 100 gold, 30 lumber; build time
-  30 seconds; no requirements and no upgrades; built by Peasants.
+- Village Tower: copied from the Guard Tower; Combat - Attack 1 - Damage Base
+  2 lower than the Guard Tower's; 100 gold, 30 lumber; build time 30 seconds;
+  no requirements and no upgrades. The (standard) Peasant is edited directly:
+  the Village Tower replaces the Scout Tower in its Techtree - Structures
+  Built and takes the Scout Tower's button position, because the build menu
+  is full.
 
 **Triggers** (category "Defend the Village"; `Melee Initialization` is disabled in
 chapter 1 and deleted in chapter 6):
