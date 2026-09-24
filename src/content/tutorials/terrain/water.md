@@ -21,19 +21,17 @@ turn one stretch of it into the ford.
 Water is not a tile. It is painted with the cliff tools, because the editor
 makes water by lowering the ground below the water line. Under **Apply
 Cliff** in the Terrain Palette there are two water tools:
-<!-- verify: Shallow Water and Deep Water are tools in the Apply Cliff group and work by lowering the ground below the water level -->
 
 - **Shallow Water** makes water that ground units can wade through. It
   slows nobody down, but nothing can be built in it.
 - **Deep Water** makes water that ground units cannot enter at all. Only
   flying units, ships and a few amphibious units can cross it.
-<!-- verify: ground units cross shallow water at normal speed, buildings cannot be placed in it, and deep water blocks all ground units -->
 
 You draw water the way you drew cliffs, so the tips from the last lesson apply
 here too: use a square brush for straight banks, keep the shape simple, and
 use :kbd[Ctrl+Z] freely.
 
-::shot[The Apply Cliff group of the Terrain Palette with the Shallow Water and Deep Water tools highlighted]{src="./water/water-tools.png"}
+::shot[The Apply Cliff group of the Terrain Palette with the pointer over the Deep Water tool, its tooltip showing, and the Shallow Water tool beside it]{src="./water/water-tools.png"}
 
 ## The river
 
@@ -61,7 +59,7 @@ crossing your dirt path in the middle of the map.
 7. Save the map with :kbd[Ctrl+S].
 :::
 
-::shot[The minimap of Defend the Village with a deep river running from the north-west edge to the south-east edge through the middle of the map, cutting the dirt path between the spawn and the village]{src="./water/river.png"}
+::shot[The terrain view zoomed all the way out over the whole map, seen from above, with a deep river running from the north-west edge to the south-east edge through the middle of the map, cutting the dirt path between the spawn and the village]{src="./water/river.png"}
 
 The river cuts straight through your dirt path for now. That is the spot for
 the ford.
