@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { MdastNode, MdastPluginDefinition, PluginFactoryContext } from 'satteri';
 
@@ -7,6 +7,8 @@ const TUTORIALS_DIR = '/src/content/tutorials/';
 
 const CALLOUTS: Record<string, string> = { tip: 'Tip', note: 'Note', caution: 'Caution' };
 const CHECKPOINT_TITLE = 'Checkpoint: your map now…';
+/** Every container directive a lesson may use; any other is an error. */
+const CONTAINERS = ['steps', ...Object.keys(CALLOUTS), 'checkpoint'];
 
 export function isTutorialFile(fileURL: URL | undefined): fileURL is URL {
   return fileURL !== undefined && fileURLToPath(fileURL).replaceAll('\\', '/').includes(TUTORIALS_DIR);
@@ -23,10 +25,15 @@ function element(type: 'blockquote' | 'paragraph' | 'emphasis', tagName: string,
 }
 const text = (value: string) => ({ type: 'text', value });
 
-/** `Ctrl+F9` → `<kbd class="keys"><kbd>Ctrl</kbd>+<kbd>F9</kbd></kbd>`. */
-function keys(combination: string): MdastNode {
+/**
+ * `Ctrl+F9` → `<kbd class="keys"><kbd>Ctrl</kbd>+<kbd>F9</kbd></kbd>`. Only a `+` between two keys
+ * separates them, so `:kbd[+]` and `:kbd[Ctrl++]` keep the plus key.
+ */
+function keys(combination: string, fileURL: URL): MdastNode {
+  const names = combination.trim().split(/(?<=\S)\s*\+\s*(?=\S)/).filter(Boolean);
+  if (names.length === 0) throw new Error(`:kbd needs at least one key (${fileURLToPath(fileURL)})`);
   const children: Child[] = [];
-  combination.split('+').map((key) => key.trim()).filter(Boolean).forEach((key, index) => {
+  names.forEach((key, index) => {
     if (index > 0) children.push(text('+'));
     children.push(element('emphasis', 'kbd', {}, [text(key)]));
   });
@@ -43,15 +50,27 @@ function menuPath(path: string): MdastNode {
   return element('emphasis', 'span', { className: ['menu-path'] }, children);
 }
 
+/** Whether `path` is a regular file; a directory or a missing path is not. */
+function isFile(path: string): boolean {
+  try {
+    return statSync(path).isFile();
+  } catch {
+    return false;
+  }
+}
+
 /** A screenshot: the image when its file exists next to the lesson, otherwise a placeholder showing the capture note. */
 function shot(alt: string, attributes: Record<string, string | null | undefined> | null | undefined, fileURL: URL): MdastNode {
   const src = attributes?.src ?? '';
   if (!src.startsWith('./')) {
     throw new Error(`::shot needs a src relative to the lesson, starting with "./" (${fileURLToPath(fileURL)}: "${alt}")`);
   }
+  if (src.split(/[/\\]/).includes('..')) {
+    throw new Error(`::shot src must stay in the lesson's folder, without ".." (${fileURLToPath(fileURL)}: "${src}")`);
+  }
   const caption = attributes?.caption;
   const figcaption = caption ? [element('paragraph', 'figcaption', {}, [text(caption)])] : [];
-  if (existsSync(fileURLToPath(new URL(src, fileURL)))) {
+  if (isFile(fileURLToPath(new URL(src, fileURL)))) {
     return element('blockquote', 'figure', { className: ['shot'] }, [{ type: 'image', url: src, alt }, ...figcaption]);
   }
   return element('blockquote', 'figure', { className: ['shot', 'shot-missing'] }, [
@@ -69,7 +88,7 @@ export function tutorialDirectives({ fileURL }: PluginFactoryContext): MdastPlug
   return {
     name: 'wc3-tutorial-directives',
     textDirective(node, ctx) {
-      if (node.name === 'kbd') return keys(ctx.textContent(node));
+      if (node.name === 'kbd') return keys(ctx.textContent(node), fileURL);
       if (node.name === 'menu') return menuPath(ctx.textContent(node));
     },
     leafDirective(node, ctx) {
@@ -80,21 +99,27 @@ export function tutorialDirectives({ fileURL }: PluginFactoryContext): MdastPlug
       const [first, ...rest] = node.children;
       const label = first?.type === 'paragraph' && first.data?.directiveLabel ? first : undefined;
       const body = label ? rest : node.children;
-      const title = (fallback: string) => element('paragraph', 'p', { className: ['tutorial-callout-title'] }, label ? label.children : [text(fallback)]);
+      const title = (fallback: string) =>
+        element('paragraph', 'p', { className: ['tutorial-callout-title'] }, label && label.children.length > 0 ? label.children : [text(fallback)]);
       if (node.name === 'steps') return element('blockquote', 'div', { className: ['tutorial-steps'] }, body);
       if (node.name === 'checkpoint') return element('blockquote', 'aside', { className: ['tutorial-checkpoint'] }, [title(CHECKPOINT_TITLE), ...body]);
       const calloutTitle = CALLOUTS[node.name];
       if (calloutTitle) {
         return element('blockquote', 'aside', { className: ['tutorial-callout', `tutorial-callout-${node.name}`] }, [title(calloutTitle), ...body]);
       }
+      // Starlight would restore an unknown container as a bare <div>, silently losing its meaning.
+      throw new Error(`Unknown container directive ":::${node.name}" in ${fileURLToPath(fileURL)}; use one of ${CONTAINERS.map((name) => `:::${name}`).join(', ')}`);
     },
     html(node) {
       // Author notes marking editor facts to confirm; `tutorial:check` lists them.
-      if (/^<!--\s*verify:/.test(node.value)) return { raw: '' };
+      if (/^\s*<!--\s*verify:/.test(node.value)) return { raw: '' };
     },
     link(node, ctx) {
       // Starlight pages don't use the shell's client router; load them in full.
-      if (node.url.startsWith('/framework/docs/')) ctx.setProperty(node, 'data', { ...node.data, hProperties: { dataAstroReload: '' } });
+      if (node.url.startsWith('/framework/docs/')) {
+        const hProperties = (node.data as { hProperties?: Record<string, unknown> } | undefined)?.hProperties;
+        ctx.setProperty(node, 'data', { ...node.data, hProperties: { ...hProperties, dataAstroReload: '' } });
+      }
     },
   };
 }
