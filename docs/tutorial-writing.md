@@ -69,7 +69,7 @@ shown as written. A `::shot` must be on a line of its own.
   `##` sections. Procedures go in `:::steps`. Each procedure section has at
   least one screenshot. 500–1,200 words.
 - No scripting: no JASS, Lua or TypeScript, and no "Custom Script" actions.
-  Point to [the w3ts framework](/framework/) only in the closing page.
+  Point to [the wc3.dev-framework](/framework/) only in the closing page.
 - Links are plain Markdown. Link other lessons as `/learn/<chapter>/<lesson>/`,
   and only to pages that exist. Link to Hive Workshop at
   `https://www.hiveworkshop.com/` unless you know an exact page exists.

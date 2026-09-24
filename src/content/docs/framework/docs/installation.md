@@ -31,8 +31,8 @@ $env:PKL_EXECUTABLE = 'C:\path\to\pkl.exe'
 ## 2. Clone the repository and install dependencies
 
 ```powershell title="Get the framework"
-git clone https://github.com/mdlsvensson/w3ts-framework.git
-cd w3ts-framework
+git clone https://github.com/mdlsvensson/wc3-dev-framework.git
+cd wc3-dev-framework
 deno install --frozen
 ```
 

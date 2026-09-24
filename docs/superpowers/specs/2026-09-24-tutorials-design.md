@@ -11,7 +11,7 @@ inside the app shell: a beginner who has never opened the World Editor follows
 one path of lessons and ends with a small, playable map. The track teaches the
 World Editor only (terrain, placement, map setup, the Object Editor, and GUI
 triggers). It teaches no scripting, and closes with a page pointing onward to
-Hive Workshop, the resource catalog, and the w3ts framework.
+Hive Workshop, the resource catalog, and the wc3.dev-framework.
 
 ## Decisions
 
@@ -168,7 +168,7 @@ lesson title.
 ### `/learn/next/`, where to go next
 
 Links to Hive Workshop (tutorials, forums, the map section), the resource
-catalog, and the w3ts framework docs, with one sentence on each. It opens as
+catalog, and the wc3.dev-framework docs, with one sentence on each. It opens as
 a tab and its previous link is the last lesson.
 
 ### Side panel: the track outline
