@@ -11,8 +11,8 @@ goals:
 
 The waves need a clock, and the triggers need a memory. Which wave comes
 next? What kind of unit is in it? How long until it arrives? In this lesson
-you create variables to hold those answers, and a Setup trigger that fills
-them in when the game starts. Setup also gives the player the gold and
+you create variables to hold those answers, and a `Setup` trigger that
+fills them in when the game starts. It also gives the player the gold and
 lumber the melee setup used to give, and starts a countdown to the first
 wave in a window the player can see.
 
@@ -40,33 +40,30 @@ Defend the Village uses four variables:
 | `WaveWindow` | Timer Window | The window that shows that countdown |
 
 :::steps
-1. In the Trigger Editor, choose :menu[Edit > Variables], or press
-   :kbd[Ctrl+B]. The **Variables** dialog opens with an empty list.
-   <!-- verify: the Variable Editor opens with Edit > Variables or Ctrl+B in the Reforged Trigger Editor, and its title -->
-2. Click the **New Variable** button. In the dialog, type `WaveNumber` as the
-   **Variable Name**, choose **Integer** as the **Variable Type**, and leave
-   the **Initial Value** at `0`. Click **OK**.
-   <!-- verify: the New Variable dialog's fields: Variable Name, Variable Type, Array with Size, and Initial Value, and the button's label -->
-3. Click **New Variable** again. Name it `WaveUnitType` and choose
-   **Unit-Type**. Tick **Array** and set **Size** to `5`. Click **OK**.
+1. Select the **Defend the Village** category and press :kbd[Ctrl+B] to add
+   a variable. It appears in the trigger list, and its settings fill the
+   right-hand side.
+   <!-- verify: in the Reforged Trigger Editor Ctrl+B (New Variable) adds a variable to the trigger list with its settings on the right; older editors opened a Variables dialog with a New Variable button (fields Variable Name, Variable Type, Array, Size, Initial Value) -->
+2. Name it `WaveNumber`, choose **Integer** as its type, and leave its
+   initial value at `0`.
+3. Press :kbd[Ctrl+B] again. Name it `WaveUnitType` and choose
+   **Unit-Type**. Tick **Array** and set **Size** to `5`.
 4. Add `WaveTimer`, of type **Timer**. Its initial value is a new timer,
    ready to be started, so leave it.
-   <!-- verify: a Timer variable's initial value in the Variable Editor is a new timer (shown as "New Timer" or similar), not None -->
-5. Add `WaveWindow`, of type **Timer Window**, and click **OK** to close the
-   Variables dialog.
+   <!-- verify: the label a Timer variable's initial value shows (New Timer or similar) -->
+5. Add `WaveWindow`, of type **Timer Window**.
 :::
 
-::shot[The Variables dialog listing WaveNumber (Integer, initial value 0), WaveUnitType (Unit-Type array of size 5), WaveTimer (Timer) and WaveWindow (Timer Window)]{src="./wave-timer/variable-editor.png"}
+::shot[The trigger list with WaveNumber, WaveUnitType, WaveTimer and WaveWindow in the Defend the Village category, and WaveUnitType's settings (Unit-Type, Array, Size 5) on the right]{src="./wave-timer/variable-editor.png"}
 
-Type the names exactly, capital letters and all. The editor lists variables
-by name, and the lessons that follow refer to them.
+Type the names exactly, capital letters and all: the lessons that follow
+refer to them.
 
 ## The Setup trigger
 
-Setup runs when the game starts, like Welcome, and prepares everything the
-other triggers need. It uses the same event as Welcome, because the timer
-window it creates at the end is something the player has to see.
-<!-- verify: a timer window created by a trigger with the Map initialization event is not shown, so Setup needs the Elapsed game time event -->
+`Setup` runs when the game starts, like `Welcome`, and prepares everything
+the other triggers need. It uses the same event as `Welcome`, because the
+timer window it creates at the end is something the player has to see.
 
 The five waves grow from gnolls to ogres. The first actions store each
 wave's unit type in its own box of `WaveUnitType`. The array's boxes are
@@ -76,10 +73,9 @@ numbered from 0, but the map leaves box 0 empty so that wave 1 uses box 1.
 1. Select the **Defend the Village** category and press :kbd[Ctrl+T] to
    add a trigger. Name it `Setup`.
 2. Press :kbd[Ctrl+E], choose **Time - Elapsed Game Time**, set the time
-   to `0`, and click **OK**.
+   to `0`, and click **OK** twice.
 3. Press :kbd[Ctrl+R] and choose **Set Variable**. Its line reads `Set
    Variable = Value`.
-   <!-- verify: the Set Variable action's default line reads "Set Variable = Value" -->
 4. Click **Variable** and choose `WaveUnitType`. An index appears after it:
    click **Index** and type `1`.
 5. Click **Value**. In the unit list, choose **Neutral Hostile**, then
@@ -122,13 +118,12 @@ player knows when to expect the next wave.
 2. In its line, click the timer and choose the variable `WaveTimer`. Leave
    **One-shot**, and set the time to `60`. The line reads `Countdown Timer -
    Start WaveTimer as a One-shot timer that will expire in 60.00 seconds`.
-   <!-- verify: the Countdown Timer - Start Timer action's line and its defaults (One-shot, the timer parameter defaulting to Last started timer) -->
+   <!-- verify: Start Timer's defaults: (Last started timer), One-shot, 30.00 seconds -->
 3. Add **Countdown Timer - Create Timer Window**. Set its timer to
    `WaveTimer` and its title to `Next wave`.
 4. Add **Set Variable**. Set the variable to `WaveWindow`, then click
    **Value** and, from the list of functions, choose **Last Created Timer
    Window**.
-   <!-- verify: the function is listed as "Countdown Timer - Last Created Timer Window" and displays as "(Last created timer window)" -->
 5. Save the map with :kbd[Ctrl+S].
 :::
 
@@ -164,7 +159,7 @@ hides it.
    lumber counters show 500 and 200. You no longer need the `greedisgood`
    cheat from chapter 5.
 3. A timer window titled **Next wave** counts down from 1:00.
-   <!-- verify: where the timer window appears on screen in Reforged (top right) and how it shows the time (1:00) -->
+   <!-- verify: how the timer window shows the time left (1:00) -->
 4. Let it reach zero. Nothing happens yet: nothing is waiting for the timer
    to expire. The window stays at 0:00.
 5. Press :kbd[F10], choose **End Game**, then **Exit Program** to return to

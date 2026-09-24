@@ -37,8 +37,7 @@ setup.
   **Conditions** and **Actions**.
   <!-- verify: the layout of the right-hand pane in the Reforged Trigger Editor (comment box, Enabled, Initially On, then the Events, Conditions and Actions tree) -->
 
-Triggers are saved with the map, like everything else in the editor. Press
-:kbd[Ctrl+S] from the Trigger Editor as usual.
+Triggers are saved with the map: press :kbd[Ctrl+S] as usual.
 
 ## Events, conditions and actions
 
@@ -89,7 +88,6 @@ game:
   that plays for computer players.
 - `Melee Game - Enforce victory/defeat conditions (for all players)` ends the
   game for a player who loses all their buildings.
-<!-- verify: the actions of a new map's Melee Initialization trigger in Reforged, their order and their exact display text -->
 
 Every one of these is something Defend the Village does its own way, or not
 at all. You kept the trigger disabled so far; now you can delete it.
@@ -116,13 +114,12 @@ gives the player their gold, and the last one decides who wins.
 
 Your first trigger shows a message when the game starts. You might expect it
 to use **Map initialization**, as the melee setup did, but that runs while
-the loading screen is still up, and a message shown then is gone before the
-player can read it. Instead, the trigger uses an event from the **Time**
+the loading screen is still up, and a message shown then never reaches the
+screen. Instead, the trigger uses an event from the **Time**
 category: **Elapsed Game Time**, set to 0 seconds, which happens the moment
 the game begins.
-<!-- verify: text displayed by a trigger with the Map initialization event does not appear in the game, while an Elapsed game time is 0.00 seconds event shows it -->
 
-Every trigger you write goes in a category of its own, so start with that.
+All your triggers go in one category of their own, so start with that.
 
 :::steps
 1. Right-click the map at the top of the trigger list and choose **New
@@ -131,7 +128,6 @@ Every trigger you write goes in a category of its own, so start with that.
 2. With the new category selected, right-click it and choose **New
    Trigger**, or press :kbd[Ctrl+T]. A trigger appears inside the category,
    with its name ready to edit. Type `Welcome` and press :kbd[Enter].
-   <!-- verify: the Trigger Editor shortcuts in Reforged: Ctrl+G New Category, Ctrl+T New Trigger, Ctrl+E New Event, Ctrl+R New Action, Ctrl+D New Condition, and the right-click menu labels -->
 3. With `Welcome` selected, press :kbd[Ctrl+E] to add an event. A dialog
    opens with a list of events. Choose **Time - Elapsed Game Time**.
 4. The line in the dialog reads `Time - Elapsed game time is 5.00 seconds`.
@@ -140,12 +136,12 @@ Every trigger you write goes in a category of its own, so start with that.
 5. Press :kbd[Ctrl+R] to add an action. Choose **Game - Text Message
    (Auto-Timed)**. Its line reads `Game - Display to (All players) the text:
    Text`.
-   <!-- verify: the action is listed as "Game - Text Message (Auto-Timed)" and its default line reads "Game - Display to (All players) the text: Text" -->
+   <!-- verify: the action is listed as "Game - Text Message (Auto-Timed)" and its default line reads "Game - Display to (All players) the text: Text"; also whether the event and action dialogs show their line without the category prefix (e.g. "Elapsed game time is 5.00 seconds"), with the prefix only in the tree -->
 6. Leave **(All players)** as it is. Click **Text**, type `Defend the
    village! The first wave arrives soon.` and click **OK** twice.
 :::
 
-::shot[The Trigger Editor with the new Defend the Village category in the trigger list and the Welcome trigger inside it, selected, with no events or actions yet]{src="./trigger-basics/new-trigger.png"}
+::shot[The Configure Event dialog over the Welcome trigger, with Time - Elapsed Game Time chosen and its line reading Elapsed game time is 5.00 seconds]{src="./trigger-basics/new-trigger.png"}
 
 The finished trigger looks like this in the editor:
 
@@ -165,7 +161,6 @@ If a line is wrong, double-click it to open its dialog again. Now test it:
    <!-- verify: File > Test Map and Ctrl+F9 work from the Trigger Editor window -->
 2. As soon as the game starts, the message appears on the left of the screen,
    above the interface, and fades after a few seconds.
-   <!-- verify: where Game - Text Message (Auto-Timed) messages appear on screen in Reforged -->
 3. Press :kbd[F10], choose **End Game**, then **Exit Program** to return to
    the editor.
 :::
