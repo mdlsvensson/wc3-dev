@@ -27,7 +27,7 @@ picks a tileset, and starts on your map's tileset, Lordaeron Summer, so you see
 scenery that suits your ground. The second picks a category, such as
 **Trees/Destructibles**, **Environment**, **Props** or **Structures**. Below
 them is the list of doodads in that category.
-<!-- verify: the Doodad Palette's two filter lists (tileset, then category), that the tileset list starts on the map's tileset, and the category names in Reforged (Trees/Destructibles, Environment, Props, Structures, and others such as Water, Cliff/Terrain, Cinematic, Bridges/Ramps, Pathing Blockers) -->
+<!-- verify: the Doodad Palette has two filter lists (tileset, then category) and the tileset list starts on the map's tileset -->
 
 ::shot[The Doodad Palette with the Lordaeron Summer tileset and the Trees/Destructibles category selected, showing the list of trees and destructibles for the tileset]{src="./doodads/doodad-palette.png"}
 
@@ -44,8 +44,6 @@ delete what you place when you are done.
 :::steps
 1. In the category list, choose **Trees/Destructibles**, then click
    **Barrel** in the list. The pointer shows the barrel, ready to place.
-   <!-- verify: Barrel is listed under Trees/Destructibles for Lordaeron Summer -->
-   <!-- verify: whether the palette list shows names as text, or icons that show their name when you hover over them -->
 2. Click in the terrain view. A barrel appears. Click again to place another:
    the palette keeps the doodad selected until you choose something else.
 3. Press :kbd[Esc] to stop placing. The pointer goes back to selecting.
@@ -80,7 +78,6 @@ game.
   and some drop items when they break. Trees are destructibles: Peasants cut
   them for lumber, and a line of trees is a wall until someone chops through
   it. Crates and barrels are destructibles too.
-  <!-- verify: which Lordaeron Summer barrels and crates are destructibles rather than doodads -->
 - **Doodads** are pure scenery. They cannot be attacked or selected in the
   game, and nothing a player does can remove them.
 
@@ -97,20 +94,21 @@ tours it; this map does not need to change either.
 
 ## Dress the village
 
-A few well-placed objects make the plateau read as a village. Keep them to the
-edges of the plateau and along the cobbled path, and leave the middle open:
-the next lesson puts the Town Hall, four Farms and a Lumber Mill there, and
-the invaders need to be able to walk from the ramp to the Town Hall.
+A few well-placed objects make the plateau read as a village. Keep them in
+small groups near the plateau's edges and beside the cobbled path, and leave
+plenty of open ground: the next lesson puts the Town Hall on the cobbled
+square with four Farms and a Lumber Mill around it, and the invaders need to
+be able to walk from the ramp to the Town Hall.
 
 :::steps
 1. Zoom in on the village plateau.
 2. From **Props** or **Structures**, place a **Fence** along parts of the
    plateau's edge, leaving the top of the ramp clear. Rotate each piece in
    its properties so the fence follows the edge.
-3. From **Trees/Destructibles**, place a few **Crates** and **Barrels** in
-   small groups near where the buildings will stand. From **Props**, place
-   one or two **Lamp Posts** along the cobbled path.
-   <!-- verify: the Lordaeron Summer names and categories: Fence (Props or Structures), Crates and Barrel (Trees/Destructibles), Lamp Post (Props) -->
+3. From **Trees/Destructibles**, place a few **Crates** and **Barrel**
+   doodads in small groups near where the buildings will stand. From
+   **Props**, place one or two **Lamp Post** doodads along the cobbled path.
+   <!-- verify: the Lordaeron Summer names and categories: Barrel and Crates (destructibles, Trees/Destructibles), Fence (Props or Structures), Lamp Post (Props, or only in the Village tileset) -->
 4. Keep the cobbled path, the cobbled square and the ramp free of anything
    that blocks units. Turn on the pathing view with :kbd[P] and check that
    the way from the ramp to the square is free of the unwalkable colour.
@@ -127,7 +125,6 @@ the lesson after next.
 :::steps
 1. Choose **Trees/Destructibles** in the category list and click **Summer Tree
    Wall**, the tree of Lordaeron Summer.
-   <!-- verify: the Lordaeron Summer tree's name in the Doodad Palette is Summer Tree Wall -->
 2. Plant trees along the rough dirt band on all four edges. Click once per
    tree, or hold the mouse button and drag to plant a row as you go. Place
    them close together, so the edge looks like a wall of forest.

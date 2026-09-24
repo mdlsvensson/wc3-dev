@@ -33,16 +33,12 @@ difference is the owner.
 1. Press :kbd[U] to switch to the Units layer.
 2. Open the player list at the top of the palette and choose **Neutral
    Hostile**. It is below the numbered players.
-3. Look through the race list. Next to the playable races there are groups of
-   creeps, and the palette lists their units.
-   <!-- verify: Neutral Hostile is listed below the numbered players in the player list; how creeps are listed in the Unit Palette with Neutral Hostile selected (the race list's entries for creeps and where Gnolls and Murlocs appear) -->
+3. In the race list, choose **Neutral Hostile**. The palette now lists the
+   creeps.
+   <!-- verify: the race list has a Neutral Hostile entry that lists the creeps (and whether they are filtered by tileset), and Neutral Hostile appears below the numbered players in the player list -->
 :::
 
 ::shot[The Unit Palette with Neutral Hostile selected in the player list, showing a list of creeps with the Gnoll highlighted]{src="./creep-camps/neutral-hostile.png"}
-
-Units placed for Neutral Hostile are drawn in its own colour in the editor,
-so you can tell creeps from the village at a glance.
-<!-- verify: the colour the editor draws Neutral Hostile units in -->
 
 ## Two camps
 
@@ -62,10 +58,9 @@ path up to the ramp. Eight or ten tiles from the path is a safe distance.
    Gnolls in the clearing in the western forest, close together.
 2. Find **Gnoll Poacher** and place one next to them. Creeps that stand close
    together fight as a group: attack one and the others join in.
-   <!-- verify: the creep names Gnoll, Gnoll Poacher and Murloc Tiderunner as they appear in the Unit Palette -->
 3. From the ford, follow the river north-west, towards the edge of the map,
    on the village's side. Well away from the ford and the path, place
-   two **Murloc Tiderunners** on the bank, at the edge of the water.
+   two **Murloc Tiderunner** creeps on the bank, at the edge of the water.
 4. Turn on the pathing view with :kbd[P] and check that each camp stands on
    walkable ground, not inside the trees or the deep water. Turn it off.
 5. Save the map with :kbd[Ctrl+S].
@@ -116,9 +111,7 @@ hero first.
 
 The Village Captain starts at level 1, and the player has to fight waves at
 the same time, so both camps are easy on purpose. Gnolls, Gnoll Poachers and
-Murloc Tiderunners are among the weakest creeps in the game, level 1 or 2
-each.
-<!-- verify: the levels of Gnoll, Gnoll Poacher and Murloc Tiderunner -->
+Murloc Tiderunners are among the weakest creeps in the game, level 1 each.
 A level 1 hero can clear either camp alone and come out stronger, which is
 exactly what the camps are for.
 

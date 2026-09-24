@@ -19,10 +19,9 @@ the waves appear in a region called `Spawn` and march on a region called
 ## The Region Palette
 
 Press :kbd[R], or choose :menu[Layer > Regions], to switch to the Regions
-layer. The palette window lists the map's regions, which is empty for now.
+layer. The palette window lists the map's regions; the list is empty for now.
 Regions are drawn straight into the terrain view, as coloured rectangles over
 the ground.
-<!-- verify: the Region Palette in Reforged shows a list of the map's regions -->
 
 Practise on open ground first.
 
@@ -30,10 +29,8 @@ Practise on open ground first.
 1. In the terrain view, press the left mouse button on open ground and drag
    diagonally. A rectangle follows the pointer. Release the button, and the
    region appears with a name such as `Region 000`.
-   <!-- verify: regions are drawn by dragging in the terrain view with the Regions layer active, and new regions are named Region 000, Region 001 and so on -->
 2. Click inside the region to select it, then drag it to move it.
 3. Drag one of its edges or corners to resize it.
-   <!-- verify: a selected region is resized by dragging its edges or corners -->
 4. With the region selected, press :kbd[Delete] to remove it.
 :::
 
@@ -42,7 +39,6 @@ Practise on open ground first.
 Regions snap to a grid as you draw them, so their edges will not always land
 exactly under the pointer. That is fine: triggers use a region's area or its
 centre, and a little either way makes no difference.
-<!-- verify: region edges snap to a grid when drawn, moved or resized -->
 
 ## Spawn
 
@@ -106,7 +102,6 @@ Chapter 6 uses `Spawn <gen>` and `Village <gen>`. Type the names exactly, with
 a capital letter and no spaces, and give every region its own name. You can
 rename a region at any time, and triggers that already use it follow the new
 name.
-<!-- verify: renaming a region updates the triggers that refer to it -->
 
 :::checkpoint
 Trees frame your map, and fences, crates and lamp posts dress the village.
