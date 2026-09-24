@@ -3,6 +3,7 @@ import { glob } from 'astro/loaders';
 import { docsLoader, i18nLoader } from '@astrojs/starlight/loaders';
 import { docsSchema, i18nSchema } from '@astrojs/starlight/schema';
 import { resourceSchema } from './lib/resource-schema';
+import { lessonSchema, tutorialPageSchema } from './lib/tutorial-schema';
 
 // Read through globalThis so this file type-checks without Node or Deno typings.
 const env = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env ?? {};
@@ -19,4 +20,14 @@ const resources = defineCollection({
   }),
   schema: resourceSchema,
 });
-export const collections = { docs, i18n, resources };
+// Lessons: one Markdown file per lesson, in a folder per chapter. Ids are `<chapter>/<slug>`.
+const tutorials = defineCollection({
+  loader: glob({ pattern: '*/*.md', base: './src/content/tutorials' }),
+  schema: lessonSchema,
+});
+// Top-level track pages, such as the closing "Where to go next" page.
+const tutorialPages = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/tutorials' }),
+  schema: tutorialPageSchema,
+});
+export const collections = { docs, i18n, resources, tutorials, tutorialPages };
