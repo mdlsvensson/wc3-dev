@@ -15,6 +15,7 @@ jobs:
       - run: deno install --frozen
       - run: deno task check
       - run: deno task resource:check
+      - run: deno task tutorial:check
       - run: deno task test
       # No ASSET_BASE_URL is set here on purpose: the production build must fail loudly rather
       # than ship a site that silently omits resource previews. Once the first hosted resource
