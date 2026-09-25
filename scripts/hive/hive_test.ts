@@ -142,3 +142,35 @@ Deno.test('hiveView adds ages, applies the limit and flags stale snapshots', () 
 
   assert.equal(hiveView({ updated: '2026-09-05', entries: [] }, now).updatedLabel, '5 September 2026');
 });
+
+Deno.test('the schemas reject malformed links, credentials and blank text without throwing', () => {
+  for (const url of ['www.hiveworkshop.com/a/', 'nope']) {
+    const snapshot = { updated: '2026-09-25', entries: [entry(1), { ...entry(2, '2026-09-19'), url }] };
+    assert.equal(hiveSnapshotSchema.safeParse(snapshot).success, false);
+  }
+  const withCredentials = entry(1, '2026-09-20', { url: 'https://user:secret@www.hiveworkshop.com/threads/a.1/' });
+  assert.equal(hiveEntrySchema.safeParse(withCredentials).success, false);
+  assert.equal(hiveOptOutSchema.safeParse({ authors: [], urls: ['https://user@hiveworkshop.com/threads/a.1/'] }).success, false);
+  const badLink = hiveEntrySchema.safeParse(entry(1, '2026-09-20', { url: 'https://example.com/a/' }));
+  assert.match(badLink.error?.issues[0].message ?? '', /https:\/\/www\.hiveworkshop\.com\/… or https:\/\/hiveworkshop\.com\/…/);
+  assert.equal(hiveEntrySchema.safeParse(entry(1, '2026-09-20', { title: '   ' })).success, false);
+  assert.equal(hiveEntrySchema.safeParse(entry(1, '2026-09-20', { category: ' \t' })).success, false);
+});
+
+Deno.test('feedItemsToEntries rejects vague dates, strips the feed title and clips without splitting emoji', () => {
+  const item = (published: string, title = 'T') => ({ title, authors: ['A'], categories: [], published, link: 'https://www.hiveworkshop.com/threads/t.1/' });
+  const vague = feedItemsToEntries([item('1'), item('Sep 2026'), item('2026-09')], 'Models');
+  assert.deepEqual(vague, { entries: [], skipped: 3 });
+  const dated = feedItemsToEntries([item('2026-09-24'), item('2026-09-24T23:00:00-02:00'), item('24 Sep 2026 10:00 GMT')], 'Hive Workshop - Models');
+  assert.deepEqual(dated.entries.map((e) => [e.published, e.category]), [
+    ['2026-09-24', 'Models'],
+    ['2026-09-25', 'Models'],
+    ['2026-09-24', 'Models'],
+  ]);
+  const long = feedItemsToEntries([item('2026-09-24', `${'x'.repeat(118)}😀😀😀`)], 'Models').entries[0];
+  assert.equal(long.title, `${'x'.repeat(118)}…`);
+  assert.equal(long.title.length <= 120, true);
+  const emoji = feedItemsToEntries([item('2026-09-24', `${'x'.repeat(117)}😀😀😀`)], 'Models').entries[0];
+  assert.equal(emoji.title, `${'x'.repeat(117)}😀…`);
+  assert.equal(hiveEntrySchema.safeParse(emoji).success, true);
+});

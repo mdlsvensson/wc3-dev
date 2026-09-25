@@ -126,8 +126,13 @@ function longDate(isoDate: string): string {
 
 /** The UTC date part of a feed date, or undefined when it cannot be read. */
 function isoDay(value: string): string | undefined {
-  const time = Date.parse(value.trim());
-  return Number.isNaN(time) ? undefined : new Date(time).toISOString().slice(0, 10);
+  const text = value.trim();
+  // ISO 8601 ('2026-09-24…') or RFC 822 ('Thu, 24 Sep 2026 …'); Date.parse alone accepts '1' or 'Sep 2026'.
+  if (!/^\d{4}-\d{2}-\d{2}(?:$|T)/.test(text) && !/^(?:[A-Za-z]{3},\s*)?\d{1,2}\s+[A-Za-z]{3}\s+\d{4}\b/.test(text)) return undefined;
+  const time = Date.parse(text);
+  if (Number.isNaN(time)) return undefined;
+  const day = new Date(time).toISOString().slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(day) ? day : undefined;
 }
 
 /** A feed's title as a category: "Hive Workshop - Models" and "Models | Hive Workshop" become "Models". */
@@ -139,8 +144,15 @@ function plural(count: number, unit: string): string {
   return `${count} ${unit}${count === 1 ? '' : 's'} ago`;
 }
 
+/** Shortens to at most `max` UTF-16 units (Zod's measure) without splitting a code point. */
 function clip(text: string, max: number): string {
-  return text.length <= max ? text : `${text.slice(0, max - 1).trimEnd()}…`;
+  if (text.length <= max) return text;
+  let out = '';
+  for (const char of Array.from(text)) {
+    if (out.length + char.length > max - 1) break;
+    out += char;
+  }
+  return `${out.trimEnd()}…`;
 }
 
 function foldName(name: string): string {
