@@ -18,6 +18,13 @@ export function isOptedOut(entry: HiveEntry, optOut: HiveOptOut): boolean {
   return optOut.urls.some((blocked) => normaliseHiveUrl(blocked) === url);
 }
 
+/** Throws, naming every entry that the opt-out register covers; the build runs this on the snapshot. */
+export function assertNoOptOuts(snapshot: HiveSnapshot, optOut: HiveOptOut): void {
+  const titles = snapshot.entries.filter((entry) => isOptedOut(entry, optOut)).map((entry) => entry.title);
+  if (titles.length === 0) return;
+  throw new Error(`${titles.join(', ')} ${titles.length === 1 ? 'is' : 'are'} in src/data/hive-optout.json; run hive:import again or remove ${titles.length === 1 ? 'it' : 'them'} from src/data/hive-activity.json`);
+}
+
 /** An item as `scripts/hive/feed.ts` reads it from an RSS or Atom feed. */
 export interface FeedItem {
   title?: string;

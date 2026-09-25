@@ -1,6 +1,6 @@
 import { strict as assert } from 'node:assert';
 import { type HiveEntry, hiveEntrySchema, hiveOptOutSchema, hiveSnapshotSchema, MAX_ENTRIES } from '../../src/lib/hive-schema.ts';
-import { feedItemsToEntries, hiveView, isOptedOut, mergeEntries, normaliseHiveUrl, relativeAge } from '../../src/lib/hive.ts';
+import { assertNoOptOuts, feedItemsToEntries, hiveView, isOptedOut, mergeEntries, normaliseHiveUrl, relativeAge } from '../../src/lib/hive.ts';
 
 const entry = (n: number, published = '2026-09-20', extra: Partial<HiveEntry> = {}): HiveEntry => ({
   title: `Entry ${n}`,
@@ -173,4 +173,17 @@ Deno.test('feedItemsToEntries rejects vague dates, strips the feed title and cli
   const emoji = feedItemsToEntries([item('2026-09-24', `${'x'.repeat(117)}😀😀😀`)], 'Models').entries[0];
   assert.equal(emoji.title, `${'x'.repeat(117)}😀…`);
   assert.equal(hiveEntrySchema.safeParse(emoji).success, true);
+});
+
+Deno.test('assertNoOptOuts passes a clean snapshot and names every opted-out entry', () => {
+  const snapshot = { updated: '2026-09-25', entries: series(3) };
+  assertNoOptOuts(snapshot, noOptOut);
+  assert.throws(
+    () => assertNoOptOuts(snapshot, { authors: [' AUTHOR '], urls: [] }),
+    /Entry 0, Entry 1, Entry 2 .*src\/data\/hive-optout\.json; run hive:import again or remove/,
+  );
+  assert.throws(
+    () => assertNoOptOuts(snapshot, { authors: [], urls: ['https://hiveworkshop.com/threads/entry.1?page=2'] }),
+    /^Error: Entry 1 is in src\/data\/hive-optout\.json/,
+  );
 });
