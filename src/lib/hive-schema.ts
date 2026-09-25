@@ -6,10 +6,11 @@ const HIVE_ORIGINS = new Set([HIVE_ORIGIN, 'https://hiveworkshop.com']);
 /** The most entries the snapshot keeps. */
 export const MAX_ENTRIES = 30;
 
-/** Whether `url` is an https link to Hive Workshop, with or without `www`. */
+/** Whether `url` is an https link to Hive Workshop, with or without `www`, and without credentials. */
 export function isHiveUrl(url: string): boolean {
   try {
-    return HIVE_ORIGINS.has(new URL(url).origin);
+    const parsed = new URL(url);
+    return HIVE_ORIGINS.has(parsed.origin) && !parsed.username && !parsed.password;
   } catch {
     return false;
   }
@@ -26,14 +27,15 @@ export function normaliseHiveUrl(url: string): string {
 }
 
 const isoDate = z.iso.date();
+const hiveUrl = z.url().refine(isHiveUrl, `Hive links must be ${[...HIVE_ORIGINS].map((origin) => `${origin}/…`).join(' or ')}`);
 
 /** One Hive resource or tutorial: metadata and an outbound link only. */
 export const hiveEntrySchema = z.object({
-  title: z.string().min(1).max(120),
+  title: z.string().trim().min(1).max(120),
   authors: z.array(z.string().trim().min(1)).min(1),
-  category: z.string().min(1).max(40),
+  category: z.string().trim().min(1).max(40),
   published: isoDate,
-  url: z.url().refine(isHiveUrl, `Hive links must start with ${HIVE_ORIGIN}/`),
+  url: hiveUrl,
 });
 export type HiveEntry = z.infer<typeof hiveEntrySchema>;
 
@@ -44,6 +46,8 @@ export const hiveSnapshotSchema = z.object({
 }).superRefine((snapshot, ctx) => {
   const seen = new Set<string>();
   snapshot.entries.forEach((entry, index) => {
+    // Zod still runs this refinement when an entry failed; its own issue already reports a bad link.
+    if (!isHiveUrl(entry.url)) return;
     const url = normaliseHiveUrl(entry.url);
     if (seen.has(url)) ctx.addIssue({ code: 'custom', path: ['entries', index, 'url'], message: `Duplicate Hive link ${url}` });
     seen.add(url);
@@ -58,6 +62,6 @@ export type HiveSnapshot = z.infer<typeof hiveSnapshotSchema>;
 /** `src/data/hive-optout.json`: authors and links to leave out. */
 export const hiveOptOutSchema = z.object({
   authors: z.array(z.string().trim().min(1)),
-  urls: z.array(z.url().refine(isHiveUrl, `Hive links must start with ${HIVE_ORIGIN}/`)),
+  urls: z.array(hiveUrl),
 });
 export type HiveOptOut = z.infer<typeof hiveOptOutSchema>;
