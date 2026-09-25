@@ -129,6 +129,34 @@ World Editor.
   `src/content/tutorials/editor-basics/create-your-map/new-map-dialog.png`) and
   rebuild: its placeholder becomes an optimised image.
 
+### Hive activity
+
+The "New on Hive" group on `/resources/` and the "Latest on Hive" card on the
+home page list recent Hive Workshop resources as titles, authors, categories,
+dates and outbound links. See `docs/hive-integration.md` for the rules and the
+current status.
+
+- `src/data/hive-activity.json` is the committed snapshot the views read (at
+  most 30 entries, newest first). When it has no entries, neither view renders.
+- `src/data/hive-optout.json` lists the authors and Hive URLs to leave out.
+  Edit it by hand when someone asks to be left out.
+- To refresh the snapshot, open Hive's RSS or Atom feeds in a browser and save
+  each one to a file, then run:
+
+  ```sh
+  deno task hive:import path/to/feed.xml path/to/other.xml --dry-run   # print the report only
+  deno task hive:import path/to/feed.xml path/to/other.xml             # rewrite the snapshot
+  ```
+
+  Feed paths resolve against the directory you run the command from. It
+  merges the feeds into the snapshot by URL, leaves out opted-out entries, cuts
+  the list to 30, sets `updated` to today, and reports what was added, updated,
+  left out and cut. Commit the snapshot afterwards.
+- The command never touches the network: its task has no `--allow-net` and
+  may write only the snapshot.
+- The build fails if the snapshot contains an entry the opt-out register
+  matches; run `hive:import` again, or remove the entry by hand.
+
 Add documentation as Markdown with `title` and `description` frontmatter, then
 add its slug to the sidebar in `astro.config.ts`.
 
