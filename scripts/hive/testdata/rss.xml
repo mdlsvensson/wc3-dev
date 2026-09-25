@@ -8,9 +8,10 @@
     <item>
       <title><![CDATA[Footman (HD) &amp; Knight]]></title>
       <pubDate>Thu, 24 Sep 2026 21:30:00 -0300</pubDate>
-      <link>https://www.hiveworkshop.com/threads/footman-hd.123456/?utm_source=rss</link>
+      <link>https://www.hiveworkshop.com/threads/footman-hd.123456/?utm_source=rss&amp;utm_medium=feed</link>
       <guid isPermaLink="false">123456</guid>
       <dc:creator>Tauren Maker</dc:creator>
+      <author>tauren.maker@example.com</author>
       <category domain="https://www.hiveworkshop.com/repositories/models/">Units</category>
       <category domain="https://www.hiveworkshop.com/repositories/models/">Human</category>
     </item>

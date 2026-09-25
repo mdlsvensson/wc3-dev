@@ -13,7 +13,7 @@
     <updated>2026-09-24T11:00:00Z</updated>
     <author><name>Paladin Writer</name></author>
     <author><name>Co Author</name></author>
-    <category term="Triggers (GUI)"/>
+    <category term="triggers-gui" label="Triggers (GUI)"/>
   </entry>
   <entry>
     <title>Terrain Basics</title>

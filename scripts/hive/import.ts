@@ -51,8 +51,13 @@ export function planImport(
 }
 
 export interface MainOptions {
-  /** The repository root the data files and relative feed paths resolve against. */
+  /** The repository root the data files resolve against. */
   root?: string;
+  /**
+   * The directory relative feed paths resolve against: where the owner ran the command. `deno task`
+   * runs in the repository root and passes the original directory as `INIT_CWD`.
+   */
+  cwd?: string;
   /** ISO date for `updated`; defaults to today in UTC. */
   today?: string;
   log?: (line: string) => void;
@@ -61,7 +66,7 @@ export interface MainOptions {
 
 /** Runs the command; returns the exit code (0 ok, 1 error, 2 usage). */
 export async function main(args: string[], options: MainOptions = {}): Promise<number> {
-  const { root = Deno.cwd(), today = new Date().toISOString().slice(0, 10), log = console.log, error = console.error } = options;
+  const { root = Deno.cwd(), cwd = initCwd() ?? root, today = new Date().toISOString().slice(0, 10), log = console.log, error = console.error } = options;
   const flags = args.filter((arg) => arg.startsWith('--'));
   const paths = args.filter((arg) => !arg.startsWith('--'));
   if (paths.length === 0 || flags.some((flag) => flag !== '--dry-run')) {
@@ -70,7 +75,7 @@ export async function main(args: string[], options: MainOptions = {}): Promise<n
   }
   const dryRun = flags.includes('--dry-run');
   try {
-    const files = await Promise.all(paths.map(async (path) => ({ name: path, xml: await readFile(resolve(root, path), path) })));
+    const files = await Promise.all(paths.map(async (path) => ({ name: path, xml: await readFile(resolve(cwd, path), path) })));
     const snapshot = await readJson(root, SNAPSHOT_PATH, hiveSnapshotSchema);
     const optOut = await readJson(root, OPT_OUT_PATH, hiveOptOutSchema);
     const plan = planImport(files, snapshot, optOut, today);
@@ -85,6 +90,15 @@ export async function main(args: string[], options: MainOptions = {}): Promise<n
   } catch (err) {
     error(`error: ${message(err)}`);
     return 1;
+  }
+}
+
+/** The directory `deno task` was started in, when it is set and readable. */
+function initCwd(): string | undefined {
+  try {
+    return Deno.env.get('INIT_CWD') || undefined;
+  } catch {
+    return undefined;
   }
 }
 
