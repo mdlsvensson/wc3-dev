@@ -5,6 +5,9 @@ export const HIVE_ORIGIN = 'https://www.hiveworkshop.com';
 const HIVE_ORIGINS = new Set([HIVE_ORIGIN, 'https://hiveworkshop.com']);
 /** The most entries the snapshot keeps. */
 export const MAX_ENTRIES = 30;
+/** The longest title and category an entry may have, in UTF-16 units (Zod's measure). */
+export const TITLE_MAX = 120;
+export const CATEGORY_MAX = 40;
 
 /** Whether `url` is an https link to Hive Workshop, with or without `www`, and without credentials. */
 export function isHiveUrl(url: string): boolean {
@@ -31,9 +34,9 @@ const hiveUrl = z.url().refine(isHiveUrl, `Hive links must be ${[...HIVE_ORIGINS
 
 /** One Hive resource or tutorial: metadata and an outbound link only. */
 export const hiveEntrySchema = z.object({
-  title: z.string().trim().min(1).max(120),
+  title: z.string().trim().min(1).max(TITLE_MAX),
   authors: z.array(z.string().trim().min(1)).min(1),
-  category: z.string().trim().min(1).max(40),
+  category: z.string().trim().min(1).max(CATEGORY_MAX),
   published: isoDate,
   url: hiveUrl,
 });
@@ -65,3 +68,13 @@ export const hiveOptOutSchema = z.object({
   urls: z.array(hiveUrl),
 });
 export type HiveOptOut = z.infer<typeof hiveOptOutSchema>;
+
+/**
+ * Validates the parsed contents of a data file against `schema`; throws an error that names `file`
+ * and lists every problem. The build's loader and `hive:import` both read the data files through it.
+ */
+export function validateDataFile<T>(schema: z.ZodType<T>, data: unknown, file: string): T {
+  const result = schema.safeParse(data);
+  if (!result.success) throw new Error(`${file} is not valid:\n${z.prettifyError(result.error)}`);
+  return result.data;
+}

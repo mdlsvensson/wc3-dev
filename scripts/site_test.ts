@@ -1,6 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { createHighlighter, type HighlighterGeneric } from 'shiki';
 import { jass } from '../src/syntax/jass.ts';
+import { HIVE_CONTACT_URL } from '../src/lib/hive.ts';
 
 const root = new URL('../dist/', import.meta.url);
 const ASSETS = 'https://assets.example.test/';
@@ -260,9 +261,11 @@ Deno.test('the resources page lists the Hive fixture as outbound links with a st
   assert(section.includes('Orcs &amp; Humans Icon Pack'), 'The & in a title is escaped once');
   assert(!section.includes('&amp;amp;'), 'No double escaping');
   assert.match(section, /by Fixture Modeler, Second Author/);
-  assert.match(section, /From Hive Workshop, last updated 10 January 2026\./);
-  assert.match(section, /<time datetime="2026-01-09">/);
-  assert.match(section, /<p class="hive-optout">[\s\S]*<a href="https:\/\/github\.com\/mdlsvensson\/wc3-dev\/issues">open an issue<\/a>/);
+  assert.match(section, /<h2 id="new-on-hive-title"><a href="https:\/\/www\.hiveworkshop\.com\/">New on Hive<svg[^>]*aria-hidden="true"/);
+  assert.match(section, /<span class="hive-updated">From Hive Workshop, last updated 10 January 2026\.<\/span>/);
+  assert.match(section, /<time datetime="2026-01-09" title="9 January 2026">/);
+  assert.match(section, /<p class="hive-optout"><strong>Authors on Hive:<\/strong>/);
+  assert(section.includes(`<a href="${HIVE_CONTACT_URL}">open an issue</a>`), 'The opt-out note links to HIVE_CONTACT_URL');
 });
 
 Deno.test('the home page shows the five newest Hive entries and links to the full list', async () => {
@@ -272,6 +275,11 @@ Deno.test('the home page shows the five newest Hive entries and links to the ful
   assert.equal(links.length, 5);
   for (const link of links) assert(link.startsWith('https://www.hiveworkshop.com/'), `Not a Hive link: ${link}`);
   assert.match(card, /href="\/resources\/#new-on-hive"/);
+});
+
+Deno.test('the home Hive card says when the list was last updated, under its heading', async () => {
+  const card = hiveSection(await readRoute('/'), 'hive-card');
+  assert.match(card, /<\/header>\s*<p class="hive-card-updated">From Hive Workshop, last updated 10 January 2026\.<\/p>\s*<ul class="hive-card-list">/);
 });
 
 Deno.test('no page loads an image from Hive', async () => {

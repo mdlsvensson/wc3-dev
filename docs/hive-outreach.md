@@ -4,9 +4,11 @@
 any automated access to Hive. This is the message for that first contact. Send
 it where Hive staff prefer to hear about site integrations: a staff contact
 form, a private message to an administrator, or the relevant site-feedback
-forum. The choice is the owner's. Replace `[Your name]` before sending, and
-record the reply (or the lack of one) in the Status section of
-`docs/hive-integration.md`.
+forum. The choice is the owner's. Send it once the contact link on
+`/resources/` is public: the message points staff to it, and it is
+`HIVE_CONTACT_URL` in `src/lib/hive.ts` (see the README). Replace `[Your name]`
+before sending, and record the reply (or the lack of one) in the Status
+section of `docs/hive-integration.md`.
 
 ---
 
@@ -19,16 +21,17 @@ documentation, a beginner tutorial track and a small catalog of modding
 resources. It is meant as a companion to Hive, and it sends people to Hive
 rather than replacing it.
 
-What wc3.dev shows today:
+What wc3.dev shows, or is about to show:
 
-- A curated selection of resources, shown with their authors' permission for
-  browsing and previewing only. Each one credits its author and links to its
-  Hive page as the main action. wc3.dev never offers downloads and never hosts
-  Hive resources without permission.
+- A curated selection of resources for browsing and previewing only, each
+  shown with their author's permission or under a licence that allows it.
+  Each one credits its author and links to where it was published; for Hive
+  resources, the Hive page is the main action. wc3.dev never offers
+  downloads.
 - A "New on Hive" list: the titles, authors, categories and dates of recent
-  Hive resources, each linking to its page on Hive. I refresh it by hand from
-  feeds saved in my browser. Nothing on wc3.dev requests anything from Hive
-  automatically.
+  Hive resources, each linking to its page on Hive. I refresh it by hand, from
+  feeds or pages I save in my browser. Nothing on wc3.dev requests anything
+  from Hive automatically.
 
 My question: does Hive have an official feed or API for new resources that I
 could use, or could one be agreed? If so, which endpoints may I use, and how
@@ -47,7 +50,8 @@ limits:
 
 If you would prefer something different, such as a shorter list, other wording
 or no list at all, let me know and I will change it. You can reply here or
-open an issue at https://github.com/mdlsvensson/wc3-dev/issues.
+use the contact link in the "Authors on Hive" note at
+https://wc3.dev/resources/.
 
 Thank you for everything Hive does for the Warcraft III community.
 

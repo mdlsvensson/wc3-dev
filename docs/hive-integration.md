@@ -61,3 +61,8 @@ anything published there.
   with `deno task hive:import` from RSS or Atom feeds saved in a browser.
 - Opted-out authors and URLs live in `src/data/hive-optout.json`. The import
   leaves them out, and the build fails if the list contains one.
+- Opting out is by request today: authors and Hive staff use the contact link
+  in the "Authors on Hive" note on `/resources/` (`HIVE_CONTACT_URL` in
+  `src/lib/hive.ts`), and the owner adds them to the register by hand. A
+  self-serve opt-out that needs no contact with wc3.dev (point 6 under
+  Automated access) must exist before any automated sync is built.

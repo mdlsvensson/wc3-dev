@@ -174,6 +174,14 @@ Deno.test('planImport with nothing new reports none', async () => {
   assert.match(plan.report, /Cut to 30 entries: none/);
 });
 
+Deno.test('planImport with no files drops opted-out entries and keeps the date', () => {
+  const snapshot: HiveSnapshot = { updated: '2026-09-01', entries: [entry(1, '2026-08-30'), entry(2, '2026-08-29')] };
+  const plan = planImport([], snapshot, { authors: [], urls: ['https://hiveworkshop.com/threads/old.2'] }, '2026-09-25');
+  assert.deepEqual(plan.snapshot, { updated: '2026-09-01', entries: [entry(1, '2026-08-30')] });
+  assert.match(plan.report, /Left out by the opt-out register \(1\):\n {2}Old 2\n/);
+  assert.equal(planImport([], snapshot, noOptOut, '2026-09-25').snapshot.updated, '2026-09-01');
+});
+
 Deno.test('planImport names a file that is not a feed', async () => {
   const xml = await read('not-a-feed.html');
   assert.throws(
@@ -247,13 +255,41 @@ Deno.test('the CLI names a bad or missing file and writes nothing', async () => 
   }
 });
 
-Deno.test('the CLI rejects missing files and unknown flags with usage', async () => {
+Deno.test('the CLI rejects unknown flags with usage', async () => {
   const { root } = await repo();
-  for (const args of [[], ['--dry-run'], ['rss.xml', '--force']]) {
+  for (const args of [['--force'], ['rss.xml', '--force'], ['--dry-run', '--allow-net']]) {
     const out = capture();
     assert.equal(await main(args, { root, cwd: root, log: out.log, error: out.log }), 2);
-    assert.match(out.lines.join('\n'), /Usage: deno task hive:import/);
+    assert.match(out.lines.join('\n'), /Usage: deno task hive:import \[<file>…\] \[--dry-run\]/);
   }
+});
+
+Deno.test('the CLI with no feed files re-applies the opt-out register and keeps the date', async () => {
+  const { root } = await repo();
+  const snapshot: HiveSnapshot = { updated: '2026-09-01', entries: [entry(1, '2026-08-30'), entry(2, '2026-08-29', { authors: ['Gone Author'] })] };
+  const before = JSON.stringify(snapshot, null, 2) + '\n';
+  await Deno.writeTextFile(join(root, 'src/data/hive-activity.json'), before);
+  await Deno.writeTextFile(join(root, 'src/data/hive-optout.json'), JSON.stringify({ authors: ['gone author'], urls: [] }));
+
+  const dry = capture();
+  assert.equal(await main(['--dry-run'], { root, cwd: root, today: '2026-09-25', log: dry.log, error: dry.log }), 0);
+  assert.match(dry.lines.join('\n'), /No feed files: re-applying the opt-out register only\.[\s\S]*Left out by the opt-out register \(1\):\n {2}Old 2\n/);
+  assert.equal(await Deno.readTextFile(join(root, 'src/data/hive-activity.json')), before);
+
+  const out = capture();
+  assert.equal(await main([], { root, cwd: root, today: '2026-09-25', log: out.log, error: out.log }), 0);
+  assert.match(out.lines.join('\n'), /Added: none[\s\S]*Snapshot: 1 entry, updated 2026-09-01\./);
+  const written = JSON.parse(await Deno.readTextFile(join(root, 'src/data/hive-activity.json'))) as HiveSnapshot;
+  assert.deepEqual(written, { updated: '2026-09-01', entries: [entry(1, '2026-08-30')] });
+});
+
+Deno.test('the hive:import task can read and write only what it needs, and never the network', async () => {
+  const config = JSON.parse(await Deno.readTextFile(new URL('../../deno.json', import.meta.url))) as { tasks: Record<string, string> };
+  const task = config.tasks['hive:import'];
+  assert.match(task, /scripts\/hive\/import\.ts/);
+  assert(!/--allow-net\b/.test(task), 'hive:import must not have --allow-net');
+  assert(!/(^|\s)(-A|--allow-all)(\s|$)/.test(task), 'hive:import must not have -A');
+  assert.match(task, /--allow-write=src\/data\/hive-activity\.json(\s|$)/);
 });
 
 Deno.test('the CLI names an invalid data file', async () => {
@@ -261,5 +297,5 @@ Deno.test('the CLI names an invalid data file', async () => {
   await Deno.writeTextFile(join(root, 'src/data/hive-optout.json'), '{ "authors": "nobody" }');
   const out = capture();
   assert.equal(await main(['rss.xml'], { root, cwd: root, today: '2026-09-25', log: out.log, error: out.log }), 1);
-  assert.match(out.lines.join('\n'), /src\/data\/hive-optout\.json: /);
+  assert.match(out.lines.join('\n'), /src\/data\/hive-optout\.json is not valid/);
 });

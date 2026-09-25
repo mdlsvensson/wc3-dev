@@ -1,21 +1,23 @@
 /**
- * `deno task hive:import <file>… [--dry-run]`: refreshes `src/data/hive-activity.json` from RSS or
- * Atom files saved from Hive in a browser. It reads local files only; it never requests anything
- * from Hive (the task has no `--allow-net`).
+ * `deno task hive:import [<file>…] [--dry-run]`: refreshes `src/data/hive-activity.json` from RSS
+ * or Atom files saved from Hive in a browser. With no files, it re-applies the opt-out register to
+ * the snapshot and keeps its date. It reads local files only; it never requests anything from Hive
+ * (the task has no `--allow-net`).
  */
 import { join, resolve } from 'jsr:@std/path@^1';
 import { z } from 'astro/zod';
-import { type HiveEntry, type HiveOptOut, hiveOptOutSchema, type HiveSnapshot, hiveSnapshotSchema, MAX_ENTRIES } from '../../src/lib/hive-schema.ts';
+import { type HiveEntry, type HiveOptOut, hiveOptOutSchema, type HiveSnapshot, hiveSnapshotSchema, MAX_ENTRIES, validateDataFile } from '../../src/lib/hive-schema.ts';
 import { feedItemsToEntries, mergeEntries } from '../../src/lib/hive.ts';
 import { parseFeed } from './feed.ts';
 
 const SNAPSHOT_PATH = 'src/data/hive-activity.json';
 const OPT_OUT_PATH = 'src/data/hive-optout.json';
-const USAGE = 'Usage: deno task hive:import <file>… [--dry-run]';
+const USAGE = 'Usage: deno task hive:import [<file>…] [--dry-run]';
 
 /**
- * Parses the feed files and merges their entries into the snapshot, dated `today`. Pure: throws an
- * error naming the file when one is not an RSS or Atom feed.
+ * Parses the feed files and merges their entries into the snapshot, dated `today`. With no files,
+ * only re-applies the opt-out register and keeps the snapshot's date. Pure: throws an error naming
+ * the file when one is not an RSS or Atom feed.
  */
 export function planImport(
   files: { name: string; xml: string }[],
@@ -38,14 +40,16 @@ export function planImport(
     skipped += mapped.skipped;
     lines.push(`${file.name}: ${count(feed.items.length, 'item')}, ${count(mapped.entries.length, 'entry', 'entries')}, ${mapped.skipped} skipped`);
   }
+  if (files.length === 0) lines.push('No feed files: re-applying the opt-out register only.');
   const merged = mergeEntries(snapshot.entries, incoming, optOut);
-  const next = hiveSnapshotSchema.parse({ updated: today, entries: merged.entries });
+  const updated = files.length > 0 ? today : snapshot.updated;
+  const next = hiveSnapshotSchema.parse({ updated, entries: merged.entries });
   lines.push(
     section('Added', merged.added),
     section('Updated', merged.updated),
     section('Left out by the opt-out register', merged.optedOut),
     section(`Cut to ${MAX_ENTRIES} entries`, merged.cut),
-    `Snapshot: ${count(next.entries.length, 'entry', 'entries')}, updated ${today}.`,
+    `Snapshot: ${count(next.entries.length, 'entry', 'entries')}, updated ${updated}.`,
   );
   return { snapshot: next, report: lines.join('\n'), skipped };
 }
@@ -69,7 +73,7 @@ export async function main(args: string[], options: MainOptions = {}): Promise<n
   const { root = Deno.cwd(), cwd = initCwd() ?? root, today = new Date().toISOString().slice(0, 10), log = console.log, error = console.error } = options;
   const flags = args.filter((arg) => arg.startsWith('--'));
   const paths = args.filter((arg) => !arg.startsWith('--'));
-  if (paths.length === 0 || flags.some((flag) => flag !== '--dry-run')) {
+  if (flags.some((flag) => flag !== '--dry-run')) {
     error(USAGE);
     return 2;
   }
@@ -112,11 +116,13 @@ async function readFile(path: string, name: string): Promise<string> {
 
 async function readJson<T>(root: string, path: string, schema: z.ZodType<T>): Promise<T> {
   const text = await readFile(join(root, path), path);
+  let data: unknown;
   try {
-    return schema.parse(JSON.parse(text));
+    data = JSON.parse(text);
   } catch (error) {
     throw new Error(`${path}: ${message(error)}`);
   }
+  return validateDataFile(schema, data, path);
 }
 
 function section(label: string, titles: string[]): string {
