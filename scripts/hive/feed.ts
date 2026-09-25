@@ -11,7 +11,8 @@ const parser = new XMLParser({
   parseTagValue: false,
   parseAttributeValue: false,
   trimValues: true,
-  processEntities: true,
+  // Entities are decoded once, by `decodeEntities`; DOCTYPE entities are never expanded.
+  processEntities: false,
 });
 
 const NAMED: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
@@ -24,13 +25,16 @@ export function parseFeed(xml: string): { title: string; items: FeedItem[] } {
   let doc: Record<string, Node>;
   try {
     doc = parser.parse(xml, true) as Record<string, Node>;
-  } catch {
-    throw new Error('Not an RSS or Atom feed');
+  } catch (error) {
+    throw new Error(`Not an RSS or Atom feed (${error instanceof Error ? error.message : error})`);
   }
   const channel = element(element(doc.rss)?.channel);
   if (channel) return { title: text(channel.title) ?? '', items: list(channel.item).map(rssItem) };
   const feed = element(doc.feed);
-  if (feed) return { title: text(feed.title) ?? '', items: list(feed.entry).map(atomEntry) };
+  if (feed) {
+    const feedAuthors = atomAuthors(feed.author);
+    return { title: text(feed.title) ?? '', items: list(feed.entry).map((entry) => atomEntry(entry, feedAuthors)) };
+  }
   throw new Error('Not an RSS or Atom feed');
 }
 
@@ -46,22 +50,34 @@ function rssItem(node: Node): FeedItem {
   };
 }
 
-/** RSS `author` is often "email (Name)"; keep the name. */
+/** RSS `author` is often "email (Name)": keep the name. A bare email address is never kept. */
 function rssAuthor(value: string | undefined): string | undefined {
-  return value?.match(/^\S+@\S+\s*\((.+)\)$/)?.[1].trim() ?? value;
+  const named = value?.match(/^\S+@\S+\s*\((.+)\)$/)?.[1].trim();
+  if (named) return named;
+  return value === undefined || /^\S+@\S+$/.test(value) ? undefined : value;
 }
 
-function atomEntry(node: Node): FeedItem {
+/** An Atom entry; without its own `author` it takes the feed's. */
+function atomEntry(node: Node, feedAuthors: string[]): FeedItem {
   const entry = element(node) ?? {};
   const links = list(entry.link).map(element).filter((link) => link !== undefined);
-  const alternate = links.find((link) => (attr(link, 'rel') ?? 'alternate') === 'alternate') ?? links[0];
+  const alternate = links.find((link) => (attr(link, 'rel') ?? 'alternate') === 'alternate') ??
+    links.find((link) => attr(link, 'rel') !== 'self');
+  const authors = atomAuthors(entry.author);
   return {
     title: text(entry.title),
-    authors: list(entry.author).map((author) => text(element(author)?.name)).filter(isText),
-    categories: list(entry.category).map((category) => attr(element(category), 'term') ?? text(category)).filter(isText),
+    authors: authors.length > 0 ? authors : feedAuthors,
+    categories: list(entry.category).map((node) => {
+      const category = element(node);
+      return attr(category, 'label') ?? attr(category, 'term') ?? text(node);
+    }).filter(isText),
     published: text(entry.published) ?? text(entry.updated),
     link: alternate ? attr(alternate, 'href') : undefined,
   };
+}
+
+function atomAuthors(value: Node | Node[] | undefined): string[] {
+  return list(value).map((author) => text(element(author)?.name)).filter(isText);
 }
 
 function list(value: Node | Node[] | undefined): Node[] {
@@ -74,18 +90,26 @@ function element(value: Node | Node[] | undefined): Record<string, Node | Node[]
 
 function attr(node: Record<string, Node | Node[] | undefined> | undefined, name: string): string | undefined {
   const value = node?.[`@_${name}`];
-  return typeof value === 'string' ? value.trim() || undefined : undefined;
+  return typeof value === 'string' ? decodeEntities(value).trim() || undefined : undefined;
 }
 
 /**
- * A node's text with HTML entities decoded (CDATA and `type="html"` titles keep them after XML
- * parsing) and whitespace collapsed; undefined when empty.
+ * A node's plain text, undefined when empty: entities decoded once (CDATA included), HTML tags
+ * stripped and whitespace collapsed. Atom `type="html"` text is escaped HTML, so after the tags go
+ * its HTML entities are decoded too.
  */
 function text(value: Node | Node[] | undefined): string | undefined {
   const node = Array.isArray(value) ? value[0] : value;
-  const raw = typeof node === 'string' ? node : typeof element(node)?.['#text'] === 'string' ? element(node)!['#text'] as string : undefined;
-  const clean = raw === undefined ? undefined : decodeEntities(raw).replace(/\s+/g, ' ').trim();
-  return clean || undefined;
+  const el = element(node);
+  const raw = typeof node === 'string' ? node : typeof el?.['#text'] === 'string' ? el['#text'] as string : undefined;
+  if (raw === undefined) return undefined;
+  let clean = stripTags(decodeEntities(raw));
+  if (attr(el, 'type') === 'html') clean = decodeEntities(clean);
+  return clean.replace(/\s+/g, ' ').trim() || undefined;
+}
+
+function stripTags(value: string): string {
+  return value.replace(/<[^>]*>/g, ' ');
 }
 
 function decodeEntities(value: string): string {

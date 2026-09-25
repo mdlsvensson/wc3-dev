@@ -26,7 +26,7 @@ Deno.test('parseFeed reads RSS 2.0', async () => {
       authors: ['Tauren Maker'],
       categories: ['Units', 'Human'],
       published: 'Thu, 24 Sep 2026 21:30:00 -0300',
-      link: 'https://www.hiveworkshop.com/threads/footman-hd.123456/?utm_source=rss',
+      link: 'https://www.hiveworkshop.com/threads/footman-hd.123456/?utm_source=rss&utm_medium=feed',
     },
     {
       title: 'Mirror of a Hive model',
@@ -68,10 +68,51 @@ Deno.test('parseFeed reads Atom', async () => {
 
 Deno.test('parseFeed rejects anything but RSS or Atom', async () => {
   const html = await read('not-a-feed.html');
-  assert.throws(() => parseFeed(html), /Not an RSS or Atom feed/);
+  // A parse error keeps its cause.
+  assert.throws(() => parseFeed(html), /Not an RSS or Atom feed \(.+\)/);
   assert.throws(() => parseFeed('{"items": []}'), /Not an RSS or Atom feed/);
   assert.throws(() => parseFeed('<rss><channel><item>'), /Not an RSS or Atom feed/);
   assert.throws(() => parseFeed(''), /Not an RSS or Atom feed/);
+});
+
+Deno.test('parseFeed never keeps a bare email address as an author', () => {
+  const feed = parseFeed(`<rss version="2.0"><channel><title>Models</title>
+    <item><title>A</title><author>someone@example.com</author></item>
+    <item><title>B</title><author>someone@example.com (Some One)</author></item>
+  </channel></rss>`);
+  assert.deepEqual(feed.items.map((item) => item.authors), [[], ['Some One']]);
+});
+
+Deno.test('parseFeed decodes entities once and strips HTML tags', () => {
+  const feed = parseFeed(`<rss version="2.0"><channel><title>Models</title>
+    <item><title>Tom &amp;amp; Jerry &lt;b&gt;HD&lt;/b&gt;</title><category><![CDATA[<i>Units</i> &amp; more]]></category></item>
+  </channel></rss>`);
+  assert.equal(feed.items[0].title, 'Tom &amp; Jerry HD');
+  assert.deepEqual(feed.items[0].categories, ['Units & more']);
+  // DOCTYPE entities are not expanded.
+  const doctype = parseFeed(`<!DOCTYPE rss [<!ENTITY x "expanded">]><rss><channel><title>&x;</title></channel></rss>`);
+  assert.equal(doctype.title, '&x;');
+});
+
+Deno.test('Atom entries inherit the feed author, prefer category labels and skip self links', () => {
+  const feed = parseFeed(`<feed xmlns="http://www.w3.org/2005/Atom"><title>Models</title>
+    <author><name>Feed Author</name></author>
+    <entry>
+      <title type="html">&lt;em&gt;Grunt&lt;/em&gt; &amp;amp; Peon</title>
+      <link rel="self" href="https://www.hiveworkshop.com/feed/entry.1.atom"/>
+      <category term="units" label="Units"/>
+      <category term="orc"/>
+    </entry>
+    <entry>
+      <title>Own author</title>
+      <link rel="self" href="https://www.hiveworkshop.com/feed/entry.2.atom"/>
+      <link rel="related" href="https://www.hiveworkshop.com/threads/own.2/?a=1&amp;b=2"/>
+      <author><name>Own</name></author>
+    </entry>
+  </feed>`);
+  assert.deepEqual(feed.items[0], { title: 'Grunt & Peon', authors: ['Feed Author'], categories: ['Units', 'orc'], published: undefined, link: undefined });
+  assert.deepEqual(feed.items[1].authors, ['Own']);
+  assert.equal(feed.items[1].link, 'https://www.hiveworkshop.com/threads/own.2/?a=1&b=2');
 });
 
 Deno.test('planImport maps, merges and reports', async () => {
@@ -161,7 +202,7 @@ function capture() {
 Deno.test('the CLI with --dry-run reports and leaves the data files untouched', async () => {
   const { root, data, optOut } = await repo();
   const out = capture();
-  const code = await main(['rss.xml', '--dry-run'], { root, today: '2026-09-25', log: out.log, error: out.log });
+  const code = await main(['rss.xml', '--dry-run'], { root, cwd: root, today: '2026-09-25', log: out.log, error: out.log });
   assert.equal(code, 0);
   const text = out.lines.join('\n');
   assert.match(text, /Added \(2\)/);
@@ -173,13 +214,24 @@ Deno.test('the CLI with --dry-run reports and leaves the data files untouched', 
 Deno.test('the CLI writes the snapshot as pretty JSON', async () => {
   const { root } = await repo();
   const out = capture();
-  assert.equal(await main(['rss.xml', 'atom.xml'], { root, today: '2026-09-25', log: out.log, error: out.log }), 0);
+  assert.equal(await main(['rss.xml', 'atom.xml'], { root, cwd: root, today: '2026-09-25', log: out.log, error: out.log }), 0);
   const written = await Deno.readTextFile(join(root, 'src/data/hive-activity.json'));
   const snapshot = JSON.parse(written) as HiveSnapshot;
   assert.equal(written, JSON.stringify(snapshot, null, 2) + '\n');
   assert.equal(snapshot.updated, '2026-09-25');
   assert.equal(snapshot.entries.length, 5);
   assert.match(out.lines.join('\n'), /Wrote src\/data\/hive-activity\.json/);
+});
+
+Deno.test('the CLI reads relative feed paths from where it was run', async () => {
+  const { root, data } = await repo();
+  const elsewhere = await Deno.makeTempDir();
+  await Deno.mkdir(join(elsewhere, 'saved'));
+  await Deno.writeTextFile(join(elsewhere, 'saved/models.xml'), await read('rss.xml'));
+  const out = capture();
+  assert.equal(await main(['saved/models.xml', '--dry-run'], { root, cwd: elsewhere, today: '2026-09-25', log: out.log, error: out.log }), 0);
+  assert.match(out.lines.join('\n'), /saved\/models\.xml: 3 items, 2 entries, 1 skipped/);
+  assert.equal(await Deno.readTextFile(join(root, 'src/data/hive-activity.json')), data);
 });
 
 Deno.test('the CLI names a bad or missing file and writes nothing', async () => {
@@ -189,7 +241,7 @@ Deno.test('the CLI names a bad or missing file and writes nothing', async () => 
     [['rss.xml', 'missing.xml'], /missing\.xml: /],
   ] as const) {
     const out = capture();
-    assert.equal(await main([...args], { root, today: '2026-09-25', log: out.log, error: out.log }), 1);
+    assert.equal(await main([...args], { root, cwd: root, today: '2026-09-25', log: out.log, error: out.log }), 1);
     assert.match(out.lines.join('\n'), pattern);
     assert.equal(await Deno.readTextFile(join(root, 'src/data/hive-activity.json')), data);
   }
@@ -199,7 +251,7 @@ Deno.test('the CLI rejects missing files and unknown flags with usage', async ()
   const { root } = await repo();
   for (const args of [[], ['--dry-run'], ['rss.xml', '--force']]) {
     const out = capture();
-    assert.equal(await main(args, { root, log: out.log, error: out.log }), 2);
+    assert.equal(await main(args, { root, cwd: root, log: out.log, error: out.log }), 2);
     assert.match(out.lines.join('\n'), /Usage: deno task hive:import/);
   }
 });
@@ -208,6 +260,6 @@ Deno.test('the CLI names an invalid data file', async () => {
   const { root } = await repo();
   await Deno.writeTextFile(join(root, 'src/data/hive-optout.json'), '{ "authors": "nobody" }');
   const out = capture();
-  assert.equal(await main(['rss.xml'], { root, today: '2026-09-25', log: out.log, error: out.log }), 1);
+  assert.equal(await main(['rss.xml'], { root, cwd: root, today: '2026-09-25', log: out.log, error: out.log }), 1);
   assert.match(out.lines.join('\n'), /src\/data\/hive-optout\.json: /);
 });
