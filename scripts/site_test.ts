@@ -245,3 +245,38 @@ Deno.test('tutorial markup stays out of the framework docs', async () => {
     assert(!/class="(keys|menu-path|tutorial-[a-z-]+|shot[a-z -]*)"/.test(html), `Tutorial markup in ${file.pathname}`);
   }
 });
+
+/** The markup of the first element with `class="<name>"`, up to its closing `</section>`. */
+const hiveSection = (html: string, name: string) => html.match(new RegExp(`<section class="${name}"[\\s\\S]*?</section>`))?.[0] ?? '';
+
+Deno.test('the resources page lists the Hive fixture as outbound links with a stale date and the opt-out note', async () => {
+  const html = await readRoute('/resources/');
+  const section = hiveSection(html, 'hive-activity');
+  assert.match(section, /id="new-on-hive"/);
+  assert(html.indexOf('id="community-and-tools"') < html.indexOf('id="new-on-hive"'), 'New on Hive comes after Community & tools');
+  const links = [...section.matchAll(/<a class="hive-title" href="([^"]+)" rel="external"/g)].map((match) => match[1]);
+  assert.equal(links.length, 7);
+  for (const link of links) assert(link.startsWith('https://www.hiveworkshop.com/'), `Not a Hive link: ${link}`);
+  assert(section.includes('Orcs &amp; Humans Icon Pack'), 'The & in a title is escaped once');
+  assert(!section.includes('&amp;amp;'), 'No double escaping');
+  assert.match(section, /by Fixture Modeler, Second Author/);
+  assert.match(section, /From Hive Workshop, last updated 10 January 2026\./);
+  assert.match(section, /<time datetime="2026-01-09">/);
+  assert.match(section, /<p class="hive-optout">[\s\S]*<a href="https:\/\/github\.com\/mdlsvensson\/wc3-dev\/issues">open an issue<\/a>/);
+});
+
+Deno.test('the home page shows the five newest Hive entries and links to the full list', async () => {
+  const card = hiveSection(await readRoute('/'), 'hive-card');
+  assert.match(card, /<h2 id="hive-card-title">Latest on Hive<\/h2>/);
+  const links = [...card.matchAll(/<a href="([^"]+)" rel="external"/g)].map((match) => match[1]);
+  assert.equal(links.length, 5);
+  for (const link of links) assert(link.startsWith('https://www.hiveworkshop.com/'), `Not a Hive link: ${link}`);
+  assert.match(card, /href="\/resources\/#new-on-hive"/);
+});
+
+Deno.test('no page loads an image from Hive', async () => {
+  for (const file of await htmlFiles(root)) {
+    const html = await Deno.readTextFile(file);
+    assert(!/<img\b[^>]*\ssrc(set)?="[^"]*hiveworkshop\.com/i.test(html), `Hive image in ${file.pathname}`);
+  }
+});

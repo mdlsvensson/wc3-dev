@@ -1,0 +1,16 @@
+---
+import { ArrowRight, ArrowUpRight } from 'lucide-astro';
+import { getHiveView } from '../../lib/hive-data';
+const { entries } = getHiveView(5);
+---
+{entries.length > 0 && (
+  <section class="hive-card" aria-labelledby="hive-card-title">
+    <header class="workspace-panel-heading"><h2 id="hive-card-title">Latest on Hive</h2></header>
+    <ul class="hive-card-list">
+      {entries.map((entry) => (
+        <li><a href={entry.url} rel="external"><span class="hive-card-title">{entry.title}</span><span class="hive-card-category">{entry.category}</span><ArrowUpRight size={15} aria-hidden="true" /></a></li>
+      ))}
+    </ul>
+    <a class="hive-card-all" href="/resources/#new-on-hive">All recent Hive resources <ArrowRight size={16} aria-hidden="true" /></a>
+  </section>
+)}

@@ -1,0 +1,25 @@
+---
+import { ArrowUpRight } from 'lucide-astro';
+import { getHiveView } from '../../lib/hive-data';
+import { HIVE_CONTACT_URL } from '../../lib/hive';
+const { entries, stale, updatedLabel } = getHiveView();
+---
+{entries.length > 0 && (
+  <section class="hive-activity" id="new-on-hive" aria-labelledby="new-on-hive-title">
+    <header class="hive-heading">
+      <h2 id="new-on-hive-title"><a href="https://www.hiveworkshop.com/">New on Hive</a></h2>
+      <p class="hive-updated">{stale ? `From Hive Workshop, last updated ${updatedLabel}.` : `From Hive Workshop, updated ${updatedLabel}.`}</p>
+    </header>
+    <ul class="hive-list">
+      {entries.map((entry) => (
+        <li>
+          <a class="hive-title" href={entry.url} rel="external">{entry.title}<ArrowUpRight size={15} aria-hidden="true" /></a>
+          <span class="hive-authors">by {entry.authors.join(', ')}</span>
+          <span class="hive-category">{entry.category}</span>
+          <time datetime={entry.published}>{entry.age}</time>
+        </li>
+      ))}
+    </ul>
+    <p class="hive-optout">wc3.dev links to Hive and never hosts these resources. Authors and Hive staff can ask to be left out: <a href={HIVE_CONTACT_URL}>open an issue</a>, and requests are honoured promptly.</p>
+  </section>
+)}
