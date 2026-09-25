@@ -50,3 +50,19 @@ No automated access to Hive exists today. Before any is built:
 wc3.dev sends people to Hive. Copy on wc3.dev describes Hive as the community
 hub it is, and never implies that wc3.dev hosts the canonical version of
 anything published there.
+
+## Status
+
+- Contact with Hive staff is pending; the message to send is drafted in
+  `docs/hive-outreach.md`.
+- No automated access to Hive exists. Nothing in the build, the tooling or the
+  browser requests anything from Hive.
+- The "New on Hive" list (`src/data/hive-activity.json`) is refreshed by hand
+  with `deno task hive:import` from RSS or Atom feeds saved in a browser.
+- Opted-out authors and URLs live in `src/data/hive-optout.json`. The import
+  leaves them out, and the build fails if the list contains one.
+- Opting out is by request today: authors and Hive staff use the contact link
+  in the "Authors on Hive" note on `/resources/` (`HIVE_CONTACT_URL` in
+  `src/lib/hive.ts`), and the owner adds them to the register by hand. A
+  self-serve opt-out that needs no contact with wc3.dev (point 6 under
+  Automated access) must exist before any automated sync is built.

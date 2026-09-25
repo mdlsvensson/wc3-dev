@@ -11,6 +11,7 @@
     "@astrojs/markdown-satteri": "0.4.1",
     "aws4fetch": "1.0.20",
     "events": "3.3.0",
+    "fast-xml-parser": "5.11.1",
     "lucide-astro": "0.556.0",
     "mdx-m3-viewer-th": "5.13.4",
     "satteri": "0.10.5",
