@@ -1,14 +1,15 @@
 ---
 import { ArrowUpRight } from 'lucide-astro';
 import { getHiveView } from '../../lib/hive-data';
-import { HIVE_CONTACT_URL } from '../../lib/hive';
-const { entries, stale, updatedLabel } = getHiveView();
+import { HIVE_CONTACT_URL, longDate } from '../../lib/hive';
+import { HIVE_ORIGIN } from '../../lib/hive-schema';
+const { entries, updatedLine } = getHiveView();
 ---
 {entries.length > 0 && (
   <section class="hive-activity" id="new-on-hive" aria-labelledby="new-on-hive-title">
-    <header class="hive-heading">
-      <h2 id="new-on-hive-title"><a href="https://www.hiveworkshop.com/">New on Hive</a></h2>
-      <p class="hive-updated">{stale ? `From Hive Workshop, last updated ${updatedLabel}.` : `From Hive Workshop, updated ${updatedLabel}.`}</p>
+    <header class="workspace-panel-heading hive-heading">
+      <h2 id="new-on-hive-title"><a href={`${HIVE_ORIGIN}/`}>New on Hive<ArrowUpRight size={15} aria-hidden="true" /></a></h2>
+      <span class="hive-updated">{updatedLine}</span>
     </header>
     <ul class="hive-list">
       {entries.map((entry) => (
@@ -16,10 +17,10 @@ const { entries, stale, updatedLabel } = getHiveView();
           <a class="hive-title" href={entry.url} rel="external">{entry.title}<ArrowUpRight size={15} aria-hidden="true" /></a>
           <span class="hive-authors">by {entry.authors.join(', ')}</span>
           <span class="hive-category">{entry.category}</span>
-          <time datetime={entry.published}>{entry.age}</time>
+          <time datetime={entry.published} title={longDate(entry.published)}>{entry.age}</time>
         </li>
       ))}
     </ul>
-    <p class="hive-optout">wc3.dev links to Hive and never hosts these resources. Authors and Hive staff can ask to be left out: <a href={HIVE_CONTACT_URL}>open an issue</a>, and requests are honoured promptly.</p>
+    <p class="hive-optout"><strong>Authors on Hive:</strong> wc3.dev links to Hive and never hosts these resources. Authors and Hive staff can ask to be left out: <a href={HIVE_CONTACT_URL}>open an issue</a>, and requests are honoured promptly.</p>
   </section>
 )}

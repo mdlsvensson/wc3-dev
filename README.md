@@ -139,23 +139,35 @@ current status.
 - `src/data/hive-activity.json` is the committed snapshot the views read (at
   most 30 entries, newest first). When it has no entries, neither view renders.
 - `src/data/hive-optout.json` lists the authors and Hive URLs to leave out.
-  Edit it by hand when someone asks to be left out.
+  Edit it by hand when someone asks to be left out, then run
+  `deno task hive:import` with no feed files to drop their entries from the
+  snapshot.
+- People ask to be left out through the contact link in the "Authors on Hive"
+  note on `/resources/`. It is `HIVE_CONTACT_URL` in `src/lib/hive.ts`, the
+  only place it is set; `docs/hive-outreach.md` points Hive staff to that note
+  rather than repeating the address. `HIVE_CONTACT_URL` must be publicly
+  reachable before the snapshot has entries or the outreach message goes out;
+  the issues page of a private repository is not.
 - To refresh the snapshot, open Hive's RSS or Atom feeds in a browser and save
   each one to a file, then run:
 
   ```sh
   deno task hive:import path/to/feed.xml path/to/other.xml --dry-run   # print the report only
   deno task hive:import path/to/feed.xml path/to/other.xml             # rewrite the snapshot
+  deno task hive:import                                                # re-apply the opt-out register only
   ```
 
   Feed paths resolve against the directory you run the command from. It
   merges the feeds into the snapshot by URL, leaves out opted-out entries, cuts
   the list to 30, sets `updated` to today, and reports what was added, updated,
-  left out and cut. Commit the snapshot afterwards.
+  left out and cut. With no feed files it only drops entries the opt-out
+  register now matches and keeps `updated` as it was. Commit the snapshot
+  afterwards.
 - The command never touches the network: its task has no `--allow-net` and
   may write only the snapshot.
 - The build fails if the snapshot contains an entry the opt-out register
-  matches; run `hive:import` again, or remove the entry by hand.
+  matches; run `deno task hive:import` (no feed files needed) to drop it, or
+  remove it from the snapshot by hand.
 
 Add documentation as Markdown with `title` and `description` frontmatter, then
 add its slug to the sidebar in `astro.config.ts`.

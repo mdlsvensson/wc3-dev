@@ -1,6 +1,6 @@
 import { strict as assert } from 'node:assert';
-import { type HiveEntry, hiveEntrySchema, hiveOptOutSchema, hiveSnapshotSchema, MAX_ENTRIES } from '../../src/lib/hive-schema.ts';
-import { assertNoOptOuts, feedItemsToEntries, hiveView, isOptedOut, mergeEntries, normaliseHiveUrl, relativeAge } from '../../src/lib/hive.ts';
+import { type HiveEntry, hiveEntrySchema, hiveOptOutSchema, hiveSnapshotSchema, MAX_ENTRIES, validateDataFile } from '../../src/lib/hive-schema.ts';
+import { assertNoOptOuts, feedItemsToEntries, hiveView, isOptedOut, longDate, mergeEntries, normaliseHiveUrl, relativeAge } from '../../src/lib/hive.ts';
 
 const entry = (n: number, published = '2026-09-20', extra: Partial<HiveEntry> = {}): HiveEntry => ({
   title: `Entry ${n}`,
@@ -131,6 +131,8 @@ Deno.test('hiveView adds ages, applies the limit and flags stale snapshots', () 
   const fresh = hiveView({ updated: '2026-08-26', entries: series(7) }, now, 5);
   assert.equal(fresh.stale, false);
   assert.equal(fresh.updatedLabel, '26 August 2026');
+  assert.equal(fresh.updatedLine, 'From Hive Workshop, updated 26 August 2026.');
+  assert(!fresh.updatedLine.includes('last'), 'A fresh snapshot does not say "last updated"');
   assert.equal(fresh.entries.length, 5);
   assert.deepEqual(fresh.entries.slice(0, 2).map((e) => e.age), ['today', 'yesterday']);
   assert.equal(fresh.entries[0].url, 'https://www.hiveworkshop.com/threads/entry.0/');
@@ -138,9 +140,11 @@ Deno.test('hiveView adds ages, applies the limit and flags stale snapshots', () 
   const stale = hiveView({ updated: '2026-08-25', entries: series(7) }, now);
   assert.equal(stale.stale, true);
   assert.equal(stale.updatedLabel, '25 August 2026');
+  assert.equal(stale.updatedLine, 'From Hive Workshop, last updated 25 August 2026.');
   assert.equal(stale.entries.length, 7);
 
   assert.equal(hiveView({ updated: '2026-09-05', entries: [] }, now).updatedLabel, '5 September 2026');
+  assert.equal(longDate('2026-01-09'), '9 January 2026');
 });
 
 Deno.test('the schemas reject malformed links, credentials and blank text without throwing', () => {
@@ -180,10 +184,25 @@ Deno.test('assertNoOptOuts passes a clean snapshot and names every opted-out ent
   assertNoOptOuts(snapshot, noOptOut);
   assert.throws(
     () => assertNoOptOuts(snapshot, { authors: [' AUTHOR '], urls: [] }),
-    /Entry 0, Entry 1, Entry 2 .*src\/data\/hive-optout\.json; run hive:import again or remove/,
+    /Entry 0, Entry 1, Entry 2 are in src\/data\/hive-optout\.json; run `deno task hive:import` \(no feed files needed\) to drop them, or remove them from src\/data\/hive-activity\.json by hand/,
   );
   assert.throws(
-    () => assertNoOptOuts(snapshot, { authors: [], urls: ['https://hiveworkshop.com/threads/entry.1?page=2'] }),
-    /^Error: Entry 1 is in src\/data\/hive-optout\.json/,
+    () => assertNoOptOuts(snapshot, { authors: [], urls: ['https://hiveworkshop.com/threads/entry.1?page=2'] }, 'src/data/_fixtures/hive-activity.json'),
+    /^Error: Entry 1 is in src\/data\/hive-optout\.json; run `deno task hive:import` \(no feed files needed\) to drop it, or remove it from src\/data\/_fixtures\/hive-activity\.json by hand$/,
+  );
+});
+
+Deno.test('the committed snapshot, fixture and opt-out register are valid and agree', async () => {
+  const read = async (path: string) => JSON.parse(await Deno.readTextFile(new URL(`../../${path}`, import.meta.url)));
+  const optOut = validateDataFile(hiveOptOutSchema, await read('src/data/hive-optout.json'), 'src/data/hive-optout.json');
+  for (const path of ['src/data/hive-activity.json', 'src/data/_fixtures/hive-activity.json']) {
+    assertNoOptOuts(validateDataFile(hiveSnapshotSchema, await read(path), path), optOut, path);
+  }
+});
+
+Deno.test('validateDataFile names the file and lists the problems', () => {
+  assert.throws(
+    () => validateDataFile(hiveOptOutSchema, { authors: 'nobody' }, 'src/data/hive-optout.json'),
+    /^Error: src\/data\/hive-optout\.json is not valid:\n[\s\S]*authors[\s\S]*urls/,
   );
 });
