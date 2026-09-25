@@ -3,9 +3,11 @@ import Shell from '../../layouts/Shell.astro';
 import ResourceDirectory from '../../components/ResourceDirectory.astro';
 import CatalogFilters from '../../components/resources/CatalogFilters.astro';
 import ResourceCatalog from '../../components/resources/ResourceCatalog.astro';
+import HiveActivity from '../../components/hive/HiveActivity.astro';
 import { getLinks, getResources, isHosted } from '../../lib/resources';
 import '../../styles/home.css';
 import '../../styles/resources.css';
+import '../../styles/hive.css';
 const all = (await getResources()).filter(isHosted);
 const links = await getLinks();
 const intro = all.length > 0
@@ -18,6 +20,7 @@ const intro = all.length > 0
     <ResourceCatalog entries={all} title="Resources" intro={intro} />
     <div class="catalog-links">
       <ResourceDirectory resources={links} title="Community & tools" id="community-and-tools" />
+      <HiveActivity />
     </div>
   </div>
 </Shell>
