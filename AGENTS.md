@@ -88,7 +88,7 @@ deno install --frozen
 deno task check            # astro check: expect 0 errors
 deno task resource:check
 deno task tutorial:check
-deno task test             # fixture build + all tests in scripts/ (167 pass)
+deno task test             # fixture build + all tests in scripts/ (168 pass)
 deno task build            # production; must pass with ASSET_BASE_URL unset
 ```
 

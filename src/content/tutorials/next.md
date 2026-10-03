@@ -22,7 +22,7 @@ was published, so you can read its terms and get it from its author.
 
 ## Scripting with Moonwell
 
-Triggers take you a long way. When you want to write gameplay as code, the
+Triggers take you a long way. When you want to write gameplay as code,
 [Moonwell](/moonwell/) lets you build maps with YueScript and Lua gameplay,
 Pkl object data, and one installed command-line tool. Its [documentation](/moonwell/docs/) starts
 with installation and a first map.
