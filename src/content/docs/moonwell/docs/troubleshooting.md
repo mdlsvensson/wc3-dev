@@ -18,7 +18,7 @@ appear in `project.log`. A failed command may leave an older archive behind.
 | Frozen lockfile error | Restore matching `package.json`, `deno.json`, and `deno.lock`; do not delete the lockfile to hide a mismatch |
 | Deno-specific types appear in gameplay errors | Restore `.vscode/settings.json`; Deno should be enabled only for `scripts/` |
 
-Use [installation](/framework/docs/installation/) for the supported tool versions. The gameplay
+Use [installation](/moonwell/docs/installation/) for the supported tool versions. The gameplay
 compiler version differs from Deno's bundled TypeScript version by design.
 
 ## Source maps
@@ -55,7 +55,7 @@ An array cannot express level-specific numeric values through this pipeline.
 
 **Object missing from the source Object Editor:** Pkl injection changes the staged
 map only. Spawn it in code or inspect a disposable built archive. See
-[object authoring](/framework/docs/object-data/) for ownership and inheritance rules.
+[object authoring](/moonwell/docs/object-data/) for ownership and inheritance rules.
 
 ## TypeScript and gameplay
 

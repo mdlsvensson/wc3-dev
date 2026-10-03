@@ -20,9 +20,9 @@ The [resource catalog](/resources/) collects models, icons, textures, sounds
 and scripts you can preview in the browser. Every resource links to where it
 was published, so you can read its terms and get it from its author.
 
-## Scripting with the wc3.dev-framework
+## Scripting with Moonwell
 
 Triggers take you a long way. When you want to write gameplay as code, the
-[wc3.dev-framework](/framework/) lets you build maps in TypeScript, with object
-data in Pkl and a Deno toolchain. Its [documentation](/framework/docs/) starts
+[Moonwell](/moonwell/) lets you build maps with YueScript and Lua gameplay,
+Pkl object data, and one installed command-line tool. Its [documentation](/moonwell/docs/) starts
 with installation and a first map.

@@ -24,7 +24,7 @@ installer and runner.
 | `deno task assets:check` | Validate asset paths, ownership, and planned changes | Source map; Pkl when `assets.pkl` exists |
 | `deno task assets:sync` | Sync imports into the source map | Same as check; close the map in World Editor first |
 | `deno task typecheck` | Check tools and gameplay types (syncs map libraries first when needed) | Current generated gameplay inputs |
-| `deno task lib:sync` | Copy the map libraries in `config.json` `libraries` into `.lib/` and map them in `tsconfig.json` `paths` | Registry access unless linked; see [Using the library](/framework/docs/library/) |
+| `deno task lib:sync` | Copy the map libraries in `config.json` `libraries` into `.lib/` and map them in `tsconfig.json` `paths` | Registry access unless linked; see [Using the library](/moonwell/docs/library/) |
 | `deno task lint` | Deno/custom lint followed by JSON/config validation | No Pkl or game required |
 | `deno task lint:json` | JSON/config validation only | No Pkl or game required |
 | `deno task objects:eval` | Regenerate `src/generated/objects.json` | Pkl |
@@ -40,9 +40,9 @@ Warcraft III. Restart it after changing `mapFolder`.
 
 ## Configuration
 
-See [Import assets](/framework/docs/assets/) for the separate `assets.pkl` schema,
+See [Import assets](/moonwell/docs/assets/) for the separate `assets.pkl` schema,
 folder layout, and editor synchronization workflow.
-See [Map settings](/framework/docs/map-settings/) for `map-settings.pkl`, which
+See [Map settings](/moonwell/docs/map-settings/) for `map-settings.pkl`, which
 overrides metadata, loading screens, gameplay constants, and interface settings
 in the staged map during build and playtest.
 
@@ -59,7 +59,7 @@ replaces the entire array, not individual entries.
 | `launchArgs` | String array, `-launch -windowmode windowed` | Arguments appended after the generated `-loadfile` argument |
 | `winePath` | Optional string | Wine executable; enables the Wine launch branch |
 | `winePrefix` | Optional string | `WINEPREFIX` environment value for the launched process |
-| `libraries` | Optional string array, e.g. `["@mdlsvensson/wc3-lib"]` | JSR packages compiled into the map; each must also be a `deno.json` dependency. See [Using the library](/framework/docs/library/) |
+| `libraries` | Optional string array, e.g. `["@mdlsvensson/wc3-lib"]` | JSR packages compiled into the map; each must also be a `deno.json` dependency. See [Using the library](/moonwell/docs/library/) |
 
 Keep `outputFolder` separate from both your source-map folder and the staging
 directory, normally under `dist/`. Changing it does not move staging or the Lua
@@ -104,7 +104,7 @@ constraints are stricter than the lint rule: Pkl requires alphanumeric IDs with
 category-specific prefixes, while lint accepts four printable ASCII characters.
 
 In `src/`, three more rules catch TypeScriptToLua 1.31 hazards: `lua-no-finally`, `lua-loop-closure`
-and `lua-truthiness` (see [Using the library](/framework/docs/library/#writing-code-for-lua)).
+and `lua-truthiness` (see [Using the library](/moonwell/docs/library/#writing-code-for-lua)).
 
 Generated files, map assets, `.lib/` and build output are excluded from normal linting.
 `deno task lint` also validates JSON syntax and the merged project configuration.

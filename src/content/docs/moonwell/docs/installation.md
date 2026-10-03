@@ -31,7 +31,7 @@ $env:PKL_EXECUTABLE = 'C:\path\to\pkl.exe'
 ## 2. Clone the repository and install dependencies
 
 ```powershell title="Get the framework"
-git clone https://github.com/mdlsvensson/wc3-dev-framework.git
+git clone https://github.com/mdlsvensson/moonwell.git
 cd wc3-dev-framework
 deno install --frozen
 ```
@@ -54,7 +54,7 @@ Editor or the Battle.net launcher.
 
 :::tip[Working with others?]
 Copy `config.json` to `config.local.json` and set your personal path there. Keep
-shared settings in `config.json`. See [all configuration options](/framework/docs/reference/#configuration).
+shared settings in `config.json`. See [all configuration options](/moonwell/docs/reference/#configuration).
 :::
 
 ## 5. Check and build
@@ -67,7 +67,7 @@ deno task build
 ```
 
 Each command should succeed. Your distributable map is **`dist/bin/map.w3x`**;
-`dist/map.w3x/` holds the intermediate files, do not edit this map. The editable map is the map folder `maps/map.w3x`. To use your own map, see [custom maps](/framework/docs/custom-maps/).
+`dist/map.w3x/` holds the intermediate files, do not edit this map. The editable map is the map folder `maps/map.w3x`. To use your own map, see [custom maps](/moonwell/docs/custom-maps/).
 
 ## 6. Play the sample
 
