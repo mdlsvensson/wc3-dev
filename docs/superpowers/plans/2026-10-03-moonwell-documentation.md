@@ -174,7 +174,7 @@ mw.on_main ->
 
 **Sources:** All three READMEs and changelogs; Moonwell `schema/Project.pkl`, `internal/cli/{cli,args,build,testcmd,dev,setup}.go`, `internal/pipeline/pipeline.go`, `internal/project/`, `internal/layout/`, `internal/pkl/`, and current library module implementations.
 
-- [ ] Show this committed library configuration and its local-path overrides; explain layout metadata, library keys versus module names, the lockfile and restart requirements for adding local libraries:
+- [x] Show this committed library configuration and its local-path overrides; explain layout metadata, library keys versus module names, the lockfile and restart requirements for adding local libraries:
 
 ```pkl
 libraries {
@@ -183,12 +183,12 @@ libraries {
 }
 ```
 
-- [ ] Provide a wrapper example using `Unit.create` and `Player.fromIndex`, with `unit\remove!` inside a timed callback. Provide a Scheduler/Scope example with explicit `start` and later `dispose`. Copy and adapt the current upstream examples, importing every name used. Explain factories versus methods, live handles, idempotent cleanup, `Unit.autoDispose`/`sweep`, explicit ownership and multiplayer limitations. List the systems modules and link upstream API reference instead of duplicating it.
-- [ ] Replace the architecture's TypeScript/Deno pipeline with the current manifest evaluation, library sync, object validation/IDs, compilation/bundling, stage creation, objects/settings/assets, Lua integration and packing/launch order confirmed in `pipeline.go`. Document `dist/stage/<map.folder>`, compile caches, `.moonwell/`, source ownership, hooks, local configuration and failed-build archive removal.
-- [ ] Build the command table from `internal/cli/cli.go`, including all twelve commands, `--entry`, `--minify`, help/version and contributor-only `init --link`. Describe `test` as the launcher and `dev` as checking, not building/launching. Document exact schema defaults, environment/cache paths and generated files. Use the actual layout implementation for paths rather than inventing bundle filenames.
-- [ ] Explain Pkl package/CLI major-minor matching, reinstalling to upgrade, resolving `PklProject`, and `setup` before `pkl project resolve` when managed Pkl is needed. Distinguish upgrading old Moonwell 0.7 projects from porting TypeScript framework projects.
-- [ ] Add recovery tables for PATH and tool downloads, wrong package version, editor workspace root, unknown globals, stale IDs, duplicate modules, invalid object fields, source-map/settings/assets failures, game path and stale locks/output. Include YueScript bitwise limitations and the floor-division fix in 0.34.3 where relevant.
-- [ ] Compare commands/defaults/version pins with source and trace both library examples through cleanup. Ensure all fresh-project instructions work without relying on an already installed Pkl or global `yue`. Run `deno task build`, inspect all four guides, fix review findings, then commit.
+- [x] Provide a wrapper example using `Unit.create` and `Player.fromIndex`, with `unit\remove!` inside a timed callback. Provide a Scheduler/Scope example with explicit `start` and later `dispose`. Copy and adapt the current upstream examples, importing every name used. Explain factories versus methods, live handles, idempotent cleanup, `Unit.autoDispose`/`sweep`, explicit ownership and multiplayer limitations. List the systems modules and link upstream API reference instead of duplicating it.
+- [x] Replace the architecture's TypeScript/Deno pipeline with the current manifest evaluation, library sync, object validation/IDs, compilation/bundling, stage creation, objects/settings/assets, Lua integration and packing/launch order confirmed in `pipeline.go`. Document `dist/stage/<map.folder>`, compile caches, `.moonwell/`, source ownership, hooks, local configuration and failed-build archive removal.
+- [x] Build the command table from `internal/cli/cli.go`, including all twelve commands, `--entry`, `--minify`, help/version and contributor-only `init --link`. Describe `test` as the launcher and `dev` as checking, not building/launching. Document exact schema defaults, environment/cache paths and generated files. Use the actual layout implementation for paths rather than inventing bundle filenames.
+- [x] Explain Pkl package/CLI major-minor matching, reinstalling to upgrade, resolving `PklProject`, and `setup` before `pkl project resolve` when managed Pkl is needed. Distinguish upgrading old Moonwell 0.7 projects from porting TypeScript framework projects.
+- [x] Add recovery tables for PATH and tool downloads, wrong package version, editor workspace root, unknown globals, stale IDs, duplicate modules, invalid object fields, source-map/settings/assets failures, game path and stale locks/output. Include YueScript bitwise limitations and the floor-division fix in 0.34.3 where relevant.
+- [x] Compare commands/defaults/version pins with source and trace both library examples through cleanup. Ensure all fresh-project instructions work without relying on an already installed Pkl or global `yue`. Run `deno task build`, inspect all four guides, fix review findings, then commit.
 
 ### Task 5: Review the complete update and verify it in a browser
 
@@ -227,6 +227,5 @@ its libraries, the site dependencies, Hive data or tutorial map behavior.
 
 ## Execution approval
 
-The owner approved the spec with “Go” on 2026-10-03. This plan is now ready for
-the separate plan approval required by `AGENTS.md`. After approval, use native
-execution unless the owner selects subagent-driven execution.
+The owner approved the spec and then this plan with “Go”/“go” on 2026-10-03.
+Native execution in the existing feature branch is authorized.

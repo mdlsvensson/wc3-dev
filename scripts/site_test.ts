@@ -259,8 +259,8 @@ Deno.test('the tutorial track chains every lesson from the overview to the closi
   assert(!closing.includes('class="pager-next"'), 'The closing page ends the track');
 });
 
-Deno.test('tutorial markup stays out of the framework docs', async () => {
-  for (const file of await htmlFiles(new URL('framework/docs/', root))) {
+Deno.test('tutorial markup stays out of the Moonwell docs', async () => {
+  for (const file of await htmlFiles(new URL('moonwell/docs/', root))) {
     const html = await Deno.readTextFile(file);
     assert(!/class="(keys|menu-path|tutorial-[a-z-]+|shot[a-z -]*)"/.test(html), `Tutorial markup in ${file.pathname}`);
   }
