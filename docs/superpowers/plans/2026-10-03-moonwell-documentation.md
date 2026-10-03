@@ -124,10 +124,10 @@ mw.on_main ->
 
 **Sources:** Moonwell `README.md` sections Quickstart, Installing and upgrading, A project, Editor setup, Unknown globals, Macros and Lua modules; `template/src/main.yue`, `template/objects/units.pkl`, `schema/Project.pkl`, `internal/cli/{initcmd,setup,check,dev}.go`, and `internal/pipeline/pipeline.go`.
 
-- [ ] Rewrite the introduction's title/description, reading order and upstream contributing/changelog links for Moonwell. Explain YueScript entry points and optional plain Lua modules.
-- [ ] Write numbered installation steps: run the upstream Windows or Linux release installer; reopen the terminal if PATH needs it; run `moonwell --version`, `init`, `check`, `build`; set `launch.gameExecutable` in `moonwell.local.pkl`; run `test`; run `setup` for editor integration. Copy installer lines from the current committed README. Explain automatic Pkl/YueScript downloads, supported architectures and the VS Code YueScript/Lua extensions.
-- [ ] Rewrite the custom-map guide around complete Lua folder-format maps, `map { folder = "MyMap.w3x" }`, source/stage/archive separation and refreshing editor globals. Keep the accurate existing explanation of extraction as an alternative when folder saving is unavailable. Explain that changing script language does not convert handwritten JASS.
-- [ ] Use this object/gameplay pair for the first custom unit, with filenames in fence titles. Explain that a project already merges `objects/**.pkl`; new objects must have unique IDs. `build` or `dev` updates generated IDs before the subsequent `check`:
+- [x] Rewrite the introduction's title/description, reading order and upstream contributing/changelog links for Moonwell. Explain YueScript entry points and optional plain Lua modules.
+- [x] Write numbered installation steps: run the upstream Windows or Linux release installer; reopen the terminal if PATH needs it; run `moonwell --version`, `init`, `check`, `build`; set `launch.gameExecutable` in `moonwell.local.pkl`; run `test`; run `setup` for editor integration. Copy installer lines from the current committed README. Explain automatic Pkl/YueScript downloads, supported architectures and the VS Code YueScript/Lua extensions.
+- [x] Rewrite the custom-map guide around complete Lua folder-format maps, `map { folder = "MyMap.w3x" }`, source/stage/archive separation and refreshing editor globals. Keep the accurate existing explanation of extraction as an alternative when folder saving is unavailable. Explain that changing script language does not convert handwritten JASS.
+- [x] Use this object/gameplay pair for the first custom unit, with filenames in fence titles. Explain that a project already merges `objects/**.pkl`; new objects must have unique IDs. `build` or `dev` updates generated IDs before the subsequent `check`:
 
 ```pkl
 amends "@moonwell/ObjectFile.pkl"
@@ -149,8 +149,8 @@ mw.on_main ->
   CreateUnit Player(0), objects.units.vanguard, 0, 0, 270
 ```
 
-- [ ] Explain module naming (`src/helpers.yue` and `lua/helpers.lua` collide), `require`/`import`, editor globals, `$FourCC`, startup hooks and iteration. Note that `src/**/*.lua` belongs to the editor extension; handwritten Lua belongs in `lua/`.
-- [ ] Review every command and example against the listed sources. Check that installation makes no manual Pkl/Go/Deno requirement, generated IDs are used directly, and `check` is not described as writing IDs. Run `deno task build` and review the four rendered guides and their anchors. Fix findings, then commit these four files.
+- [x] Explain module naming (`src/helpers.yue` and `lua/helpers.lua` collide), `require`/`import`, editor globals, `$FourCC`, startup hooks and iteration. Note that `src/**/*.lua` belongs to the editor extension; handwritten Lua belongs in `lua/`.
+- [x] Review every command and example against the listed sources. Check that installation makes no manual Pkl/Go/Deno requirement, generated IDs are used directly, and `check` is not described as writing IDs. Run `deno task build` and review the four rendered guides and their anchors. Fix findings, then commit these four files.
 
 ### Task 3: Document Pkl objects, assets and map settings
 

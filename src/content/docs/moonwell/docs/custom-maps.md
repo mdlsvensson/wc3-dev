@@ -1,106 +1,90 @@
 ---
-title: "Use your own World Editor map"
-description: "Use your own World Editor map for the Warcraft III TypeScript framework."
+title: Use your own World Editor map
+description: Bring a complete Lua folder-format map into a Moonwell project.
 ---
 
-The framework reads an **unpacked map directory**, named with a `.w3x` suffix.
-A single packed `.w3x` file cannot be used directly as the source directory.
-The source must include the complete map contents, including `war3map.lua` and
-`war3map.w3i` at its root.
+Moonwell reads a complete **map directory with a `.w3x` suffix**. A packed
+`.w3x` archive cannot serve directly as the source directory. Terrain,
+placements, editor triggers, imported files, and the editor's Lua script all
+remain part of the source map.
 
-## 1. Prepare a source map
+## 1. Prepare the map
 
-Back up your map before changing its scripting language or storage format. Open
-the original map in the World Editor, or create a new map with your preferred
-terrain, size, and player settings.
+Back up your map. Open it in World Editor and select **Lua** under
+**Scenario > Map Options**, then save successfully. Moonwell does not convert
+handwritten JASS to Lua; resolve incompatible custom-script triggers before
+continuing.
 
-In **Scenario > Map Options**, select **Lua** as the scripting language and save.
-For an existing JASS map, resolve incompatible custom-script triggers before
-continuing; this framework does not convert handwritten JASS to Lua. Confirm that
-the editor saves successfully.
+## 2. Save a complete directory
 
-## 2. Save the map as a directory
+Use **File > Save As** and the editor's directory/folder map format to save
+`MyMap.w3x` under your project's `maps/` folder. The format's label varies by
+editor version. In File Explorer, confirm that `MyMap.w3x` is a folder rather
+than one archive.
 
-Use **File > Save As**, select the directory/folder map format in the save dialog,
-and save as `MyMap.w3x` inside this project's `maps/` folder. The wording of the
-directory format varies by editor version. Confirm in File Explorer that
-`MyMap.w3x` is a folder containing map files, rather than a single archive.
+If your editor cannot save directories, export a normal Lua map archive and
+extract its complete contents with an MPQ-capable tool. A `.w3x` is not a ZIP;
+renaming it does not unpack it. Keep the editable original separately and
+replace the complete export after each editor save, so deleted files do not
+linger. Preserve internal paths and imported resources.
 
-If your editor does not offer directory saving, save a normal Lua `.w3x` archive
-and extract its complete contents with an MPQ-capable map archive tool into
-`maps/MyMap.w3x/`. A `.w3x` archive is not a ZIP: renaming its extension does not
-unpack it. Preserve internal paths, imported assets, and editor data. Repeat the
-export/extraction after each editor save, replacing the previous source export so
-removed files do not linger. Keep your editable original separately in that workflow.
-
-The resulting layout should resemble:
-
-```text
+```text title="Complete source map"
 maps/
   MyMap.w3x/
     war3map.lua
     war3map.w3i
     war3map.w3e
-    war3map.wts
-    ...remaining map and imported asset files...
+    ...other map and imported files...
 ```
 
-Do not add an extra nesting level such as `MyMap.w3x/MyMap/war3map.lua`. Copying only
-the Lua script loses terrain, placements, and other map data.
+Do not nest another folder between `MyMap.w3x` and its files. Copying only
+`war3map.lua` loses the map's terrain and placements. If replacing the template,
+move its folder aside first instead of merging two maps' contents.
 
-## 3. Select the new map
+## 3. Select the map
 
-Change `mapFolder` in the root `config.json`:
+Change the existing `map` block in `moonwell.pkl`:
 
-```json
-{
-  "mapFolder": "MyMap.w3x",
-  "minifyScript": false,
-  "gameExecutable": "C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe",
-  "outputFolder": "./dist/bin",
-  "launchArgs": ["-launch", "-windowmode", "windowed"]
+```pkl title="moonwell.pkl · map"
+map {
+  folder = "MyMap.w3x"
+  entry = "src/main.yue"
 }
 ```
 
-The value is only the folder name, not `maps/MyMap.w3x` or an absolute path.
-Check that `config.local.json` does not override `mapFolder`. The compiler derives
-its map paths from this setting; you do not need to change the template map paths
-inside `tsconfig.json`.
+`folder` is relative to `maps/`; do not include that prefix or use an absolute
+path. Check whether `moonwell.local.pkl` overrides the shared value.
 
-Alternatively, keep `mapFolder` as `map.w3x` and replace the template directory
-with your complete unpacked map. Move the old directory to a backup first; merging
-two maps' contents can leave unwanted object tables and assets behind.
+Review the template's `src/main.yue` and `objects/` too. They remain your project
+sources when you replace the map. Remove unwanted demo gameplay, choose object
+rawcodes that do not collide with objects already in your map, and replace
+references to `gg_` or `udg_` globals that belonged to the previous source map.
 
-## 4. Refresh declarations and build
+## 4. Refresh, build and play
 
 ```powershell
-deno task build:defs
-deno task typecheck
-deno task build
-deno task test
+moonwell build
+moonwell check
+moonwell test
 ```
 
-`build:defs` replaces `src/war3map.d.ts` with globals from the selected map. Fix any
-TypeScript references to globals that only existed in the template. The packed
-output is now `dist/bin/MyMap.w3x`; staging uses `dist/MyMap.w3x/`.
+`build` refreshes the generated object-ID module and editor declarations,
+then packages the map. `check` validates the current project without creating
+a map. `test` stages and launches it. The archive is now `dist/bin/MyMap.w3x`;
+staging is `dist/stage/MyMap.w3x/`.
 
-If the watcher was running, restart `deno task dev` after changing `mapFolder`.
+After saving the source map in World Editor, run `moonwell check` to refresh
+editor globals, or save a watched source file while `moonwell dev` runs.
+Restart `dev` after changing which map or local library it should watch.
 
 ## 5. Keep source and output separate
 
-Continue saving terrain and placements into the source directory under `maps/`.
-When opening a directory map in the editor, use its directory-map opening option;
-some versions expose this by selecting the directory's `war3map.w3i` file.
-If that is unavailable, use the packed-original and extraction workflow above.
+Commit your complete `maps/` source, `moonwell.pkl`, `PklProject` and its
+resolved dependencies, gameplay and Pkl objects, and generated `objects.yue`.
+Commit `.asset-state/` with source changes made by asset synchronization, and
+`moonwell.lock` when using libraries. Keep `.moonwell/`, `dist/`, and local
+machine configuration ignored.
 
-Do not use `dist/` as your editing project. Each build replaces the selected staged
-directory. Reusing a built map as source can also append the gameplay bundle twice
-and introduce Pkl rawcode collisions.
-
-World Editor object modifications are loaded before Pkl definitions are applied.
-Pkl creates new objects; it does not overwrite existing map objects with the same
-ID. Give editor-owned objects and Pkl-owned objects different rawcodes.
-
-For the first playtest, check terrain, player starts, imported models, triggers,
-and the TypeScript startup message. Then follow the [map-making walkthrough](/moonwell/docs/map-making/).
-
+Objects and settings from Pkl apply to the staged copy. Imported assets reach
+World Editor only through explicit [asset synchronization](/moonwell/docs/assets/#check-build-and-sync).
+Continue with [your first custom unit](/moonwell/docs/map-making/).

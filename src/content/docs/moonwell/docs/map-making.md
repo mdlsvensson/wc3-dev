@@ -1,164 +1,142 @@
 ---
-title: "Make your first map"
-description: "Make your first map for the Warcraft III TypeScript framework."
+title: Make your first map with Moonwell
+description: Define a Pkl unit, spawn it from YueScript, and iterate on your map.
 ---
 
-Start with a working [installation](/moonwell/docs/installation/). This walkthrough uses the
-template map and creates a custom Footman with Pkl, then spawns it with TypeScript.
-Use a fresh checkout or back up your existing definitions before replacing files.
+Start with a working [installation](/moonwell/docs/installation/). This guide
+adds a Vanguard unit to the template and spawns it with Warcraft natives;
+the optional wrappers and systems are not required.
 
 ## 1. Define a custom unit
 
-Replace `objects/definitions/units.pkl` with:
+Create `objects/vanguard.pkl`:
 
-```pkl
-module wc3.definitions.units
+```pkl title="objects/vanguard.pkl"
+amends "@moonwell/ObjectFile.pkl"
 
-import "../schema.pkl" as schema
-import "../bases.pkl" as bases
-
-units: Mapping<String, schema.RegularUnit> = new {
-  ["vanguard"] = new schema.RegularUnit {
-    id = "u001"
-    base = bases.Units.Footman
+units {
+  ["vanguard"] {
+    id = "h001"
+    base = "hfoo"
     name = "Vanguard"
-    hitPointsMaximumBase = 650
-    goldCost = 120
-    speedBase = 300
+    hitPointsMaximumBase = 350
   }
 }
 ```
 
-`vanguard` is the friendly key used by your code. `u001` is the four-character
-engine ID, also called a rawcode. The new unit inherits the Footman's unspecified
-fields. Keep this ID unique across your map and all Pkl definitions.
+`hfoo` is the standard Footman. `h001` is the new object's rawcode; choose
+another if your map already uses it. The category key `vanguard` names the
+object in gameplay code. Unset fields keep the base object's values.
 
-Run:
+The template already merges all object files through these lines in
+`moonwell.pkl`; keep them when reorganizing definitions:
 
-```powershell
-deno task objects:eval
+```pkl title="moonwell.pkl · object imports"
+import "@moonwell/Objects.pkl"
+objects = Objects.merge(import*("objects/**.pkl"))
 ```
 
-Inspect `src/generated/objects.json`: it should contain `units.vanguard.id` with
-the value `u001`. Do not edit that JSON; it is regenerated from Pkl. Evaluation
-checks Pkl types, while the subsequent build also checks actual base objects,
-property names, and collisions with your source map.
+## 2. Spawn the Vanguard
 
-## 2. Spawn the unit
+Replace the template's demo gameplay with:
 
-Replace `src/main.ts` with:
+```text title="src/main.yue · YueScript"
+import "moonwell" as mw
+import "generated.objects" as objects
 
-```typescript
-import { Unit } from "w3ts";
-import { Players } from "w3ts/globals";
-import { addScriptHook, W3TS_HOOK } from "w3ts/hooks";
-import * as objects from "./generated/objects.json";
-
-function startGame(): void {
-  const vanguard = Unit.create(
-    Players[0],
-    FourCC(objects.units.vanguard.id),
-    0,
-    0,
-    270,
-  );
-  if (!vanguard) {
-    print("Could not create the Vanguard.");
-    return;
-  }
-  print("Your Vanguard is ready at the center of the map.");
-}
-
-addScriptHook(W3TS_HOOK.MAIN_AFTER, startGame);
+mw.on_main ->
+  CreateUnit Player(0), objects.units.vanguard, 0, 0, 270
 ```
 
-The hook runs after the editor-generated `main`, so editor initialization has
-already taken place. `Players[0]` is the first player slot. Coordinates are world
-coordinates; choose a walkable point inside your map's playable bounds if `(0, 0)`
-is unsuitable. `FourCC` converts a string rawcode to the numeric ID the game uses.
+The build generates `src/generated/objects.yue`. `objects.units.vanguard`
+is already an integer ID suitable for `CreateUnit`; do not wrap it in `FourCC`
+or read an `.id` field. Player IDs are zero-based, so `Player(0)` is Player 1
+in the editor. The unit appears at the map origin; adjust the coordinates to
+a playable part of your map.
 
-Importing the generated manifest keeps the unit's ID in one source of truth. Run
-`objects:eval` after adding or renaming Pkl keys before running `typecheck`; builds
-evaluate Pkl automatically. Standard constants such as `Units.Footman` from
-`@objectdata/units` describe built-in objects, not your new custom objects.
+Create game objects inside `mw.on_main`, after editor initialization. Module
+top-level code runs when the map script loads. Other available hooks are
+`before_config`, `on_config`, and `before_main`.
 
 ## 3. Build and play
 
 ```powershell
-deno task typecheck
-deno task build
-deno task test
+moonwell build
+moonwell check
+moonwell test
 ```
 
-Look for the startup message, then inspect the Vanguard's name and maximum health.
-If the source map's Object Editor does not list it, that is expected: the build
-injects Pkl definitions into the staged map. Spawn Pkl objects in code. For objects
-that must be placed visually in the editor, maintain those objects in the source
-map's Object Editor using distinct IDs.
+`build` and `test` update the generated IDs and apply your objects to a staged
+copy. Commit `src/generated/objects.yue` with the Pkl definitions. `check`
+fails if those IDs are stale; it does not regenerate them. `objects:eval`
+prints validated JSON for inspection, not the generated gameplay module.
 
-You can also build and open the packaged archive separately to inspect its object
-data. Treat that as a disposable inspection copy; do not save it back over source.
+The source map remains unchanged. World Editor's Object Editor will therefore
+not show this Pkl unit in the source; open a built copy to inspect the injected
+data. See [Object data](/moonwell/docs/object-data/) for levels and other categories.
 
 ## 4. Add gameplay modules
 
-Keep `src/main.ts` as the startup point and move larger systems into imported files.
-For example, create `src/gameplay/welcome.ts`:
+Split gameplay into `.yue` modules under `src/`. For example:
 
-```typescript
-export function showWelcome(): void {
-  print("Defend the village!");
+```text title="src/greetings.yue · YueScript"
+return {
+  announce: -> print "Welcome to the village."
 }
 ```
 
-Import `showWelcome` from `./gameplay/welcome` in `src/main.ts` and call it inside
-`startGame`. Unreferenced gameplay modules are not a substitute for startup hooks:
-import the modules your entry point needs.
+```text title="src/main.yue · YueScript"
+import "moonwell" as mw
+import "greetings" as greetings
 
-Code under `src/` runs inside Warcraft III after transpilation to Lua. Use Warcraft
-natives and `w3ts`, not `Deno`, Node filesystem APIs, browser DOM APIs, or network
-calls. TypeScript acceptance alone does not guarantee that a JavaScript feature is
-supported by the Lua transpiler; run a full build and playtest after substantial changes.
+mw.on_main ->
+  greetings.announce!
+```
 
-Destroy timers, triggers, groups, effects, and other handles when their work is
-finished. In multiplayer, keep gameplay changes synchronized between clients;
-local-player-only UI behavior must not change shared game state.
+For handwritten Lua, put a module such as `lua/greetings.lua` under `lua/` and
+import it by the same path-based name. `src/`, `lua/`, and libraries share one
+module namespace: both of those greeting files cannot coexist. Only modules
+reachable through `import` or `require` enter the bundle. Leave `src/**/*.lua`
+for the editor extension's generated output.
+
+For standard object IDs, use the compile-time macro:
+
+```text title="YueScript · standard Footman"
+import "moonwell.macros" as {:$FourCC}
+
+-- Put this call inside a startup hook.
+CreateUnit Player(0), $FourCC("hfoo"), 0, 0, 270
+```
+
+`$FourCC` accepts exactly four printable ASCII characters in a literal string,
+without escapes or interpolation. Custom objects use their generated IDs.
 
 ## 5. Use World Editor globals
 
-Place units, regions, or cameras in the source map and save it. Then run:
+Editor-created regions, units, and variables appear as `gg_` and `udg_`
+globals. Refer to the actual names in your source map's `war3map.lua`. After
+an editor save, run `moonwell check` to refresh `.moonwell/types/` and catch
+references to globals that no longer exist.
+
+Unknown globals fail `check`, `build`, `test`, and `dev` by default. Declare
+your own with YueScript's `global`, or list externally provided names in
+`lint.globals`; avoid suppressing a typo that should be fixed.
+
+## 6. Iterate
 
 ```powershell
-deno task build:defs
+moonwell dev
 ```
 
-Open `src/war3map.d.ts` to find the exact exported names. These declarations provide
-types for values created by the map's Lua script; they do not create handles.
-For example, if that file contains `gg_rct_Arena`, code inside your startup hook
-can use `GetRectCenterX(gg_rct_Arena)` and `GetRectCenterY(gg_rct_Arena)` as spawn
-coordinates.
+`dev` checks changes and refreshes object IDs. It watches gameplay, Pkl objects,
+manifests, assets, preview pictures, and configured local libraries. It does
+not rebuild an archive or launch Warcraft III. Run `build` for a distributable
+map and `test` for a new playtest.
 
-Do not invent or manually declare a global merely to silence a type error. The
-editor must actually emit it in `war3map.lua`. Some preplaced objects need to be
-referenced by an editor trigger before a named global is generated. Save, regenerate
-the declarations, and inspect the output after renaming or removing editor objects.
+YueScript 0.34.3 supports floor division (`//`). Its Lua rewrite step still
+rejects bitwise operators; put that code in a handwritten Lua module instead.
+Normal builds report runtime errors with source files and lines; minified
+YueScript loses line numbers. Lua modules remain unminified.
 
-## 6. Iterate on your map
-
-In one terminal:
-
-```powershell
-deno task dev
-```
-
-Edit object Pkl files to regenerate the manifest, or save the source map to regenerate
-Lua-global declarations. Edits to the existing map-settings Pkl files run validation;
-see [Map settings](/moonwell/docs/map-settings/) for available overrides.
-The watcher does not build the archive, watch TypeScript,
-or reload a running game. It performs no initial generation, so run `objects:eval`
-and `build:defs` once if their outputs are stale. Use another terminal for `build`
-or `test` after generation finishes. Stop the watcher with Ctrl+C.
-
-After a successful build, share `dist/bin/<mapFolder>`. Test that exact archive in
-the game before distribution. Continue with the [object-data reference](/moonwell/docs/object-data/)
-to add abilities, items, heroes, and upgrades.
-
+Continue with [assets](/moonwell/docs/assets/), [map settings](/moonwell/docs/map-settings/),
+or [wrappers and systems](/moonwell/docs/library/).
