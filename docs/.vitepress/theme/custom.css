@@ -1,0 +1,21 @@
+:root {
+  --vp-c-brand-1: #057792;
+  --vp-c-brand-2: #046a82;
+  --vp-c-brand-3: #057792;
+  --vp-c-brand-soft: rgba(8, 173, 201, 0.12);
+}
+
+.dark {
+  --vp-c-brand-1: #08adc9;
+  --vp-c-brand-2: #28e4f8;
+  --vp-c-brand-3: #057792;
+  --vp-c-brand-soft: rgba(8, 173, 201, 0.16);
+  --vp-button-brand-hover-bg: #046a82;
+  --vp-button-brand-active-bg: #046a82;
+}
+
+.VPHero .image-container .image-src {
+  max-width: 16rem;
+  max-height: 16rem;
+  image-rendering: pixelated;
+}
