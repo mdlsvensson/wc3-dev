@@ -19,7 +19,8 @@ export default defineConfig({
   cleanUrls: true,
   head: [['link', { rel: 'icon', type: 'image/png', href: '/mw-moonwell.png' }]],
   themeConfig: {
-    logo: { src: '/mw-moonwell.png', alt: '' },
+    logo: { src: '/mw-text-edit.png', alt: 'Moonwell' },
+    siteTitle: false,
     nav: [
       { text: 'Moonwell', link: '/moonwell/', activeMatch: '^/moonwell/' },
       { text: 'Wrappers', link: '/wrappers/', activeMatch: '^/wrappers/' },
