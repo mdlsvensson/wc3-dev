@@ -3,7 +3,7 @@ title: "Make your first map"
 description: "Make your first map for the Warcraft III TypeScript framework."
 ---
 
-Start with a working [installation](/framework/docs/installation/). This walkthrough uses the
+Start with a working [installation](/moonwell/docs/installation/). This walkthrough uses the
 template map and creates a custom Footman with Pkl, then spawns it with TypeScript.
 Use a fresh checkout or back up your existing definitions before replacing files.
 
@@ -152,13 +152,13 @@ deno task dev
 
 Edit object Pkl files to regenerate the manifest, or save the source map to regenerate
 Lua-global declarations. Edits to the existing map-settings Pkl files run validation;
-see [Map settings](/framework/docs/map-settings/) for available overrides.
+see [Map settings](/moonwell/docs/map-settings/) for available overrides.
 The watcher does not build the archive, watch TypeScript,
 or reload a running game. It performs no initial generation, so run `objects:eval`
 and `build:defs` once if their outputs are stale. Use another terminal for `build`
 or `test` after generation finishes. Stop the watcher with Ctrl+C.
 
 After a successful build, share `dist/bin/<mapFolder>`. Test that exact archive in
-the game before distribution. Continue with the [object-data reference](/framework/docs/object-data/)
+the game before distribution. Continue with the [object-data reference](/moonwell/docs/object-data/)
 to add abilities, items, heroes, and upgrades.
 

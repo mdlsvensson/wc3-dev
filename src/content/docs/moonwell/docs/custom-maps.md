@@ -102,5 +102,5 @@ Pkl creates new objects; it does not overwrite existing map objects with the sam
 ID. Give editor-owned objects and Pkl-owned objects different rawcodes.
 
 For the first playtest, check terrain, player starts, imported models, triggers,
-and the TypeScript startup message. Then follow the [map-making walkthrough](/framework/docs/map-making/).
+and the TypeScript startup message. Then follow the [map-making walkthrough](/moonwell/docs/map-making/).
 

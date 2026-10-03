@@ -133,7 +133,7 @@ export function tutorialDirectives({ fileURL }: PluginFactoryContext): MdastPlug
     },
     link(node, ctx) {
       // Starlight pages don't use the shell's client router; load them in full.
-      if (node.url.startsWith('/framework/docs/')) {
+      if (node.url.startsWith('/moonwell/docs/')) {
         const hProperties = (node.data as { hProperties?: Record<string, unknown> } | undefined)?.hProperties;
         ctx.setProperty(node, 'data', { ...node.data, hProperties: { ...hProperties, dataAstroReload: '' } });
       }

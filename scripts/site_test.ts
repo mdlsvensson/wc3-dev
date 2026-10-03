@@ -26,19 +26,38 @@ Deno.test('the download-attribute check matches download in any attribute positi
   assert(!DOWNLOAD_ATTRIBUTE.test('<p>the package download fails</p>'), 'Must not match prose');
 });
 
-Deno.test('portal, framework, and migrated documentation routes are built', async () => {
-  for (const route of ['', 'resources/', 'learn/', 'framework/', 'framework/docs/', ...[
-    'installation', 'custom-maps', 'map-making', 'object-data', 'architecture', 'reference', 'troubleshooting',
-  ].map((slug) => `framework/docs/${slug}/`)]) {
+Deno.test('portal, Moonwell, and documentation routes are built', async () => {
+  for (const route of ['', 'resources/', 'learn/', 'moonwell/', 'moonwell/docs/', ...[
+    'installation', 'custom-maps', 'map-making', 'assets', 'map-settings', 'library', 'object-data', 'architecture', 'reference', 'troubleshooting',
+  ].map((slug) => `moonwell/docs/${slug}/`)]) {
     const html = await Deno.readTextFile(new URL(`${route}index.html`, root));
     assert.match(html, /<h1[\s>]/, `Missing heading at /${route}`);
   }
   const homepage = await Deno.readTextFile(new URL('index.html', root));
   assert.match(homepage, /Hive Workshop/);
-  assert.match(homepage, /wc3\.dev-framework/);
+  assert.match(homepage, /Moonwell/);
   for (const title of ['Lua Reference', 'w3ts', 'WCSharp', 'Jassbot']) assert(homepage.includes(title), `Missing link ${title}`);
   const search = await Deno.stat(new URL('pagefind/pagefind.js', root));
   assert(search.isFile, 'Search bundle must exist');
+});
+
+Deno.test('old framework bookmarks redirect and active pages link to Moonwell', async () => {
+  const slugs = ['', 'installation', 'custom-maps', 'map-making', 'assets',
+    'map-settings', 'library', 'object-data', 'architecture', 'reference', 'troubleshooting'];
+  const pairs = [['framework/', 'moonwell/'], ...slugs.map((slug) => {
+    const suffix = slug ? `${slug}/` : '';
+    return [`framework/docs/${suffix}`, `moonwell/docs/${suffix}`];
+  })];
+  for (const [from, to] of pairs) {
+    const html = await Deno.readTextFile(new URL(`${from}index.html`, root));
+    assert.match(html, /http-equiv="refresh"/i, `Missing static redirect at /${from}`);
+    assert(html.includes(`/${to}`), `Wrong destination at /${from}`);
+    assert((await Deno.stat(new URL(`${to}index.html`, root))).isFile);
+  }
+  for (const file of await htmlFiles(root)) {
+    if (file.href.slice(root.href.length).startsWith('framework/')) continue;
+    assert(!/href="\/framework(?:\/|")/.test(await Deno.readTextFile(file)), `Old active link in ${file.href}`);
+  }
 });
 
 Deno.test('built pages have no broken local links, anchors, or asset references, and never link or download store files', async () => {
@@ -82,7 +101,7 @@ Deno.test('TypeScript, Lua, and JASS produce distinct syntax tokens', async () =
 });
 
 Deno.test('shell pages share the application shell', async () => {
-  for (const route of ['', 'resources/', 'learn/', 'framework/']) {
+  for (const route of ['', 'resources/', 'learn/', 'moonwell/']) {
     const html = await Deno.readTextFile(new URL(`${route}index.html`, root));
     assert.match(html, /class="activity-rail"/, `Missing activity rail at /${route}`);
     assert.match(html, /data-astro-transition-persist="tabs"/, `Tab strip must persist at /${route}`);
@@ -91,7 +110,7 @@ Deno.test('shell pages share the application shell', async () => {
     assert.match(html, /class="status-bar"/, `Missing status bar at /${route}`);
     assert.match(html, /id="command-palette"/, `Missing command palette at /${route}`);
   }
-  const docs = await Deno.readTextFile(new URL('framework/docs/index.html', root));
+  const docs = await Deno.readTextFile(new URL('moonwell/docs/index.html', root));
   assert.match(docs, /class="status-bar"/, 'Docs must share the status bar');
 });
 

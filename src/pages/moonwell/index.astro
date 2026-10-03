@@ -1,0 +1,40 @@
+---
+import { ArrowRight, Github, CodeXml, Boxes, Terminal } from 'lucide-astro';
+import { Code } from 'astro:components';
+import Shell from '../../layouts/Shell.astro';
+import GuideNav from '../../components/GuideNav.astro';
+const example = `import "moonwell" as mw
+import "moonwell.macros" as {:$FourCC}
+
+mw.on_main ->
+  footman = CreateUnit Player(0), $FourCC("hfoo"), 0, 0, 270
+  SetUnitName footman, "Vanguard"`;
+const quickstart = `irm https://github.com/mdlsvensson/moonwell/releases/latest/download/install.ps1 | iex
+moonwell init my-map
+cd my-map
+moonwell build`;
+---
+<Shell title="Moonwell" description="Build Warcraft III maps with YueScript and Lua gameplay, Pkl data, and the Moonwell command-line tool.">
+  <GuideNav slot="side" />
+  <section class="hero wrap framework-hero">
+    <div class="eyebrow">MOONWELL <span class="badge">0.9.1</span></div>
+    <div class="hero-grid">
+      <div>
+        <h1>From your code<br />to <span>living worlds.</span></h1>
+        <p class="hero-copy">Write gameplay in YueScript and Lua. Bring your World Editor map, define objects in Pkl, and build something worth playing.</p>
+        <div class="actions"><a class="button primary" href="/moonwell/docs/installation/" data-astro-reload>Start building <ArrowRight size={18} /></a><a class="button secondary" href="https://github.com/mdlsvensson/moonwell"><Github size={18} /> Source code</a></div>
+      </div>
+      <div class="code-panel"><div class="panel-label">src/main.yue <span>YUESCRIPT → LUA</span></div><Code code={example} lang="text" theme="github-dark" /></div>
+    </div>
+  </section>
+  <section class="wrap framework-pillars" aria-label="Moonwell capabilities">
+    <article><CodeXml /><h2>Gameplay your way</h2><p>Use Warcraft natives or opt into Lua wrappers and systems for damage, missiles, buffs, and save files. Bundle only the modules your map imports.</p></article>
+    <article><Boxes /><h2>Declarative data</h2><p>Author objects, map settings, and asset mappings in Pkl. Keep terrain and placement in World Editor while Moonwell builds a separate copy.</p></article>
+    <article><Terminal /><h2>One command-line tool</h2><p>Install Moonwell, create a project, build, and play. The Go toolchain downloads its pinned compiler and supplies Pkl when needed.</p></article>
+  </section>
+  <section class="wrap getting-started">
+    <div><div class="eyebrow">THE FIRST BUILD</div><h2>A familiar starting point.</h2><p>Install Moonwell in PowerShell on Windows, then create and build a map. You’ll need Warcraft III and a Lua-capable World Editor to edit and play it. A Linux installer is available too.</p><a class="text-link" href="/moonwell/docs/installation/" data-astro-reload>Full installation guide <ArrowRight size={18} /></a></div>
+    <Code code={quickstart} lang="powershell" theme="github-dark" />
+  </section>
+  <section class="wrap docs-callout"><div><h2>Learn the workflow.</h2><p>Installation, your first custom unit, assets, libraries, and the complete command reference.</p></div><a class="button secondary" href="/moonwell/docs/" data-astro-reload>Open the docs <ArrowRight size={18} /></a></section>
+</Shell>

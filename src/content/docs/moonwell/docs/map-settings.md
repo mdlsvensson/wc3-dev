@@ -68,7 +68,7 @@ loadingScreen {
 
 This block belongs inside the same `map-settings.pkl` module. The model path must
 match its imported map path. Setting `model` does not import files or choose the
-custom background automatically. See [Import assets](/framework/docs/assets/) for
+custom background automatically. See [Import assets](/moonwell/docs/assets/) for
 path mappings and texture dependencies.
 
 Unchanged metadata, including existing `TRIGSTR` references, is preserved. An
@@ -185,7 +185,7 @@ Run commands from the framework repository root:
 
 Pkl must be available on `PATH` or through `PKL_EXECUTABLE`. Check, build, and test
 use the source map selected by `config.json` and optional `config.local.json`.
-See [Commands and configuration](/framework/docs/reference/).
+See [Commands and configuration](/moonwell/docs/reference/).
 
 The watcher does not apply settings or rebuild the map. Run `build` or `test`
 after validation finishes. If you add a settings file while the watcher is

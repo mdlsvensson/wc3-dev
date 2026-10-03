@@ -105,14 +105,14 @@ Deno.test('a screenshot src that is a directory counts as missing', async () => 
 });
 
 Deno.test('verify notes are removed and docs links reload the page', async () => {
-  const output = await html('Press F9.\n\n<!-- verify: F9 opens the Help -->\n\nSee [the docs](/framework/docs/installation/) and [resources](/resources/).');
+  const output = await html('Press F9.\n\n<!-- verify: F9 opens the Help -->\n\nSee [the docs](/moonwell/docs/installation/) and [resources](/resources/).');
   assert(!output.includes('verify'), 'Verify notes never reach the page');
   assert(!(await html('Press F9.\n\n  <!-- verify: indented note -->\n')).includes('verify'), 'Indented verify notes are removed too');
   const trailing = await html('<!-- verify: a note --> Text after it stays.\n\nInline <!-- verify: x --> note, <!-- verify: y --> twice.');
   assert(!trailing.includes('verify'));
   assert.match(trailing, /Text after it stays\./);
   assert.match(trailing, /Inline\s+note,\s+twice\./);
-  assert.match(output, /<a href="\/framework\/docs\/installation\/" data-astro-reload="">the docs<\/a>/);
+  assert.match(output, /<a href="\/moonwell\/docs\/installation\/" data-astro-reload="">the docs<\/a>/);
   assert.match(output, /<a href="\/resources\/">resources<\/a>/);
-  assert.match(await html('[Docs](/framework/docs/ "Read the docs")'), /<a href="\/framework\/docs\/" title="Read the docs" data-astro-reload="">Docs<\/a>/);
+  assert.match(await html('[Docs](/moonwell/docs/ "Read the docs")'), /<a href="\/moonwell\/docs\/" title="Read the docs" data-astro-reload="">Docs<\/a>/);
 });
