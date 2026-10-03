@@ -38,8 +38,11 @@ v0.5.1. The old `/framework/` overview and docs URLs redirect to `/moonwell/`.
 - **Content with Windows paths** (`Textures\Footman.blp`,
   `Documents\Warcraft III\Maps`): write files directly, not through shell
   heredocs, which have mangled backslashes before.
-- Commit messages have ended with a `Co-Authored-By:` trailer for the agent
-  that wrote them; keep a similar attribution line for your own commits.
+- **No agent attribution.** Commit as the owner's git identity, with no
+  `Co-Authored-By:` trailer or other agent attribution (Claude, Codex or any
+  other tool) in commits, pull request descriptions, tags, releases or files.
+  This is the owner's rule since 2026-10-03; older commits may still carry
+  trailers.
 
 ## What exists (all merged on `main`)
 
