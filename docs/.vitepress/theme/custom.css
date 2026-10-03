@@ -53,7 +53,8 @@
 }
 
 /* Landing page. The image already carries the name, so the heading is kept for screen readers and search engines
-   but not drawn. On a wide screen the image is to the left of the tagline; on a narrow one it stays above it. */
+   but not drawn. On a wide screen the image is to the left of the tagline and the pair is centred on the page; on
+   a narrow one the image stays above the tagline. */
 .VPHero .main .heading {
   position: absolute;
   width: 1px;
@@ -71,10 +72,12 @@
 @media (min-width: 60rem) {
   .VPHero .main .tagline {
     padding-top: 0;
+    max-width: none;
   }
 
   .VPHero .container {
     align-items: center;
+    justify-content: center;
     gap: 2rem;
   }
 
@@ -90,10 +93,12 @@
     transform: none;
   }
 
-  .VPHero .container .main {
+  /* The text takes only the room it needs, so that the image and the text are centred as one group. */
+  .VPHome .VPHero.has-image .container .main {
     order: 2;
-    flex: 1;
+    flex: 0 1 auto;
     width: auto;
+    max-width: none;
   }
 }
 
