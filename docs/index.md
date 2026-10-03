@@ -7,10 +7,6 @@ hero:
   image:
     src: /mw.gif
     alt: A moonwell
-  actions:
-    - theme: brand
-      text: Docs
-      link: /moonwell/
 
 features:
   - title: Moonwell
