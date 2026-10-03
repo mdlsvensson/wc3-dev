@@ -1,7 +1,0 @@
----
-import { guides } from '../data/guides';
----
-<nav class="panel-nav" aria-label="Moonwell guides">
-  <h2 class="panel-title">Moonwell guides</h2>
-  {guides.map(({ label, slug }) => <a href={`/moonwell/docs/${slug}/`} data-astro-reload>{label}<span aria-hidden="true">›</span></a>)}
-</nav>

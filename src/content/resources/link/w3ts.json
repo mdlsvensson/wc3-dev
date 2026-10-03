@@ -1,9 +1,0 @@
-{
-  "type": "link",
-  "title": "w3ts",
-  "summary": "Object-oriented TypeScript wrappers for Warcraft III natives.",
-  "source": { "site": "github", "url": "https://github.com/cipherxof/w3ts" },
-  "category": "Scripting",
-  "order": 4,
-  "added": "2026-09-22"
-}
