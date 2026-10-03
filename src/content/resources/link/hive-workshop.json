@@ -1,9 +1,0 @@
-{
-  "type": "link",
-  "title": "Hive Workshop",
-  "summary": "Find custom maps, models, spells, and tutorials. The main hub of the Warcraft III modding community.",
-  "source": { "site": "hive", "url": "https://www.hiveworkshop.com/" },
-  "category": "Community",
-  "order": 1,
-  "added": "2026-09-22"
-}

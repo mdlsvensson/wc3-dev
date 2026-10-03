@@ -1,9 +1,0 @@
-{
-  "type": "link",
-  "title": "Jassbot",
-  "summary": "JASS2 API search engine.",
-  "source": { "site": "other", "url": "https://lep.nrw/jassbot/" },
-  "category": "Scripting",
-  "order": 6,
-  "added": "2026-09-22"
-}
