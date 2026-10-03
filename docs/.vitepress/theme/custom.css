@@ -52,6 +52,51 @@
   margin-right: 0;
 }
 
+/* Landing page. The image already carries the name, so the heading is kept for screen readers and search engines
+   but not drawn. On a wide screen the image is to the left of the tagline; on a narrow one it stays above it. */
+.VPHero .main .heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.VPHero .main .tagline {
+  padding-top: 2.5rem;
+}
+
+@media (min-width: 60rem) {
+  .VPHero .main .tagline {
+    padding-top: 0;
+  }
+
+  .VPHero .container {
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .VPHero .container .image {
+    order: 1;
+    flex: none;
+    width: 16rem;
+    min-height: 16rem;
+  }
+
+  .VPHero .container .image-container {
+    height: 16rem;
+    transform: none;
+  }
+
+  .VPHero .container .main {
+    order: 2;
+    flex: 1;
+    width: auto;
+  }
+}
+
 .VPHero .image-container .image-src {
   max-width: 16rem;
   max-height: 16rem;
