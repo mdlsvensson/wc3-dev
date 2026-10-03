@@ -2,14 +2,14 @@
 layout: home
 
 hero:
-  name: wc3.dev
-  tagline: Documentation for Moonwell and its libraries, for making Warcraft III maps.
+  name: Moonwell
+  tagline: "Multilingual modding framework for Warcraft III: Reforged"
   image:
-    src: /mw-moonwell.png
+    src: /mw.gif
     alt: A moonwell
   actions:
     - theme: brand
-      text: Read the Moonwell docs
+      text: Docs
       link: /moonwell/
 
 features:
