@@ -46,8 +46,8 @@ code blocks referencing old stylesheets. Code-block styles are inlined with the 
 | Path | Purpose |
 | --- | --- |
 | `src/pages/index.astro` | Community and modding resource portal |
-| `src/pages/framework/index.astro` | Framework landing page at `/framework/` |
-| `src/content/docs/framework/docs/` | Starlight docs at `/framework/docs/` |
+| `src/pages/moonwell/index.astro` | Moonwell overview at `/moonwell/` |
+| `src/content/docs/moonwell/docs/` | Moonwell Starlight docs at `/moonwell/docs/` |
 | `src/content/resources/` | Resource cards, validated with Zod — curated links in `link/`, hosted resources in `<type>/`, build fixtures in `_fixtures/` |
 | `src/content.config.ts` | Content collection loaders and schemas |
 | `src/syntax/jass.ts` | Project-owned JASS / basic vJASS TextMate grammar |
@@ -175,23 +175,28 @@ add its slug to the sidebar in `astro.config.ts`.
 TypeScript and Lua use Shiki's built-in grammars. JASS is registered in both
 Astro's Markdown renderer and Starlight's Expressive Code renderer. Use fenced
 code blocks labeled `typescript`, `lua`, or `jass`. JASS highlighting is lexical;
-it is not a compiler or validator.
+it is not a compiler or validator. YueScript examples use `text` fences with
+filenames in their titles; they are not labeled as Lua.
 
 Mona Sans is the site text font; Monaspace Argon 1.400 is used for code. Both are
 self-hosted under `public/fonts/`, with their licenses and sources included there.
 Shared font definitions live in `src/styles/fonts.css`.
 
-## Documentation migration
+## Moonwell documentation
 
-All eight Markdown pages from `wc3.dev-framework/docs` are now hosted here. The former
-`docs/README.md` becomes `/framework/docs/`. Internal links use the website routes;
-contributing and changelog links point to the framework source repository.
+The overview at `/moonwell/` and eleven guides under `/moonwell/docs/` describe
+Moonwell 0.9.1, moonwell-wrappers v0.9.1, and moonwell-systems v0.5.1. Gameplay
+uses YueScript and Lua, project data uses Pkl, and Moonwell is an installed Go
+CLI. wc3.dev itself continues to use Deno. Internal links use the new website
+routes; source, contributing, changelog and library API links point upstream.
+
+Earlier versions of this site hosted documentation migrated from
+`wc3.dev-framework/docs` under `/framework/docs/`. Those URLs and the old
+overview now have static redirects to the corresponding Moonwell pages.
 The framework's MIT license is retained in `LICENSE` for the migrated material.
 
-This repository is independent and does not read from the framework at build time.
-The original framework repository is untouched to respect the requested folder
-boundary. Once this site is published, its documentation links can be redirected
-to wc3.dev and the original copies retired in a separate framework change.
+This repository is independent and does not read from Moonwell or its libraries
+at build time. Updating the site does not modify those upstream repositories.
 
 Warcraft III is a Blizzard Entertainment game. This is an independent community
 project and is not affiliated with Blizzard Entertainment.

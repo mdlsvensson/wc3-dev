@@ -8,11 +8,13 @@ is left to do, as of 2026-09-25.
 wc3.dev is a fully static Warcraft III: Reforged modding platform that
 complements Hive Workshop and never competes with it. It is built with
 Astro 7 + Starlight + Deno. Everything except the Starlight docs
-(`/framework/docs/`) renders inside one desktop-app-style shell.
+(`/moonwell/docs/`) renders inside one desktop-app-style shell.
 
-Related repositories (context only): `mdlsvensson/wc3-dev-framework` (the
-TypeScript/Pkl/Deno map framework the docs describe) and `mdlsvensson/wc3-lib`
-(opt-in TypeScript systems for maps).
+Related repositories (context only): `mdlsvensson/moonwell` (the Go CLI with
+YueScript/Lua gameplay and Pkl data the docs describe),
+`mdlsvensson/moonwell-wrappers` and `mdlsvensson/moonwell-systems` (opt-in Lua
+libraries). The site documents Moonwell 0.9.1, wrappers v0.9.1 and systems
+v0.5.1. The old `/framework/` overview and docs URLs redirect to `/moonwell/`.
 
 ## Owner's rules (non-negotiable)
 
