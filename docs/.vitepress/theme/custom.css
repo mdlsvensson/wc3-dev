@@ -25,19 +25,62 @@
 :root {
   --vp-font-family-base: 'Mona Sans', system-ui, sans-serif;
   --vp-font-family-mono: 'Monaspace Argon', ui-monospace, monospace;
-  --vp-c-brand-1: #057792;
-  --vp-c-brand-2: #046a82;
-  --vp-c-brand-3: #057792;
-  --vp-c-brand-soft: rgba(8, 173, 201, 0.12);
+}
+
+/* The colours come from the artwork (mw.gif and the wordmark): its navy and stone blues for surfaces and text, the
+   blues of the letters for links and buttons, the glow of the water for links in dark mode. Colours not in the
+   artwork are steps between two that are. Every pairing of text and surface is at 4.5 to 1 or more, except the
+   tertiary text (text-3), which is at 3.5 to 1 as in the default theme. */
+:root {
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-alt: #eef4fa;
+  --vp-c-bg-elv: #ffffff;
+  --vp-c-bg-soft: #eef4fa;
+
+  --vp-c-border: #a8cae6;
+  --vp-c-divider: #d6e4ef;
+  --vp-c-gutter: #d6e4ef;
+
+  --vp-c-text-1: #1b304c;
+  --vp-c-text-2: #40587a;
+  --vp-c-text-3: #748bac;
+
+  --vp-c-default-1: #c2d4e6;
+  --vp-c-default-2: #d6e4ef;
+  --vp-c-default-3: #e3edf5;
+  --vp-c-default-soft: rgba(87, 110, 142, 0.14);
+
+  --vp-c-brand-1: #176094;
+  --vp-c-brand-2: #11467a;
+  --vp-c-brand-3: #176094;
+  --vp-c-brand-soft: rgba(30, 191, 249, 0.12);
 }
 
 .dark {
-  --vp-c-brand-1: #08adc9;
+  --vp-c-bg: #0a1422;
+  --vp-c-bg-alt: #050c18;
+  --vp-c-bg-elv: #13233a;
+  --vp-c-bg-soft: #13233a;
+
+  --vp-c-border: #354d6c;
+  --vp-c-divider: #1b304c;
+  --vp-c-gutter: #050c18;
+
+  --vp-c-text-1: #d6edf6;
+  --vp-c-text-2: #8fa8c8;
+  --vp-c-text-3: #576e8e;
+
+  --vp-c-default-1: #354d6c;
+  --vp-c-default-2: #283e5c;
+  --vp-c-default-3: #1b304c;
+  --vp-c-default-soft: rgba(87, 110, 142, 0.16);
+
+  --vp-c-brand-1: #1ebff9;
   --vp-c-brand-2: #28e4f8;
-  --vp-c-brand-3: #057792;
-  --vp-c-brand-soft: rgba(8, 173, 201, 0.16);
-  --vp-button-brand-hover-bg: #046a82;
-  --vp-button-brand-active-bg: #046a82;
+  --vp-c-brand-3: #176094;
+  --vp-c-brand-soft: rgba(30, 191, 249, 0.16);
+  --vp-button-brand-hover-bg: #0d5fb8;
+  --vp-button-brand-active-bg: #0d5fb8;
 }
 
 /* The wordmark is 256 by 96 pixels; at 3rem it is drawn at exactly half size. Its letters sit below the middle of
