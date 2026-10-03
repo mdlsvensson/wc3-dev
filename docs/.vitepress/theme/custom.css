@@ -27,35 +27,11 @@
   --vp-font-family-mono: 'Monaspace Argon', ui-monospace, monospace;
 }
 
-/* The colours come from the artwork (mw.gif and the wordmark): its navy and stone blues for surfaces and text, the
-   blues of the letters for links and buttons, the glow of the water for links in dark mode. Colours not in the
-   artwork are steps between two that are. Every pairing of text and surface is at 4.5 to 1 or more, except the
-   tertiary text (text-3), which is at 3.5 to 1 as in the default theme. */
-:root {
-  --vp-c-bg: #ffffff;
-  --vp-c-bg-alt: #eef4fa;
-  --vp-c-bg-elv: #ffffff;
-  --vp-c-bg-soft: #eef4fa;
-
-  --vp-c-border: #a8cae6;
-  --vp-c-divider: #d6e4ef;
-  --vp-c-gutter: #d6e4ef;
-
-  --vp-c-text-1: #1b304c;
-  --vp-c-text-2: #40587a;
-  --vp-c-text-3: #748bac;
-
-  --vp-c-default-1: #c2d4e6;
-  --vp-c-default-2: #d6e4ef;
-  --vp-c-default-3: #e3edf5;
-  --vp-c-default-soft: rgba(87, 110, 142, 0.14);
-
-  --vp-c-brand-1: #176094;
-  --vp-c-brand-2: #11467a;
-  --vp-c-brand-3: #176094;
-  --vp-c-brand-soft: rgba(30, 191, 249, 0.12);
-}
-
+/* The site is dark only (`appearance: 'force-dark'` in the config), so only the dark colours are set. They come
+   from the artwork (mw.gif and the wordmark): its navy and stone blues for surfaces and text, the glow of the water
+   for links, the blue of the letters for buttons. Colours not in the artwork are steps between two that are. Every
+   pairing of text and surface is at 4.5 to 1 or more, except the tertiary text (text-3), which is at 3.5 to 1 as in
+   the default theme. */
 .dark {
   --vp-c-bg: #0a1422;
   --vp-c-bg-alt: #050c18;
