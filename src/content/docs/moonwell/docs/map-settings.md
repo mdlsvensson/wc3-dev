@@ -1,217 +1,194 @@
 ---
 title: Map settings
-description: Configure map metadata, players, forces, environment, and gameplay in Pkl.
+description: Override metadata, players, forces, environment, and map-list pictures in Moonwell's Pkl manifest.
 ---
 
-Edit `map-settings.pkl` in your **framework repository** to override settings
-stored in internal map files. Build and playtest apply these settings to the staged
-map; your World Editor source map stays unchanged.
+Set map overrides in the `settings` block of `moonwell.pkl`. They apply to the
+staged copy during `build` and `test`; World Editor keeps the source map's own
+values. The template spells out everyday settings as `null` so it inherits
+the editor map until you change them.
 
-## Configure a map
+## Inheritance and clearing
 
-```pkl
-amends "map-settings-schema.pkl"
+An omitted or `null` field inherits the source map. `false`, `0`, and `""`
+are explicit values; an empty string clears text. Text you set is literal;
+text you leave alone keeps its `TRIGSTR_*` reference. Moonwell does not rewrite
+`war3map.wts`.
 
-info {
-  name = "My Map"
-  author = "Your name"
-  description = "A cooperative adventure."
-  recommendedPlayers = "1-4"
-}
-
-loadingScreen {
-  title = "Welcome"
-  subtitle = "A cooperative adventure"
-  text = "Work together to win."
-}
-
-gameplay {
-  heroMaxLevel = 25
-}
-```
-
-The file is optional. If it is absent, the build uses the source map's settings.
-An omitted field or `null` in `info` or `loadingScreen` inherits its source-map
-value; an empty string explicitly clears text. Removing an override restores the
-source-map value on the next build.
-
-## Metadata and loading screens
-
-Both groups update `war3map.w3i`. Map name and description also update the
-editor-generated `config()` function in Lua.
-
-| Field | Value |
-| --- | --- |
-| `info.name` | Map name |
-| `info.author` | Author text |
-| `info.description` | Map description |
-| `info.recommendedPlayers` | Player recommendation text, such as `"1-4"`; does not change player slots |
-| `loadingScreen.title` | Loading-screen title |
-| `loadingScreen.subtitle` | Loading-screen subtitle |
-| `loadingScreen.text` | Loading-screen description |
-| `loadingScreen.model` | In-map path to a custom loading-screen model |
-| `loadingScreen.background` | World Editor campaign background index, or `-1` for a custom model |
-
-All fields except `background` accept strings or `null`. `background` accepts
-`null` or an integer from `-1` to `2147483647`; use a valid World Editor index for
-your game version. Text may contain line breaks but cannot contain NUL characters.
-
-To use a custom loading screen, place its model at
-`assets/LoadingScreen/LoadingScreen.mdx`, along with any textures it needs, then set:
-
-```pkl
-loadingScreen {
-  background = -1
-  model = "LoadingScreen\\LoadingScreen.mdx"
-}
-```
-
-This block belongs inside the same `map-settings.pkl` module. The model path must
-match its imported map path. Setting `model` does not import files or choose the
-custom background automatically. See [Import assets](/moonwell/docs/assets/) for
-path mappings and texture dependencies.
-
-Unchanged metadata, including existing `TRIGSTR` references, is preserved. An
-overridden text field receives the supplied text directly; it does not rewrite
-shared entries in `war3map.wts`.
-
-## Players, forces, and environment
-
-These groups update both map metadata and editor-generated Lua. Player keys are
-existing **zero-based slot IDs**; force keys are existing **zero-based force
-indices**. Quote the keys because Pkl renders them as JSON object keys.
-
-```pkl
-players {
-  ["0"] {
-    controller = "user"
-    race = "human"
-    fixedStart = true
-    x = 128.0
-    y = -896.0
+```pkl title="moonwell.pkl · settings"
+settings {
+  info {
+    name = "Defend the Village"
+    author = ""
+    description = "Protect the village from incoming waves."
+    recommendedPlayers = "1–4"
   }
-}
-forces {
-  ["0"] {
-    name = "Allies"
-    allied = true
-    alliedVictory = true
-    sharedVision = true
-  }
-}
-environment {
-  waterColor = new {
-    80
-    120
-    180
-    255
-  }
-  fog {
-    enabled = true
-    start = 1000.0
-    end = 5000.0
-    density = 0.5
+  gameplay {
+    heroMaxLevel = 25
+    foodLimit = 200
   }
 }
 ```
 
-| Group | Supported fields |
-| --- | --- |
-| Player | `name`, `controller`, `race`, `fixedStart`, `x`, `y` |
-| Force | `name`, `allied`, `alliedVictory`, `sharedVision`, `sharedControl`, `sharedAdvancedControl` |
-| Environment | `soundEnvironment`, `waterColor`, `fog` |
-| Fog | `enabled`, `style`, `start`, `end`, `density`, `color` |
+`heroMaxLevel` accepts 1–10000 and `foodLimit` 0–300. They are convenient
+typed overrides for `war3mapMisc.txt`.
 
-Controllers: `"user"`, `"computer"`, `"neutral"`, `"rescuable"`.
-Races: `"selectable"`, `"human"`, `"orc"`, `"undead"`, `"nightelf"`.
-Colours contain four integers (red, green, blue, alpha), each from 0 to 255.
-Fog styles are 0 (linear), 1 (exponential), or 2 (exponential squared); density
-ranges from 0 to 1. Set `enabled = true` to enable fog; other fog fields inherit
-unless explicitly overridden. Water colour overrides enable custom water tint.
-An empty sound environment selects the game's default sound environment.
+## Loading screen
 
-Omitted or null fields inherit the source. Slot counts, force membership and
-start-location priorities remain inherited. Enable custom forces in World Editor
-before overriding force flags. Missing slots or forces, inconsistent start/team
-assignments, and unsupported Lua initialization shapes fail validation.
+```pkl title="moonwell.pkl · loading screen"
+settings {
+  loadingScreen {
+    background = -1
+    model = #"war3mapImported\LoadingScreen.mdx"#
+    title = "Defend the Village"
+    subtitle = "Hold the line"
+    text = "Protect the village until the last wave falls."
+  }
+}
+```
 
-## Gameplay constants and interface settings
+`background` is a World Editor campaign background index; `-1` selects a
+custom model. `model` is an in-map path, not a project filesystem path.
+Import the model and its textures through [assets](/moonwell/docs/assets/).
+Loading-screen models require map-info version 25 or later.
 
-Use `gameplay.heroMaxLevel` (1–10000) and `gameplay.foodLimit` (0–300) for
-typed overrides of `[Misc] HeroMaxLevel` and `FoodCeiling`. Raw mappings remain
-available for other constants. Conflicting typed and raw values are rejected.
-These limits validate the configuration; they do not make custom progression
-systems or every game version support every possible value.
+## Existing players and forces
 
+```pkl title="moonwell.pkl · player slots"
+settings {
+  players {
+    ["0"] {
+      name = "Village defender"
+      controller = "user"
+      race = "human"
+      fixedStart = true
+    }
+  }
+}
+```
 
-| Group | Internal file | Purpose |
-| --- | --- | --- |
-| `gameplayConstants` | `war3mapMisc.txt` | Gameplay constants |
-| `gameInterface` | `war3mapSkin.txt` | Game interface settings |
+IDs are zero-based: `"0"` is Player 1 in World Editor, up to `"23"`.
+Players must already exist in the source map. Set controllers to `user`,
+`computer`, `neutral`, or `rescuable`; races to `selectable`, `human`, `orc`,
+`undead`, or `nightelf`. Optional `x` and `y` override the start location.
 
-Both groups map section names to field/value mappings. Use the exact section and
-field names from the game's data or a source map saved with the corresponding
-World Editor setting. For example, the typed `heroMaxLevel` override above writes
-`HeroMaxLevel=25` in the `[Misc]` section of `war3mapMisc.txt`.
+Forces use zero-based indices too:
 
-Values are **strings in Warcraft's raw text format**, including numbers and
-comma-separated lists. The framework validates the structure, but does not check
-whether Warcraft recognizes a key or accepts its value.
+```pkl title="moonwell.pkl · an existing custom force"
+settings {
+  forces {
+    ["0"] {
+      name = "Defenders"
+      allied = true
+      alliedVictory = true
+      sharedVision = true
+    }
+  }
+}
+```
 
-- Section and field names must start with a letter or underscore, followed by
-  letters, digits, or underscores.
-- Values must be single-line strings without NUL characters. Use `""` for an
-  empty value; `null` is not supported in these mappings.
-- Duplicate section or field names differing only in case are rejected in the
-  configuration.
-- Existing sections and keys are matched without regard to case. Unspecified
-  entries and unrelated comments are retained; missing entries are added.
-- Missing files are created in staging when the corresponding group has entries.
+First enable **Use Custom Forces** under **Scenario > Force Properties**,
+configure teams, and save in World Editor. Moonwell cannot create or remove
+slots or forces, and does not change force membership. `sharedControl` and
+`sharedAdvancedControl` are available for an existing force.
 
-An empty value does not delete a key. To stop overriding a source-map entry, remove
-it from the Pkl mapping and rebuild.
+## Environment
 
-## Validate and apply
+```pkl title="moonwell.pkl · environment"
+settings {
+  environment {
+    soundEnvironment = "Default"
+    waterColor = List(20, 40, 80, 255)
+    fog {
+      enabled = true
+      style = 0
+      start = 1000
+      end = 5000
+      color = List(80, 100, 120, 255)
+    }
+  }
+}
+```
 
-Run commands from the framework repository root:
+Colors contain red, green, blue, alpha in that order, each from 0 to 255.
+A color replaces the whole inherited color. `waterColor` enables custom
+water tint. Fog's other properties do not enable fog by themselves: use
+`enabled`. Style is 0 (linear), 1 (exponential), or 2 (exponential squared);
+optional density is 0–1. After inheriting omitted values, start must not
+exceed end. An empty sound environment selects `Default`.
 
-| Command | Effect |
-| --- | --- |
-| `deno task settings:check` | Evaluate Pkl and validate planned changes without writing map files |
-| `deno task build` | Apply settings to the staged map and package the archive |
-| `deno task test` | Apply settings to the staged map and launch Warcraft III |
-| `deno task dev` | Validate edits to the existing `map-settings.pkl` and `map-settings-schema.pkl` files |
-| `deno task test:settings:pkl` | Run the schema integration test using the real Pkl CLI |
+## A picture in the map list
 
-Pkl must be available on `PATH` or through `PKL_EXECUTABLE`. Check, build, and test
-use the source map selected by `config.json` and optional `config.local.json`.
-See [Commands and configuration](/moonwell/docs/reference/).
+```pkl title="moonwell.pkl · preview"
+settings {
+  info { preview = "preview.png" }
+}
+```
 
-The watcher does not apply settings or rebuild the map. Run `build` or `test`
-after validation finishes. If you add a settings file while the watcher is
-running, restart it to watch that file.
+Place the picture beside `moonwell.pkl` or elsewhere in the project **outside
+`assets/`**. The path is relative to the project root. Supported inputs are:
 
-Overrides are written only to `dist/<mapFolder>/` and the archive produced by
-`build`. There is no source-map sync command for settings, so reopening the source
-map in World Editor still shows its original values.
+- **PNG**, any color type or bit depth, interlaced or not.
+- **TGA**, true color at 24 or 32 bits, with or without RLE compression.
+- **BLP**, Warcraft III BLP1, preserved as supplied.
 
-## Supported settings and formats
+The image must be **256×256 or 512×512**. PNG/TGA inputs become an opaque TGA
+in the layout Reforged reads; alpha is dropped and stored pixel colors remain.
+Other sizes, unreadable files and unsupported formats fail `check` and builds.
 
-Metadata overrides support map-info versions **18, 25, 28, 31, 32, 33, and 39**.
-Version 18 cannot set a custom loading-screen model. Unsupported versions fail
-when a metadata or loading-screen override is requested. Unrelated binary data,
-including newer fields, is preserved rather than reserialized.
+Reforged's map list ignores the old `war3mapPreview.tga` mechanism. Moonwell
+puts the picture in the minimap's place, preserves the source minimap as
+`war3mapMinimap.blp`, and adds a call at the end of editor `main()` to restore
+that normal minimap in the game. PNG/TGA inputs are written as `war3mapMap.tga`;
+BLP inputs replace `war3mapMap.blp`. The source map must have its original
+`war3mapMap.blp` and no conflicting `war3mapMinimap.blp` or `war3mapMap.tga`.
 
-Player, force and environment overrides require a Lua map with map-info version
-28 or later and recognizable editor-generated initialization. The writer patches
-specific calls while preserving unrelated triggers and unit placement code.
-Terrain geometry, slot creation/removal, force membership, weather, lighting,
-and HD water parameters remain editor-authored. This is an override layer for
-supported settings, not a replacement for the World Editor.
+Start-location markers are placed for a 256×256 picture, so on a 512×512 one
+they appear smaller and toward the top left. A gameplay `on_main` hook that
+calls `BlzChangeMinimapTerrainTex` runs after Moonwell's restoration and wins;
+a map-initialization editor trigger runs earlier and is overridden.
 
-Version 39 is regression-tested against a frozen World Editor 3.0.0.24268 map,
-including its extra loading-screen and player fields. Older metadata formats
-have synthetic compatibility tests. Binary, Lua, Pkl, and archive tests do not
-replace an in-game playtest; game acceptance has not been verified automatically.
-Unknown properties, invalid values, truncated records, and incompatible Lua
-report errors before the build replaces staging.
+This behavior was measured in the single-player map list on Reforged
+3.0.0.24268. Hosted-lobby verification remains deferred.
+
+## Raw constants and interface values
+
+For fields without typed settings, use string-valued section/key mappings:
+
+```pkl title="moonwell.pkl · a raw gameplay constant"
+settings {
+  gameplayConstants {
+    ["Misc"] { ["DefenseArmor"] = "0.05" }
+  }
+}
+```
+
+`gameplayConstants` targets `war3mapMisc.txt`; `gameInterface` uses the same
+shape for `war3mapSkin.txt`. Section and key names follow the schema's
+identifier rules, match case-insensitively, and cannot duplicate each other
+by case. Values are one-line strings; `""` writes an empty value. Unrelated
+keys and comments remain, and absent sections/files are created.
+
+Do not conflict with typed settings: `heroMaxLevel = 25` and raw
+`MaxHeroLevel = "25"` agree, but `"025"` fails even though it looks numerically
+equivalent. Use actual Warcraft section/key names; an arbitrary interface key
+can be written successfully without the game using it.
+
+## Check settings and map compatibility
+
+```powershell
+moonwell settings:check
+moonwell check
+```
+
+`settings:check` lists internal map files a build would change, without writing
+them. `check` and `dev` validate settings too. Map-info versions 18, 25, 28,
+31, 32, 33, and 39 are supported. Players, forces, and environment need version
+28 or later and Lua script mode; World Editor 3.00 saves version 39.
+
+The editor stores some settings in Lua as well as map-info data. Moonwell
+updates the corresponding map/player/team calls and sound, water, and fog
+initialization. Those functions must retain the structure World Editor writes;
+a hand-edited script may be refused with a diagnostic naming `war3map.lua`.
+Re-save the source in World Editor to restore it, then check again. Your
+gameplay modules are separate from those editor functions.
