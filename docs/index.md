@@ -9,13 +9,13 @@ hero:
     alt: A moonwell
 
 features:
-  - title: Moonwell
-    details: The modding framework for Warcraft III Reforged. Placeholder text.
+  - title: moonwell
+    details: Moonwell framework docs.
     link: /moonwell/
-  - title: Wrappers
-    details: A Lua library of wrappers over the game's natives. Placeholder text.
+  - title: moonwell-wrappers
+    details: Lua wrappers for Warcraft III natives.
     link: /wrappers/
-  - title: Systems
-    details: Gameplay systems built on the wrappers. Placeholder text.
+  - title: moonwell-systems
+    details: Full gameplay systems suite including damage engine, physics, save/load, and more.
     link: /systems/
 ---
