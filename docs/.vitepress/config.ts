@@ -17,6 +17,7 @@ export default defineConfig({
   title: 'wc3.dev',
   description: 'Documentation for Moonwell and its libraries, for making Warcraft III maps.',
   cleanUrls: true,
+  appearance: 'force-dark',
   head: [['link', { rel: 'icon', type: 'image/png', href: '/mw-moonwell.png' }]],
   themeConfig: {
     logo: { src: '/mw-text-edit.png', alt: 'Moonwell' },
