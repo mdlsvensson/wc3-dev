@@ -1,130 +1,133 @@
 ---
 title: Import assets
-description: Import models, textures, icons, and sounds from folders with optional Pkl path mappings.
+description: Import map and library assets, inspect model paths, and sync resources into World Editor.
 ---
 
-Keep resources under `assets/` in your **framework repository**. Builds and
-playtests import them automatically. You do not need to add each file through the
-World Editor Import Manager.
+Drop models, textures, icons, sounds, and other map resources under `assets/`.
+Moonwell imports them during builds. To make them available in the source map
+for World Editor, run an explicit synchronization.
 
 ## Folder paths become map paths
 
+`assets/Models/Knight.mdx` imports as `Models\Knight.mdx`. Keep the folder
+layout that the model and your object definitions expect. Names starting with
+`.` are skipped.
+
 ```text
 assets/
-  Models/
-    Knight.mdx
-  Textures/
-    Knight.blp
-  ReplaceableTextures/
-    CommandButtons/
-      BTNMySword.blp
-    CommandButtonsDisabled/
-      DISBTNMySword.blp
+  Models/Knight.mdx
+  Textures/Knight.blp
+  ReplaceableTextures/CommandButtons/BTNKnight.blp
+  ReplaceableTextures/CommandButtonsDisabled/DISBTNKnight.blp
 ```
 
-The `assets/` prefix is removed. For example, the icon is imported at
-`ReplaceableTextures\CommandButtons\BTNMySword.blp`. The disabled icon is imported
-at `ReplaceableTextures\CommandButtonsDisabled\DISBTNMySword.blp`.
-The framework registers these as custom paths in `war3map.imp`; it does not add a
-`war3mapImported\` prefix. Forward and backward slashes in configuration are accepted;
-map import paths use backslashes.
+The model's texture references must match the imported paths. Warcraft path
+matching ignores case; avoid two files whose map paths differ only in case.
+Files cannot replace the map's own internal files, such as `war3map.lua`,
+`war3mapMap.blp`, or `war3mapPreview.tga`. Use the
+[preview setting](/moonwell/docs/map-settings/#a-picture-in-the-map-list) for a map-list picture.
 
-Keep texture paths exactly as the model expects. Copying a texture to a different
-path does not rewrite references inside an MDX or MDL file. Assign the imported
-model or icon path to the appropriate object field in Pkl or World Editor.
-Importing a sound file does not create a Sound Editor variable.
+## Mappings and exclusions
 
-## Optional Pkl mappings
+Change the `assets` block in the project manifest:
 
-With `assets.pkl`, source files can be organized differently from their map paths:
-
-```text
-assets/icons/my-sword/BTNMySword.blp
-assets/icons/my-sword/DISBTNMySword.blp
-```
-
-```pkl
-amends "assets-schema.pkl"
-
-paths {
-  ["icons/my-sword/BTNMySword.blp"] =
-    "ReplaceableTextures\\CommandButtons\\BTNMySword.blp"
-  ["icons/my-sword/DISBTNMySword.blp"] =
-    "ReplaceableTextures\\CommandButtonsDisabled\\DISBTNMySword.blp"
-}
-
-exclude {
-  "credits/"
-  "source-art/"
-  "README.txt"
+```pkl title="moonwell.pkl · assets"
+assets {
+  paths {
+    ["icons/BTNSword.blp"] = #"ReplaceableTextures\CommandButtons\BTNSword.blp"#
+  }
+  exclude = List("credits/", "source-art.psd")
 }
 ```
 
-Mapping keys are relative to `assets/`; values are complete in-map paths.
-Unmapped files retain their relative paths. An excluded path ending in `/` excludes
-that directory and its contents; other exclusions match exact files. These are
-paths, not globs. Dotfiles and files in dot-directories are omitted automatically.
-Other files, including license texts, are included unless explicitly excluded.
-Respect resource authors' attribution requirements when distributing maps.
+Mapping keys and exclusions are relative to `assets/`. A folder exclusion
+ends in `/`. Mapping values are exact in-map paths; Pkl raw strings preserve
+the backslashes. These controls apply to your own assets, not a library's files.
 
-`assets-schema.pkl` validates the configuration's types. Deno validates actual files,
-path safety, and case-insensitive collisions. A mapping for a missing or excluded
-file is an error. If `assets.pkl` is absent, folder imports still work without Pkl
-evaluation for assets (the overall build still evaluates Pkl object definitions).
+## Icons
+
+`init` creates the standard icon folders. Follow Warcraft's names:
+
+| Folder under `assets/` | Filenames |
+| --- | --- |
+| `ReplaceableTextures/CommandButtons/` | `BTN<Name>.blp` |
+| `ReplaceableTextures/CommandButtonsDisabled/` | `DISBTN<Name>.blp`, `DISPASBTN<Name>.blp` |
+| `ReplaceableTextures/PassiveButtons/` | `PASBTN<Name>.blp` |
+
+Pair each `BTN` icon with a `DISBTN` and each `PASBTN` with a `DISPASBTN`.
+Missing disabled icons show a placeholder when the game greys out the button.
+Reference the enabled icon's imported path in object data.
+
+## Assets shipped by libraries
+
+A library can describe its module and asset folders in a root
+`moonwell-library.json`:
+
+```json title="Library metadata"
+{ "dir": "src", "assets": "assets" }
+```
+
+Every file in that asset folder imports at its relative path. A project asset
+at the same map path wins over a library asset, with a replacement message;
+this lets you replace a library's model or icon. Two libraries importing the
+same path fail. Library authors should put files under a distinctive path,
+such as `war3mapImported/<library>/`.
+
+Library assets participate in checks, builds, synchronization, and model-path
+inspection. See [Libraries](/moonwell/docs/library/) for configuration and locking.
 
 ## Check, build, and sync
 
-| Command | Effect |
-| --- | --- |
-| `deno task assets:check` | Print source-to-map paths and validate changes without writing map files or sync state |
-| `deno task build` | Include resources and the merged import index in the staged map and packed archive |
-| `deno task test` | Include resources in the staged map before launching Warcraft III |
-| `deno task assets:sync` | Update imported files and the import index in `maps/<mapFolder>/` |
+```powershell
+moonwell assets:check
+moonwell build
+```
 
-Build and test never sync assets into the source map. To see resources while editing:
+`assets:check` shows the proposed source-map changes without applying them.
+The build imports files into `dist/stage/<map.folder>/` and packages them;
+it does not modify `maps/<map.folder>/` or asset ownership state.
 
-1. Save and **close the map in World Editor**.
-2. Add or edit files in `assets/`, and update mappings if necessary.
-3. Run `deno task assets:check`, then `deno task assets:sync`.
-4. Reopen the source map in World Editor and assign or preview the imported resources.
+To use the resources in World Editor, **close the map in World Editor first**:
 
-Run sync, build, and editor saves serially. The tool does not detect an open editor
-or provide live reload. `deno task dev` continues to watch object definitions and
-editor Lua; it does not synchronize resources automatically.
+```powershell
+moonwell assets:sync
+```
+
+This writes imports and `war3map.imp` into the source map and records ownership
+in `.asset-state/`. Reopen the map afterwards. Commit the synchronized source
+files and ownership record together. `check`, `build`, `test`, and `setup`
+also synchronize configured libraries into the project cache as needed.
 
 ## Ownership and deletion
 
-Sync writes `.asset-state/<mapFolder>.json` outside the map. This generated file
-records managed paths and SHA-256 hashes. **Commit it with the updated source map**
-so collaborators have the same ownership information. Do not edit it by hand.
+Sync owns only the source-map files recorded in its state. It never overwrites
+or deletes an unowned file, and it refuses to change an owned file whose
+contents you edited directly in the source map. Fix the conflict at its source
+instead of deleting the ownership record to bypass it.
 
-Existing editor imports retain their paths and flags. An asset that collides with
-an unmanaged map file or import entry is rejected, even if its bytes are identical.
-To migrate an existing editor import, first back up the source map, place the
-resource in `assets/`, and remove the old editor-owned import and its map file
-before syncing. There is no implicit adoption or overwrite option.
+Removing an asset or excluding it causes the next sync to remove its managed
+copy and import entry. Unrelated editor imports remain. Sync applies changes
+with rollback if writing fails; keeping the editor closed avoids competing
+writes to map files.
 
-Deleting or remapping a managed asset removes its old copied file and import entry
-on the next sync. Builds also remove stale synced imports from their fresh staged
-copy. Unmanaged files are never deleted. Empty directories may remain.
+## Inspect a model's references
 
-If a managed file was edited directly in the map, both check and sync report a
-conflict. Preserve those edits in `assets/`, then restore the managed map copy to
-its previously synced contents (for example, from version control) before retrying.
-Deleting state does not resolve ownership conflicts safely.
+```powershell
+moonwell assets:paths assets/Models/Knight.mdx
+moonwell assets:paths
+```
 
-All paths and managed-file hashes are checked before any writes. Ordinary write
-failures trigger file-content rollback, including the import index and state.
-This is not a crash-proof transaction: keep source maps in version control and do
-not run concurrent processes that modify the same map.
+The first command lists that model's referenced textures, particle models,
+and attachments. With no argument it checks every model under the project's
+assets and the libraries' asset folders. Paths are shown as in Import Manager:
 
-## Limits
+| Classification | Meaning |
+| --- | --- |
+| `in-game path` | Warcraft ships the file |
+| `in-game path, replaced` | Your imports replace a game file |
+| `custom path, imported` | The needed custom file is present in the import plan |
+| `custom path, not imported` | The model references a custom file the map will be missing |
 
-- Only unpacked Lua source maps are supported by this workflow.
-- Symlinks, traversal paths, Windows device names, case collisions, and reserved
-  internal map paths such as `war3map.lua` are rejected.
-- The importer copies bytes; it does not convert images/audio, rewrite models,
-  resolve texture dependencies, or validate that Warcraft supports a file format.
-- Removing a file does not remove object-field references to its old path.
-- Binary and CLI tests verify import metadata and archive contents. Verify your
-  actual resources in your World Editor/game version before distributing a map.
+You can also run the command on a model outside a Moonwell project to inspect
+which paths it needs. Moonwell does not download missing textures or rewrite
+the model's references. Import the right files at the right paths, then rebuild.

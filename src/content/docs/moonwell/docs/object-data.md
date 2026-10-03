@@ -1,204 +1,148 @@
 ---
-title: "Pkl object authoring"
-description: "Pkl object authoring for the Warcraft III TypeScript framework."
+title: Pkl object data
+description: Define Warcraft III objects with Moonwell's Pkl schemas and generated gameplay IDs.
 ---
 
-Pkl describes custom Warcraft III objects as typed, version-controlled text.
-It runs during development and building; no Pkl runtime is included in the map.
+Author custom objects under `objects/`. Moonwell validates them against its
+game metadata and the source map, then writes the built map's object tables.
+The source map and its World Editor object definitions remain unchanged.
 
-## Modules and data flow
+## Files and categories
 
-`objects/objects.pkl` amends `objects/schema.pkl` and merges the category mappings
-from `objects/definitions/*.pkl`. The root schema exposes the authoring classes
-and registries. `objects/schema/types.pkl` constrains rawcodes and selected enums;
-`objects/schema/generated/` supplies properties derived from the pinned object-data
-library. `objects/bases.pkl` supplies built-in unit, item, and ability constants.
+Each object file amends `@moonwell/ObjectFile.pkl`. It can contain any of
+`heroes`, `units`, `buildings`, `items`, `abilities`, `buffs`, and `upgrades`:
 
-```text
-definitions/*.pkl + schema + bases
-              |
-         Pkl evaluation
-              |
-   src/generated/objects.json
-              |
-  validation and object injection
-              |
-   dist/<mapFolder>/war3map*.w3*
-```
+```pkl title="objects/units.pkl"
+amends "@moonwell/ObjectFile.pkl"
 
-Edit definitions and, when necessary, handwritten schema modules. Generated files
-are outputs. Run `deno task objects:eval` to evaluate without compiling gameplay.
-A full build always evaluates the manifest again.
-
-## Categories and IDs
-
-| Registry / file | Class | Custom ID rule | Base |
-| --- | --- | --- | --- |
-| `heroes` / `heroes.pkl` | `schema.Hero` | Uppercase initial, e.g. `H001` | `bases.Units.Paladin` |
-| `units` / `units.pkl` | `schema.RegularUnit` | Lowercase initial, e.g. `u001` | `bases.Units.Footman` |
-| `buildings` / `buildings.pkl` | `schema.Building` | Lowercase initial, e.g. `b001` | `bases.Units.Barracks` |
-| `items` / `items.pkl` | `schema.Item` | Initial `I`, e.g. `I001` | `bases.Items.ClawsOfAttackPlus15` |
-| `abilities` / `abilities.pkl` | `schema.Ability` | Initial `A`, e.g. `A001` | Built-in ability constant or rawcode |
-| `buffs` / `buffs.pkl` | `schema.Buff` | Initial `B`, e.g. `B001` | Rawcode such as `BHbz` |
-| `upgrades` / `upgrades.pkl` | `schema.Upgrade` | Initial `R`, e.g. `R001` | Rawcode such as `Rhme` |
-
-IDs contain exactly four alphanumeric characters and are case sensitive. Explicit
-`id` values are required in typed Pkl definitions. Mapping keys can be descriptive
-names such as `vanguard`; they do not determine the engine ID. The JSON loader can
-fall back to the key when `id` is omitted, but that is not the typed Pkl workflow.
-
-Pkl rejects standard unit/item/ability IDs using generated sets. The build also
-rejects duplicate IDs across the manifest and IDs already present in the target
-game/map table. Heroes, regular units, and buildings all share that unit table.
-
-Unit, item, and ability bases must be among the generated built-in IDs. Buff and
-upgrade bases are rawcode strings validated against their tables at build time.
-You cannot use another newly declared Pkl object as `base`: all bases are resolved
-before custom objects are created. Reuse Pkl definitions through classes or object
-amendment instead.
-
-## A complete manifest example
-
-The normal project splits categories across files. This equivalent standalone
-example can be saved as `objects/example.pkl` and evaluated with
-`pkl eval -f json objects/example.pkl`. It does not become part of the build unless
-you integrate its definitions into `objects/objects.pkl` or the existing files.
-
-```pkl
-amends "schema.pkl"
-
-import "schema.pkl" as schema
-import "bases.pkl" as bases
-
-heroes {
-  ["captain"] = new schema.Hero {
-    id = "H001"
-    base = bases.Units.Paladin
-    name = "Captain"
-    primaryAttribute = "STR"
-  }
-}
 units {
-  ["guard"] = new schema.RegularUnit {
-    id = "u001"
-    base = bases.Units.Footman
-    name = "Guard"
-    goldCost = 100
-    normal = List("Adef")
+  ["vanguard"] {
+    id = "h001"
+    base = "hfoo"
+    name = "Vanguard"
+    hitPointsMaximumBase = 350
   }
 }
-buildings {
-  ["barracks"] = new schema.Building {
-    id = "b001"
-    base = bases.Units.Barracks
-    name = "Garrison"
-  }
-}
-items {
-  ["claws"] = new schema.Item {
-    id = "I001"
-    base = bases.Items.ClawsOfAttackPlus15
-    name = "Veteran's Claws"
-    goldCost = 200
-  }
-}
+```
+
+The project merges files recursively:
+
+```pkl title="moonwell.pkl · object definitions"
+amends "@moonwell/Project.pkl"
+
+import "@moonwell/Objects.pkl"
+objects = Objects.merge(import*("objects/**.pkl"))
+```
+
+Organize by category, hero, or subsystem. Every `.pkl` under `objects/` is an
+object file; put shared helper modules outside that folder and import them.
+`Objects.merge` records each object's source file for diagnostics.
+
+## Keys, rawcodes and bases
+
+| Field | Rule |
+| --- | --- |
+| Category key, such as `vanguard` | Letters, digits and `_`, starting with a letter or `_`; no Lua/YueScript keyword. Unique within its category across all files |
+| `id` | Four ASCII letters or digits; unique across all authored categories, absent from standard IDs and conflicting source-map custom objects |
+| Hero `id` | Starts with an uppercase letter |
+| Unit/building `id` | Must not start with an uppercase letter |
+| `base` | A standard object of the correct category, such as `hfoo`; custom objects cannot be bases |
+
+Modified standard objects and existing custom objects in the source map are
+preserved. A Pkl ID colliding with an editor-created custom object fails;
+choose another ID or remove that editor object. Heroes, units, and buildings
+share the unit table, even though they have separate authoring categories.
+
+Pkl amendment can share authoring values, but `base` still names a standard
+Warcraft object. Moonwell does not implement copying a custom object as a base.
+
+## Fields and values
+
+Typed property names come from World Editor labels: **Hit Points Maximum
+(Base)** becomes `hitPointsMaximumBase`. A Pkl-aware editor shows each field's
+label and rawcode on hover. The package's generated `*Props.pkl` modules list
+the supported fields.
+
+- An omitted or `null` field inherits the base value.
+- `false`, `0`, and `""` are explicit values. For a list-valued field,
+  `List()` explicitly empties it.
+- Text you set is stored literally. Moonwell does not generate `TRIGSTR_*`
+  entries or change `war3map.wts`.
+- A scalar on a per-level field sets level 1. A `List` supplies consecutive
+  levels; remaining levels retain their base values.
+- A level list cannot exceed the object's `levels`, or the base's level count
+  when you inherit it. An empty level list sets no levels and is rejected.
+- List-valued fields take a comma-separated string or `List<String>`, such as
+  `normal = List("Adef", "Aslo")`. Per-level list-valued fields take nested
+  lists, one inner list per level.
+
+## Ability-specific properties
+
+Abilities, buffs, and upgrades have typed properties for common fields.
+Fields specific to an ability's base go in `properties`, keyed by friendly
+name or rawcode:
+
+```pkl title="objects/abilities.pkl"
+amends "@moonwell/ObjectFile.pkl"
+
 abilities {
-  ["heal"] = new schema.Ability {
-    id = "A001"
+  ["holy_light"] {
+    id = "A000"
     base = "AHhb"
-    name = "Field Medicine"
-    manaCost = 25
-    cooldown = 8.0
-  }
-}
-buffs {
-  ["blizzard"] = new schema.Buff {
-    id = "B001"
-    base = "BHbz"
-    name = "Custom Blizzard"
-  }
-}
-upgrades {
-  ["weapons"] = new schema.Upgrade {
-    id = "R001"
-    base = "Rhme"
-    name = "Veteran Weapons"
-    goldBase = 100
+    levels = 4
+    properties {
+      ["amountHealedOrDamaged"] = List(111, 222, 333, 444)
+    }
   }
 }
 ```
 
-Creating these definitions makes the objects available; it does not automatically
-add an ability to a unit, an item to a shop, or an upgrade to a building. Configure
-the relevant object fields or gameplay logic separately.
+`Hhb1` is the rawcode alternative for that property. Do not set it under both
+names, or duplicate a typed field in `properties`. A field that does not apply
+to the selected base fails validation.
 
-## Properties and inheritance
+## Generated gameplay IDs
 
-An omitted or `null` field inherits the base value. Explicit `0`, `false`, `""`,
-and `List()` are overrides, so an empty ability list clears inherited abilities.
-`schema.Building` sets `isABuilding = true`; other unspecified fields still inherit.
+`build`, `test`, and `dev` refresh `src/generated/objects.yue` before compiling
+gameplay. Commit it with your object definitions:
 
-Use the generated property files as the exhaustive property reference. Each field
-has a Pkl type and comments identifying the engine field. For example, unit
-`hitPointsMaximumBase` is an integer, `speedBase` is an integer, and `normal` is a
-list of ability rawcodes. Standard Pkl type checking catches misspelled top-level
-fields and incompatible values during evaluation.
+```text title="src/main.yue · YueScript"
+import "moonwell" as mw
+import "generated.objects" as objects
 
-The optional `properties` mapping accepts friendly or library property names and
-overrides top-level values. For example, inside a unit definition:
-
-```pkl
-goldCost = 100
-properties = new {
-  ["goldCost"] = 0
-  ["abilities"] = List("Adef")
-}
+mw.on_main ->
+  CreateUnit Player(0), objects.units.vanguard, 0, 0, 270
 ```
 
-This makes the unit free and sets its normal abilities. `null` inside `properties`
-does not erase a supplied top-level override. This mapping bypasses Pkl's individual
-field types, so prefer typed top-level properties whenever possible.
+`objects.units.vanguard` is an integer, already converted from the rawcode.
+It is not a record with `.id`, and needs no `FourCC`. For a standard object
+literal, use `$FourCC` from `moonwell.macros` instead.
 
-Aliases include `abilities` → unit `normal`, `heroAbilities` → unit `hero`,
-`movementType` → library `type`, `upgradeClass` → library `class`, and friendly
-tinting-color names. Buff `name` maps to `nameEditorOnly`. Some library names have
-an `undefined` suffix; friendly names remove it. Aliases are category dependent.
+## Validation and inspection
 
-The mapping is not a raw four-character field-ID API: use `goldCost`, for example,
-not a metadata field rawcode. Unknown properties and `oldId`/`newId` overrides are
-rejected. List properties become comma-separated engine strings.
-
-## Limits to design around
-
-- Numeric ability/upgrade fields are scalars in the pinned object-data library.
-  Per-level arrays such as `cooldown = List(8, 6, 4)` are unsupported and rejected.
-- Pkl supports these seven registries. Doodads and destructibles are not authoring
-  registries, although existing map tables are loaded and saved.
-- Names and other strings are literal values; there is no automatic localization
-  table generator.
-- Validation does not prove that a model path exists or that all cross-object
-  references and gameplay effects work. Playtest them.
-- Generated metadata reflects the pinned dependency, not a scan of your installed
-  Warcraft III data. Not every newer editor property is necessarily represented.
-
-## Split larger projects into modules
-
-Create a module exporting a typed mapping, import it into the relevant definitions
-file, and merge it with Pkl's spread syntax, as the root manifest already does:
-
-```pkl
-import "factions/human.pkl" as human
-
-units: Mapping<String, schema.RegularUnit> = new {
-  ...human.units
-}
+```powershell
+moonwell objects:check
+moonwell objects:eval
 ```
 
-Retain the existing `schema` import in that definitions file. Files are not discovered
-automatically: every new module needs an import path leading from `objects/objects.pkl`.
-Keep mapping keys unique when merging, as well as rawcodes unique across objects.
+`objects:check` lists the internal tables a build would change and reports
+whether the generated IDs are current. Stale or missing IDs fail it; use
+`build`, `test`, or `dev` to refresh them. `objects:eval` prints validated,
+resolved objects as JSON to stdout; it does not rewrite `objects.yue`.
 
-Run `deno task bases:gen` after intentionally updating object metadata dependencies;
-it regenerates constants and property schemas. `deno task schema:gen` regenerates
-only property schemas. Review generated diffs and rebuild afterward.
+Pkl reports schema errors with file and line. Moonwell reports metadata and
+map conflicts with the file, object, and field, gathering problems rather
+than stopping after the first invalid object. A misspelled base can include
+suggestions for valid IDs.
 
+Builds plan object changes before compiling and apply them to staged standard
+and skin tables. Removing a Pkl object removes it from the next build because
+each build starts from the source map.
+
+## Limits
+
+Moonwell does not import `.w3o` exports, place units, create per-unit skins,
+or read packed maps as its source. Object field validation does not replace
+in-game testing: many fields accept basic numbers or strings without encoding
+every game-specific range or named value. The [first-map guide](/moonwell/docs/map-making/)
+shows the complete authoring and playtest loop.
