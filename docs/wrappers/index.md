@@ -1,5 +1,5 @@
-# Moonwell Wrappers
+# moonwell-wrappers
 
-Moonwell Wrappers is a Lua library of wrappers over the game's natives.
+moonwell-wrappers is a Lua library of wrappers over the game's natives.
 
 This page is a placeholder. The next page is [Getting started](./getting-started).
