@@ -17,6 +17,8 @@ export default defineConfig({
   title: 'wc3.dev',
   description: 'Moonwell docs, a multilingual modding framework for Warcraft III: Reforged.',
   cleanUrls: true,
+  // Files in public/ are copied as they are; without this the fonts' README.md would also become a page.
+  srcExclude: ['public/**'],
   appearance: 'force-dark',
   head: [['link', { rel: 'icon', type: 'image/png', href: '/mw-moonwell.png' }]],
   themeConfig: {
