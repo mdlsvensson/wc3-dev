@@ -4,8 +4,10 @@
   "type": "module",
   "scripts": {
     "dev": "vitepress dev docs",
-    "build": "vitepress build docs",
+    "dev:home": "vitepress dev home --port 5174",
+    "build": "vitepress build docs && vitepress build home",
     "build:docs": "vitepress build docs",
+    "build:home": "vitepress build home",
     "preview": "vitepress preview docs"
   },
   "devDependencies": {
