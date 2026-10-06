@@ -1,8 +1,9 @@
+// The home page, wc3.dev. The documentation, docs.wc3.dev, is wrangler.docs.jsonc.
 {
   "name": "wc3-dev",
   "compatibility_date": "2026-10-06",
   "assets": {
-    "directory": "./docs/.vitepress/dist",
+    "directory": "./home/.vitepress/dist",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"
   }
