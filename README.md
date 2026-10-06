@@ -4,11 +4,12 @@ The source of [wc3.dev](https://wc3.dev): the documentation of
 [Moonwell](https://github.com/mdlsvensson/moonwell),
 [Moonwell Wrappers](https://github.com/mdlsvensson/moonwell-wrappers) and
 [Moonwell Systems](https://github.com/mdlsvensson/moonwell-systems). It is built with
-[VitePress](https://vitepress.dev) and deployed on GitHub Pages.
+[VitePress](https://vitepress.dev) and deployed on Cloudflare Workers as static files (`wrangler.jsonc`): Cloudflare
+builds and deploys every push to `main`.
 
 ## Commands
 
-The deployment builds with Node 24.
+Needs Node 20.19 or newer.
 
 ```sh
 npm ci            # install the pinned dependencies
