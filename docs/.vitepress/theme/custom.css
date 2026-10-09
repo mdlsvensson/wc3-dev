@@ -1,8 +1,58 @@
+/* Body text. */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/IBMPlexSans-Regular.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/IBMPlexSans-Italic.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/IBMPlexSans-SemiBold.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* Headings and navigation: Jersey, a pixel font in four cuts. See "Type" below. */
+@font-face {
+  font-family: 'Jersey 10';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Jersey10-Regular.woff2') format('woff2');
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'Jersey 15';
   font-style: normal;
   font-weight: 400;
   src: url('/fonts/Jersey15-Regular.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jersey 20';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Jersey20-Regular.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jersey 25';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Jersey25-Regular.woff2') format('woff2');
   font-display: swap;
 }
 
@@ -39,9 +89,69 @@
   font-display: swap;
 }
 
+/* Type. Text that is read (paragraphs, lists, the sidebar's links) is IBM Plex Sans. Headings, the top bar's links
+   and the landing page's lines are Jersey.
+
+   A Jersey cut is named for the height of its capital letters in pixels: 10, 15, 20, 25. Each cut is used at one
+   size only, the size at which one of its pixels is one CSS pixel, so every heading is drawn from whole pixels and
+   all of them share one pixel size. That size is the cut's number divided by the height of its capitals as a share
+   of the font size (35/64, 9/16, 19/32 and 39/64 of it). Jersey has one weight, and the browser is told not to fake
+   a bold or an italic of it.
+
+   Pixel Code is drawn on a grid of 9 pixels to the font size, so code is 13.5px: one and a half screen pixels to
+   each of its pixels, and three on a screen of double density. */
 :root {
-  --vp-font-family-base: 'Jersey 15', system-ui, sans-serif;
+  --vp-font-family-base: 'IBM Plex Sans', system-ui, sans-serif;
   --vp-font-family-mono: 'Pixel Code', ui-monospace, monospace;
+  --vp-code-font-size: 13.5px;
+  --vp-code-line-height: 1.6;
+
+  --jersey-10: 400 calc(128px / 7) / 24px 'Jersey 10', var(--vp-font-family-base);
+  --jersey-15: 400 calc(80px / 3) / 32px 'Jersey 15', var(--vp-font-family-base);
+  --jersey-20: 400 calc(640px / 19) / 40px 'Jersey 20', var(--vp-font-family-base);
+  --jersey-25: 400 calc(1600px / 39) / 48px 'Jersey 25', var(--vp-font-family-base);
+}
+
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4,
+.vp-doc h5,
+.vp-doc h6,
+.VPNavBarMenuLink,
+.VPNavScreenMenuLink,
+.VPSidebarItem.level-0 > .item > .text,
+.VPHero .tagline,
+.VPFeature .title,
+.NotFound .code,
+.NotFound .title {
+  font-synthesis: none;
+  letter-spacing: 0;
+}
+
+.vp-doc h1,
+.NotFound .code {
+  font: var(--jersey-25);
+}
+
+.vp-doc h2 {
+  font: var(--jersey-20);
+}
+
+.vp-doc h3,
+.VPHero .main .tagline,
+.NotFound .title {
+  font: var(--jersey-15);
+}
+
+.vp-doc h4,
+.vp-doc h5,
+.vp-doc h6,
+.VPNavBar .VPNavBarMenuLink,
+.VPNavScreen .VPNavScreenMenuLink,
+.VPSidebar .VPSidebarItem.level-0 > .item > .text,
+.VPFeatures .VPFeature .title {
+  font: var(--jersey-10);
 }
 
 /* The site is dark only (`appearance: 'force-dark'` in the config), so only the dark colours are set. They come
