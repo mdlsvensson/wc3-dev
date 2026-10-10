@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "dev": "deno run -A --frozen npm:vite@7.3.7 --config vite.config.ts",
+    "build": "deno run -A --frozen npm:vite@7.3.7 build --config vite.config.ts"
+  }
+}

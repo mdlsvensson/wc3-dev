@@ -3,3 +3,8 @@ docs/.vitepress/dist/
 docs/.vitepress/cache/
 home/.vitepress/dist/
 home/.vitepress/cache/
+home/_fresh/
+docs/_fresh/
+home/.wrangler/
+docs/.wrangler/
+.wrangler/
