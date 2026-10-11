@@ -51,6 +51,27 @@ Deno.test("invalid content preserves the generated page/search pair and recovery
     for (const path of outputs) {
       assertStringIncludes(await Deno.readTextFile(path), "Task Six Recovery");
     }
+    const recovered = await Promise.all(
+      outputs.map((path) => Deno.readFile(path)),
+    );
+    const section = new URL("docs/content/moonwell/", root);
+    const moved = new URL("removed-section/", root);
+    await Deno.rename(section, moved);
+    await assertRejects(
+      () => prepareDocumentation(root),
+      Error,
+      "missing navigation source",
+    );
+    assertEquals(
+      await Promise.all(outputs.map((path) => Deno.readFile(path))),
+      recovered,
+    );
+    await Deno.rename(moved, section);
+    await prepareDocumentation(root);
+    assertEquals(
+      await Promise.all(outputs.map((path) => Deno.readFile(path))),
+      recovered,
+    );
   } finally {
     await Deno.remove(root, { recursive: true });
   }

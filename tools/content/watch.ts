@@ -139,9 +139,10 @@ export function documentationPreparation(
           for await (const event of watcher!) {
             if (
               retiring ||
-              !["create", "modify", "remove"].includes(event.kind) ||
-              !event.paths.some((path) => path.endsWith(".md"))
+              !["create", "modify", "remove"].includes(event.kind)
             ) continue;
+            // Recursive directory moves/removals can report only the directory path
+            // on Windows. Revalidate all relevant events in this dedicated tree.
             pending = prepare().then(() => {
               if (closed || retiring) return;
               for (const environment of Object.values(server.environments)) {
