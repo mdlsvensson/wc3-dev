@@ -19,6 +19,7 @@ export default defineConfig({
   cleanUrls: true,
   // Files in public/ are copied as they are; without this the fonts' README.md would also become a page.
   srcExclude: ['public/**'],
+  vite: { publicDir: '../shared/static' },
   appearance: 'force-dark',
   head: [['link', { rel: 'icon', type: 'image/png', href: '/mw-moonwell.png' }]],
   themeConfig: {

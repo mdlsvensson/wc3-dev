@@ -17,7 +17,7 @@ export default defineConfig({
   appearance: 'force-dark',
   head: [['link', { rel: 'icon', type: 'image/png', href: '/mw-moonwell.png' }]],
   // The images and fonts are the docs': one copy for both sites.
-  vite: { publicDir: '../docs/public' },
+  vite: { publicDir: '../shared/static' },
   themeConfig: {
     logo: { src: '/mw-text-edit.png', alt: 'Moonwell' },
     siteTitle: false,
