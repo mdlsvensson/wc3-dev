@@ -1,1 +1,2 @@
 shared/static/** -text
+docs/content/** -text

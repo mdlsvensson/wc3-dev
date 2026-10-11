@@ -1,14 +1,18 @@
 {
   "workspace": ["./home", "./docs", "./shared"],
   "nodeModulesDir": "auto",
+  "fmt": {
+    "exclude": ["**/*.md"]
+  },
   "tasks": {
     "dev": "deno task --cwd docs dev --port 5173",
     "dev:home": "deno task --cwd home dev --port 5174",
+    "content": "deno run --frozen --allow-env=VSCODE_TEXTMATE_DEBUG --allow-read --allow-write=docs/generated tools/content/prepare.ts",
     "test": "deno test --frozen --allow-env --allow-read --allow-run=git tests/",
     "build:docs": "deno task --cwd docs build",
     "build:home": "deno task --cwd home build",
     "build": "deno task build:docs && deno task build:home",
-    "check": "deno check --frozen home/main.ts docs/main.ts home/vite.config.ts docs/vite.config.ts tests/ && deno lint home/app.tsx home/main.ts home/client.ts home/server.js home/vite.config.ts home/routes/ home/islands/ docs/app.tsx docs/main.ts docs/client.ts docs/server.js docs/vite.config.ts docs/routes/ docs/islands/ shared/components/ shared/content/ shared/types.ts tests/ && deno fmt --check deno.json home/deno.json docs/deno.json shared/deno.json home/app.tsx home/main.ts home/client.ts home/server.js home/vite.config.ts home/routes/ home/islands/ docs/app.tsx docs/main.ts docs/client.ts docs/server.js docs/vite.config.ts docs/routes/ docs/islands/ shared/components/ shared/content/ shared/styles/ shared/types.ts tests/ wrangler.jsonc wrangler.docs.jsonc",
+    "check": "deno task content && deno check --frozen home/main.ts docs/main.ts home/vite.config.ts docs/vite.config.ts docs/navigation.ts tools/content/ tests/ && deno lint home/app.tsx home/main.ts home/client.ts home/server.js home/vite.config.ts home/routes/ home/islands/ docs/app.tsx docs/main.ts docs/client.ts docs/server.js docs/vite.config.ts docs/routes/ docs/islands/ docs/navigation.ts tools/content/ shared/components/ shared/content/ shared/types.ts tests/ && deno fmt --check --ignore=tests/fixtures/ deno.json home/deno.json docs/deno.json shared/deno.json home/app.tsx home/main.ts home/client.ts home/server.js home/vite.config.ts home/routes/ home/islands/ docs/app.tsx docs/main.ts docs/client.ts docs/server.js docs/vite.config.ts docs/routes/ docs/islands/ docs/navigation.ts tools/content/ shared/components/ shared/content/ shared/styles/ shared/types.ts tests/ wrangler.jsonc wrangler.docs.jsonc",
     "preview:docs": "deno task wrangler dev --config docs/_fresh/server/wrangler.json --port 5173 --inspector-port 0 --persist-to docs/.wrangler/state --local",
     "preview:home": "deno task wrangler dev --config home/_fresh/server/wrangler.json --port 5174 --inspector-port 0 --persist-to home/.wrangler/state --local",
     "dry-run:docs": "deno task wrangler deploy --dry-run --config docs/_fresh/server/wrangler.json --outdir docs/.wrangler/dry-run",
@@ -37,6 +41,10 @@
     "@types/markdown-it": "npm:@types/markdown-it@14.2.0",
     "@types/babel__core": "npm:@types/babel__core@7.20.5",
     "shiki": "npm:shiki@4.5.0",
+    "shiki/core": "npm:shiki@4.5.0/core",
+    "shiki/engine/javascript": "npm:shiki@4.5.0/engine/javascript",
+    "shiki/langs/lua.mjs": "npm:shiki@4.5.0/langs/lua.mjs",
+    "shiki/themes/github-dark.mjs": "npm:shiki@4.5.0/themes/github-dark.mjs",
     "minisearch": "npm:minisearch@7.2.0",
     "@std/assert": "jsr:@std/assert@1.0.19"
   }

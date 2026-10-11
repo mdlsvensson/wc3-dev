@@ -5,6 +5,7 @@ home/.vitepress/dist/
 home/.vitepress/cache/
 home/_fresh/
 docs/_fresh/
+docs/generated/
 home/.wrangler/
 docs/.wrangler/
 .wrangler/
