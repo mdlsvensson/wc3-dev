@@ -9,3 +9,4 @@ docs/generated/
 home/.wrangler/
 docs/.wrangler/
 .wrangler/
+.build-tools/

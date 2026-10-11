@@ -1,2 +1,3 @@
 shared/static/** -text
 docs/content/** -text
+tools/cloudflare-build.sh text eol=lf

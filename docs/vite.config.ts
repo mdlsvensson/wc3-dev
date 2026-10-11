@@ -2,6 +2,11 @@ import { fresh } from "@fresh/plugin-vite";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { defineConfig } from "vite";
+import { documentationPreparation } from "../tools/content/watch.ts";
+import { navigation } from "./navigation.ts";
+
+// Keep navigation in Vite's config dependency graph so an edit restarts preparation.
+void navigation;
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const configPath = fileURLToPath(
@@ -15,6 +20,7 @@ export default defineConfig(({ command }) => ({
     alias: [{ find: "./_fresh/server.js", replacement: "fresh:server_entry" }],
   },
   plugins: [
+    documentationPreparation(),
     {
       name: "documentation-search-asset",
       enforce: "pre",
