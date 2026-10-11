@@ -1,5 +1,5 @@
 import type { VNode } from "preact";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useLayoutEffect, useRef, useState } from "preact/hooks";
 import type { NavItem } from "../types.ts";
 import { GitHubLink } from "./Header.tsx";
 
@@ -10,7 +10,7 @@ export function MobileNav({ items }: { items: readonly NavItem[] }): VNode {
     setOpen(false);
     trigger.current?.focus();
   };
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
