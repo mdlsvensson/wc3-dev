@@ -19,25 +19,29 @@ export function GitHubLink(): VNode {
 }
 
 export function Header(
-  { items, children }: {
+  { items, children, leading }: {
     items: readonly NavItem[];
     children?: ComponentChildren;
+    leading?: ComponentChildren;
   },
 ): VNode {
+  const brand = (
+    <a class="brand" href="/" aria-label="Moonwell home">
+      <img
+        class="wordmark"
+        src="/mw-text-edit.png"
+        alt="Moonwell"
+        width="128"
+        height="48"
+      />
+    </a>
+  );
   return (
     <>
       <a class="skip-link" href="#main-content">Skip to content</a>
       <header class="site-header">
         <div class="header-inner">
-          <a class="brand" href="/" aria-label="Moonwell home">
-            <img
-              class="wordmark"
-              src="/mw-text-edit.png"
-              alt="Moonwell"
-              width="128"
-              height="48"
-            />
-          </a>
+          {leading ? <div class="header-start">{brand}{leading}</div> : brand}
           <div class="header-controls">
             <nav class="desktop-nav" aria-label="Main navigation">
               {items.map((item) => (

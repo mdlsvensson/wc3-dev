@@ -1,5 +1,6 @@
 import { navigation } from "../../docs/navigation.ts";
 import { compileDocumentation, compileLandingPage } from "./compile.ts";
+import { buildSearchPayload } from "../../docs/search/index.ts";
 
 const repo = new URL("../../", import.meta.url);
 
@@ -34,6 +35,7 @@ export async function prepareDocumentation(): Promise<void> {
   );
   const pages = await compileDocumentation(sources, navigation, assets);
   const landingPage = compileLandingPage(pages, assets);
+  const search = JSON.stringify(buildSearchPayload([landingPage, ...pages]));
   const module =
     'import type { CompiledPage } from "../../shared/types.ts";\n\n' +
     `export const pages: readonly CompiledPage[] = ${
@@ -48,6 +50,9 @@ export async function prepareDocumentation(): Promise<void> {
   const temporary = new URL("pages.ts.tmp", generated);
   await Deno.writeTextFile(temporary, module);
   await Deno.rename(temporary, new URL("pages.ts", generated));
+  const searchTemporary = new URL("search.json.tmp", generated);
+  await Deno.writeTextFile(searchTemporary, search);
+  await Deno.rename(searchTemporary, new URL("search.json", generated));
 }
 
 if (import.meta.main) await prepareDocumentation();

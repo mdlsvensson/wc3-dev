@@ -4,6 +4,7 @@ import { Document } from "../../shared/components/Document.tsx";
 import { Header } from "../../shared/components/Header.tsx";
 import MobileNav from "../islands/MobileNav.tsx";
 import DocMenu from "../islands/DocMenu.tsx";
+import Search from "../islands/Search.tsx";
 import { Outline, Pager, Sidebar } from "./DocNavigation.tsx";
 
 export interface DocPageProps {
@@ -23,7 +24,7 @@ export function DocPage({ page, pages, sections }: DocPageProps): VNode {
   return (
     <Document title={`${page.title} | wc3.dev`}>
       <div class="documentation" id="top">
-        <Header items={items}>
+        <Header items={items} leading={<Search />}>
           <MobileNav items={items} />
         </Header>
         <DocMenu page={page} pages={pages} sections={sections} />
