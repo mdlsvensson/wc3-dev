@@ -21,6 +21,11 @@ export default function Search(): VNode {
   const [selected, setSelected] = useState(0);
   const results = useMemo(() => engine?.search(query) ?? [], [engine, query]);
   useLayoutEffect(() => setSelected(0), [results]);
+  useLayoutEffect(() => {
+    if (!dialog.current?.open) return;
+    dialog.current.querySelector<HTMLElement>(`#search-result-${selected}`)
+      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [results, selected]);
   const close = () => {
     dialog.current?.close();
     trigger.current?.focus({ preventScroll: true });
