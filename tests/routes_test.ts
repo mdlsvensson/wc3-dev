@@ -3,7 +3,8 @@ import { createHomeApp } from "../home/app.tsx";
 import { createDocsApp } from "../docs/app.tsx";
 import { buildSidebars } from "../docs/sidebar.ts";
 import type { PageRecord } from "../shared/types.ts";
-import { loadSampleSite } from "./support/site.ts";
+import { compileDocumentation } from "../tools/content/compile.ts";
+import { flatSection, loadSampleSite, titleElement } from "./support/site.ts";
 
 const { navigation, pages, sidebars } = await loadSampleSite();
 
@@ -154,7 +155,7 @@ Deno.test("every sample page shows its own section's sidebar, its title and one 
       await (await handler(new Request(`https://docs.wc3.dev${page.url}`)))
         .text();
     assertEquals((html.match(/<h1\b/g) ?? []).length, 1);
-    assertStringIncludes(html, `<title>${page.title} | wc3.dev</title>`);
+    assertStringIncludes(html, titleElement(page.title));
     assertStringIncludes(html, `href="${page.url}" aria-current="page"`);
     assertStringIncludes(html, 'aria-label="Documentation navigation"');
     assertHeader(html, ["Moonwell"]);
@@ -183,6 +184,32 @@ Deno.test("every sample page shows its own section's sidebar, its title and one 
   const root = await (await handler(new Request("https://docs.wc3.dev/")))
     .text();
   assertEquals(root.includes('aria-label="Documentation navigation"'), false);
+});
+
+Deno.test("a title that holds markup characters is found as the page writes it", async () => {
+  const nav = [
+    flatSection("moonwell", ["moonwell/index.md", "moonwell/quoted.md"]),
+  ];
+  const titled = await compileDocumentation(
+    new Map([
+      ["moonwell/index.md", "# Save & load <fast>\n"],
+      ["moonwell/quoted.md", '# The "staged" copy\n'],
+    ]),
+    nav,
+    new Set(),
+  );
+  assertEquals(titled.map((page) => page.title), [
+    "Save & load <fast>",
+    'The "staged" copy',
+  ]);
+  const handler = createDocsApp(titled, buildSidebars(titled, nav)).handler();
+  for (const page of titled) {
+    const html =
+      await (await handler(new Request(`https://docs.wc3.dev${page.url}`)))
+        .text();
+    assertEquals(html.includes(`<title>${page.title} |`), false, page.title);
+    assertStringIncludes(html, titleElement(page.title));
+  }
 });
 
 Deno.test("both landing pages keep the header's links, the GitHub link and their two images", async () => {

@@ -4,7 +4,7 @@ import { navigation } from "../docs/navigation.ts";
 import { buildSidebars } from "../docs/sidebar.ts";
 import { compileDocumentation } from "../tools/content/compile.ts";
 import { readSources } from "../tools/content/prepare.ts";
-import { staticAssets } from "./support/site.ts";
+import { staticAssets, titleElement } from "./support/site.ts";
 
 // Contracts that hold for whatever pages are authored. No test names an authored page or its text.
 const sources = await readSources(new URL("../docs/content/", import.meta.url));
@@ -25,7 +25,7 @@ Deno.test("every authored page is served with one h1, its title and its own plac
     assertEquals(response.status, 200, page.url);
     const html = await response.text();
     assertEquals((html.match(/<h1\b/g) ?? []).length, 1, page.url);
-    assertStringIncludes(html, `<title>${page.title} | wc3.dev</title>`);
+    assertStringIncludes(html, titleElement(page.title));
     assertStringIncludes(html, `href="${page.url}" aria-current="page"`);
     assertStringIncludes(html, 'id="main-content"');
   }

@@ -18,6 +18,13 @@ export function flatSection(
   return { id, label, groups: [{ pages: sources }] };
 }
 
+/** The title element of a documentation page as the page writes it: the renderer escapes `&`, `<` and `"` in text. */
+export function titleElement(title: string): string {
+  const escaped = title.replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll('"', "&quot;");
+  return `<title>${escaped} | wc3.dev</title>`;
+}
+
 export function staticAssets(): Promise<Set<string>> {
   return staticAssetPaths(new URL("../../", import.meta.url));
 }
