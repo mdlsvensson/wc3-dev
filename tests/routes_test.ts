@@ -7,6 +7,22 @@ import { loadSampleSite } from "./support/site.ts";
 
 const { navigation, pages, sidebars } = await loadSampleSite();
 
+/** What every page's header holds, and the alternative of every image on the page. */
+function assertHeader(html: string, alternatives: readonly string[]): void {
+  const nav =
+    html.match(/<nav class="desktop-nav"[^>]*>([\s\S]*?)<\/nav>/)?.[1] ?? "";
+  assertEquals([...nav.matchAll(/>([^<]+)<\/a>/g)].map((match) => match[1]), [
+    "docs",
+    "wrappers",
+    "systems",
+  ]);
+  assertStringIncludes(html, 'href="https://github.com/mdlsvensson/moonwell"');
+  assertEquals(
+    [...html.matchAll(/<img\b[^>]*\balt="([^"]*)"/g)].map((match) => match[1]),
+    alternatives,
+  );
+}
+
 Deno.test("home redirects preserve section paths and queries on both hosts", async () => {
   for (const host of ["wc3.dev", "www.wc3.dev"]) {
     for (const section of ["moonwell", "wrappers", "systems"]) {
@@ -139,6 +155,8 @@ Deno.test("every sample page shows its own section's sidebar, its title and one 
     assertEquals((html.match(/<h1\b/g) ?? []).length, 1);
     assertStringIncludes(html, `<title>${page.title} | wc3.dev</title>`);
     assertStringIncludes(html, `href="${page.url}" aria-current="page"`);
+    assertStringIncludes(html, 'aria-label="Documentation navigation"');
+    assertHeader(html, ["Moonwell"]);
     const sidebar = html.slice(
       html.indexOf('class="sidebar-links"'),
       html.indexOf("</nav>", html.indexOf('class="sidebar-links"')),
@@ -164,6 +182,19 @@ Deno.test("every sample page shows its own section's sidebar, its title and one 
   const root = await (await handler(new Request("https://docs.wc3.dev/")))
     .text();
   assertEquals(root.includes('aria-label="Documentation navigation"'), false);
+});
+
+Deno.test("both landing pages keep the header's links, the GitHub link and their two images", async () => {
+  for (
+    const [app, url] of [
+      [createHomeApp(), "https://wc3.dev/"],
+      [createDocsApp(pages, sidebars), "https://docs.wc3.dev/"],
+    ] as const
+  ) {
+    const response = await app.handler()(new Request(url));
+    assertEquals(response.status, 200, url);
+    assertHeader(await response.text(), ["Moonwell", "A moonwell"]);
+  }
 });
 
 Deno.test("render failures are logged and return a generic 500", async () => {
