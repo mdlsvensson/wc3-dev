@@ -92,3 +92,9 @@ Deno.test("made ids are unchanged: repeats take a suffix and Unicode is kept", a
     "ångström",
   ]);
 });
+
+Deno.test("a made repeat suffix steps over a hand-written id", async () => {
+  const [page] = await compile("## Setup\n\n## Setup\n\n## Other {#setup-1}\n");
+  const ids = page.headings.slice(1).map((heading) => heading.id);
+  assertEquals(ids, ["setup", "setup-2", "setup-1"]);
+});

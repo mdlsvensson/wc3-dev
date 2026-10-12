@@ -209,7 +209,11 @@ export async function createRenderer() {
               );
             }
             id = slug;
-            for (let suffix = 1; used.has(id); suffix++) {
+            for (
+              let suffix = 1;
+              used.has(id) || writtenIds.has(id);
+              suffix++
+            ) {
               id = `${slug}-${suffix}`;
             }
           }
