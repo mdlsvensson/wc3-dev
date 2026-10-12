@@ -167,21 +167,40 @@ export async function createRenderer() {
         const marker = last?.type === "text"
           ? /\s*\{#([^}]*)\}\s*$/.exec(last.content)
           : null;
-        if (!marker || !last) continue;
-        const id = marker[1];
-        if (!/^[a-z0-9][a-z0-9._-]*$/.test(id)) {
-          throw new Error(
-            `${source}:${line}: heading id may hold a-z, 0-9, '.', '_' and '-': ${id}`,
-          );
+        if (marker && last) {
+          const id = marker[1];
+          if (!id) {
+            throw new Error(
+              `${source}:${line}: heading id is empty: write one as {#id}`,
+            );
+          }
+          if (!/^[a-z0-9][a-z0-9._-]*$/.test(id)) {
+            throw new Error(
+              `${source}:${line}: heading id may hold a-z, 0-9, '.', '_' and '-': ${id}`,
+            );
+          }
+          if (writtenIds.has(id)) {
+            throw new Error(
+              `${source}:${line}: heading id ${id} is written twice`,
+            );
+          }
+          last.content = last.content.slice(0, marker.index);
+          writtenIds.add(id);
+          written.set(tokens[i], id);
         }
-        if (writtenIds.has(id)) {
-          throw new Error(
-            `${source}:${line}: heading id ${id} is written twice`,
-          );
-        }
-        last.content = last.content.slice(0, marker.index);
-        writtenIds.add(id);
-        written.set(tokens[i], id);
+        // What is left of the heading must not show a marker (a code span may).
+        visitTokens(tokens[i + 1].children ?? [], (child) => {
+          const shown = child.type === "text"
+            ? /\{#[^}]*\}?/.exec(child.content)
+            : null;
+          if (shown) {
+            throw new Error(
+              `${source}:${line}: heading id marker must end the heading: ${
+                shown[0]
+              }`,
+            );
+          }
+        });
       }
       for (let i = 0; i < tokens.length; i++) {
         const token = tokens[i];
@@ -203,21 +222,19 @@ export async function createRenderer() {
                 `${source}:${line}: heading has no id: write one as {#id}`,
               );
             }
-            if (writtenIds.has(slug)) {
-              throw new Error(
-                `${source}:${line}: heading id ${slug} is also written by hand`,
-              );
-            }
-            id = slug;
-            for (
-              let suffix = 1;
-              used.has(id) || writtenIds.has(id);
-              suffix++
-            ) {
-              id = `${slug}-${suffix}`;
+            // A made id steps over other made ids only: a hand-written id is never taken or stepped over.
+            for (let suffix = 0;; suffix++) {
+              id = suffix ? `${slug}-${suffix}` : slug;
+              if (writtenIds.has(id)) {
+                throw new Error(
+                  `${source}:${line}: heading id ${id} is also written by hand`,
+                );
+              }
+              if (!used.has(id)) break;
             }
           }
-          used.add(id);
+          // `used` holds made ids only, so that a made id steps over made ids alone.
+          if (!written.has(token)) used.add(id);
           token.attrSet("id", id);
           token.meta = { text: headingText };
           headings.push({

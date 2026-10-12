@@ -75,6 +75,41 @@ for (
       "3: heading id may hold a-z, 0-9, '.', '_' and '-': a b",
     ],
     ["a heading that is only a marker", "## {#x}\n", "3: heading has no text"],
+    [
+      "an empty marker",
+      "## A {#}\n",
+      "3: heading id is empty: write one as {#id}",
+    ],
+    [
+      "a made suffixed id equal to a later hand-written one",
+      "## Setup\n\n## Setup\n\n## Other {#setup-1}\n",
+      "5: heading id setup-1 is also written by hand",
+    ],
+    [
+      "a made suffixed id equal to an earlier hand-written one",
+      "## Other {#setup-1}\n\n## Setup\n\n## Setup\n",
+      "7: heading id setup-1 is also written by hand",
+    ],
+    [
+      "a made id equal to an earlier hand-written one",
+      "## Other {#setup}\n\n## Setup\n",
+      "5: heading id setup is also written by hand",
+    ],
+    [
+      "a marker inside emphasis",
+      "## *Foo {#x}*\n",
+      "3: heading id marker must end the heading: {#x}",
+    ],
+    [
+      "a marker followed by more text",
+      "## Foo {#x} *bar*\n",
+      "3: heading id marker must end the heading: {#x}",
+    ],
+    [
+      "two markers",
+      "## Foo {#a}{#b}\n",
+      "3: heading id marker must end the heading: {#a}",
+    ],
   ] as const
 ) {
   Deno.test(`rejects ${name}`, async () => {
@@ -93,8 +128,21 @@ Deno.test("made ids are unchanged: repeats take a suffix and Unicode is kept", a
   ]);
 });
 
-Deno.test("a made repeat suffix steps over a hand-written id", async () => {
-  const [page] = await compile("## Setup\n\n## Setup\n\n## Other {#setup-1}\n");
-  const ids = page.headings.slice(1).map((heading) => heading.id);
-  assertEquals(ids, ["setup", "setup-2", "setup-1"]);
+Deno.test("a made id steps over other made ids", async () => {
+  const [page] = await compile("## Setup\n\n## Setup 1\n\n## Setup\n");
+  assertEquals(page.headings.slice(1).map((heading) => heading.id), [
+    "setup",
+    "setup-1",
+    "setup-2",
+  ]);
+});
+
+Deno.test("a marker inside a code span is shown and the heading gets a made id", async () => {
+  const [page] = await compile("## The `{#id}` marker\n");
+  assertEquals(page.headings[1], {
+    id: "the-id-marker",
+    text: "The {#id} marker",
+    level: 2,
+  });
+  assertStringIncludes(page.html, "<code>{#id}</code>");
 });
