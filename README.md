@@ -88,7 +88,8 @@ shows "Note" or "Warning"; a written title is plain text.
 A heading takes a hand-written id from a trailing `{#id}`: it starts with a lower-case letter or a digit and goes on
 with lower-case letters, digits, `.`, `_` and `-`. The marker must end the heading, and an id that is written by hand
 cannot be the id of another heading of the page. To show a literal `{#...}` in a heading, put it in inline code.
-Without a marker the id is made from the heading's text.
+Without a marker the id is made from the heading's text. An id that the page itself uses (such as `top` or
+`main-content`) is refused, for a made id and a hand-written one alike: the way out is another hand-written id.
 
 `deno task check:examples` compiles the `yue` and `lua` blocks of the authored pages. `MOONWELL_YUE` names the
 YueScript compiler and `MOONWELL_LUAC` names Lua 5.3's `luac`. The task reads both when it starts, and stops with a
@@ -97,8 +98,9 @@ stand alone is written `lua skip` or `yue skip`: it is counted and not compiled.
 `lua` needs the other.
 
 Content preparation fails, with the file and the line, on an unknown code language, a code block without a language,
-an unknown block name, a block that is not closed or that stands inside another, and a heading id that is written
-twice. It fails on a dead link, a page missing from the navigation and a navigation entry without a page.
+an unknown block name, a block that is not closed or that stands inside another, a heading id that is written twice
+and a heading id that the page itself uses. It fails on a dead link, a page missing from the navigation and a
+navigation entry without a page.
 
 The search covers every page and every `h2` and `h3` heading. A function name is found whole or by its parts
 (`issueTargetOrder` by `target order`), and a qualified name finds its section.
