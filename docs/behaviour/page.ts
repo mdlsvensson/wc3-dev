@@ -1,7 +1,7 @@
 import {
   chooseLanguage,
   nextTab,
-  parseStored,
+  pageLanguages,
   pickLanguage,
   storageKey,
 } from "./languages.ts";
@@ -10,12 +10,18 @@ import { currentHeading } from "./outline.ts";
 // Behaviour for compiled text. It reads the document and holds no page data; every decision it makes is in
 // languages.ts and outline.ts.
 
-function readStored(): string[] {
+/** The list the page holds, or else the stored one: storage may be blocked or full, the page's own value is not. */
+function readLanguages(): string[] {
+  let stored: string | null = null;
   try {
-    return parseStored(localStorage.getItem(storageKey));
+    stored = localStorage.getItem(storageKey);
   } catch {
-    return [];
+    // No storage: the page's own value, if any, is all there is.
   }
+  return pageLanguages(
+    document.documentElement.getAttribute("data-code-languages"),
+    stored,
+  );
 }
 
 function blocksOf(group: Element): HTMLElement[] {
@@ -49,7 +55,7 @@ function applyGroups(stored: readonly string[]): void {
 function choose(tab: HTMLElement): void {
   const group = tab.closest(".code-group")!;
   const stored = chooseLanguage(
-    readStored(),
+    readLanguages(),
     blocksOf(group).map((block) => block.dataset.lang!),
     tab.dataset.lang!,
   );
@@ -66,7 +72,7 @@ function choose(tab: HTMLElement): void {
 }
 
 function codeGroups(): void {
-  applyGroups(readStored());
+  applyGroups(readLanguages());
   document.addEventListener("click", (event) => {
     const tab = event.target instanceof Element
       ? event.target.closest<HTMLElement>(".code-tab")
@@ -77,7 +83,12 @@ function codeGroups(): void {
     const tab = event.target instanceof Element
       ? event.target.closest<HTMLElement>(".code-tab")
       : null;
-    if (!tab) return;
+    // A key with a modifier is the browser's own (Alt+Left is Back): leave it alone.
+    if (
+      !tab || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey
+    ) {
+      return;
+    }
     const tabs = [
       ...tab.parentElement!.querySelectorAll<HTMLElement>(".code-tab"),
     ];
@@ -105,10 +116,14 @@ function copyButtons(): void {
       : null;
     const code = button?.parentElement?.querySelector("pre")?.textContent;
     if (!button || code == null) return;
-    void navigator.clipboard.writeText(code).then(() => {
-      button.textContent = "Copied";
+    const say = (text: string) => {
+      button.textContent = text;
       setTimeout(() => button.textContent = "Copy", 2000);
-    });
+    };
+    navigator.clipboard.writeText(code).then(
+      () => say("Copied"),
+      () => say("Not copied"),
+    );
   });
 }
 

@@ -40,3 +40,14 @@ export function nextTab(
   if (key === "End") return count - 1;
   return undefined;
 }
+
+/**
+ * The list a page starts a choice from: the one it already holds (the root element's attribute, which every choice
+ * updates) when it has one, else the stored one. Storage alone would lose choices when it cannot be written.
+ */
+export function pageLanguages(
+  pageValue: string | null,
+  storedValue: string | null,
+): string[] {
+  return parseStored(pageValue ?? storedValue);
+}

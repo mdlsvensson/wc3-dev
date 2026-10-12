@@ -5,6 +5,7 @@ import { languageCss, languageScript } from "../docs/behaviour/head.ts";
 import {
   chooseLanguage,
   nextTab,
+  pageLanguages,
   parseStored,
   pickLanguage,
   storageKey,
@@ -146,4 +147,27 @@ Deno.test("a documentation page carries the head script and CSS; other pages do 
         .text(),
     ]
   ) assertEquals(html.includes("data-code-languages"), false);
+});
+
+Deno.test("the list a page starts from is its own value, else the stored one", () => {
+  assertEquals(pageLanguages("lua", "powershell"), ["lua"]);
+  assertEquals(pageLanguages(null, "powershell lua"), ["powershell", "lua"]);
+  assertEquals(pageLanguages(null, null), []);
+  assertEquals(pageLanguages('lua "><script>', "powershell"), ["lua"]);
+  assertEquals(pageLanguages("", "powershell"), []);
+});
+
+Deno.test("with storage blocked, a choice in one group keeps the choices in groups of other languages", () => {
+  const yueLua = ["yue", "lua"];
+  const shell = ["sh", "powershell"];
+  const afterLua = chooseLanguage(pageLanguages(null, null), yueLua, "lua");
+  assertEquals(afterLua, ["lua"]);
+  const afterShell = chooseLanguage(
+    pageLanguages(afterLua.join(" "), null),
+    shell,
+    "powershell",
+  );
+  assertEquals(afterShell, ["powershell", "lua"]);
+  assertEquals(pickLanguage(afterShell, yueLua), "lua");
+  assertEquals(pickLanguage(afterShell, shell), "powershell");
 });

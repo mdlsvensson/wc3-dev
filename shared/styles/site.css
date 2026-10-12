@@ -562,8 +562,14 @@ html.js .code-group:not([data-ready]) > .code-block ~ .code-block {
   border-radius: 4px;
   background: var(--surface-raised);
   font-size: 12px;
+  line-height: 20px;
   color: var(--text-secondary);
   opacity: 0;
+}
+/* In a group the button sits in the tab row above the block: the row is 42px (tab 8 + 24 + 8 + 2) and the button
+   26px (20 + 2 + 2 + 1 + 1), so its top is 8px below the row's top: -42 + 8 = -34. */
+html.js .code-group > .code-block > .code-copy {
+  top: -34px;
 }
 .code-block:hover > .code-copy,
 .code-copy:focus-visible {
