@@ -22,13 +22,25 @@ const groups: [title: string, verb: string][] = [
 ];
 
 export function example(name: string): string {
-  return "```lua\nlocal result = unit:" + name + "()\n```\n";
+  return [
+    "::: code-group",
+    "```yue",
+    `result = unit\\${name}!`,
+    "```",
+    "```lua",
+    `local result = unit:${name}()`,
+    "```",
+    ":::",
+    "",
+  ].join("\n");
 }
 
 export function unitPage(): string {
   const parts = [
     "# wrappers.unit\n",
     "Sample marker wrappers unit. This page is sample text for tests, not documentation.\n",
+    "::: note Measured on 3.0.0.24268\nA sample note with `code` in it.\n:::\n",
+    "::: warning\nA sample warning.\n:::\n",
     "## Orders\n",
     "### issueOrder\n",
     "Sample text for `Unit.issueOrder`.\n",

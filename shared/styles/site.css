@@ -492,6 +492,40 @@ code {
   background: #24292e;
   color: #e1e4e8;
 }
+.code-group {
+  margin: 16px 0;
+}
+.code-group > .code-block {
+  margin: 0;
+}
+.code-group > .code-block + .code-block {
+  margin-top: 8px;
+}
+.code-tabs {
+  display: none;
+}
+.callout {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-left: 2px solid var(--border);
+  border-radius: 0 8px 8px 0;
+  background: var(--surface-raised);
+}
+.callout-warning {
+  border-left-color: var(--brand);
+}
+.callout > .callout-title {
+  margin: 0 0 4px;
+  font: var(--jersey-10);
+  font-synthesis: none;
+  color: var(--text);
+}
+.callout-warning > .callout-title {
+  color: var(--brand);
+}
+.callout > :last-child {
+  margin-bottom: 0;
+}
 .doc-prose table {
   display: block;
   width: max-content;

@@ -5,3 +5,14 @@ Sample marker wrappers handles. This page is sample text for tests, not document
 ## Identity
 
 Two wrappers of one handle are the same object.
+
+## Cleanup
+
+::: code-group
+```yue
+unit\remove!
+```
+```lua
+unit:remove()
+```
+:::
