@@ -23,10 +23,13 @@ deno task content     # explicitly prepare/validate documentation
 deno task check       # content, source/test types, lint and source formatting
 deno task test        # contract tests
 deno task build       # both production builds, each validating shared links
+deno task build:docs  # documentation Worker only
+deno task build:home  # home Worker only
 deno task dry-run:docs # inspect docs deployment without uploading
 deno task dry-run:home # inspect home deployment without uploading
 deno task preview:docs # built docs Worker, http://localhost:5173
 deno task preview:home # built home Worker, http://localhost:5174
+deno task test:preview # direct HTTP checks while both Worker previews are running
 ```
 
 Stop the corresponding dev server before running its Worker preview on the same port. Build before previewing.
@@ -39,6 +42,17 @@ initial compilation, then watches Markdown changes. Successful validation publis
 the browser. An invalid edit reports its error and keeps the previous valid generation available until corrected.
 Editing navigation restarts Vite's configuration. Home development shares the components and assets; the home
 production build also validates every documentation and landing link.
+
+The apps have independent entry points, client bundles and Worker configurations. `home/` serves the landing page
+and redirects legacy documentation paths to `docs.wc3.dev`; `docs/` serves its landing page and the six authored
+documents. Shared components, styles and static files live in `shared/`. Each Worker builds and previews independently;
+production rendering uses bundled records and never reads the authored Markdown. Search loads its generated JSON
+and MiniSearch client only when opened. Static font licences and provenance stay beside the fonts.
+
+Contract tests compare the authored content and shared asset bytes with their original git objects, so run
+`deno task test` from a Git checkout with history. Clean source archives can install frozen dependencies and build
+both Workers without git history. `deno task test:preview` exercises the actual built routes, redirect queries,
+both home hosts, missing pages/assets and empty HEAD bodies, then checks all shared asset types and bytes.
 
 ## Cloudflare Workers Builds
 

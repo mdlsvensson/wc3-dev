@@ -6,7 +6,6 @@ const excluded = new Set([
   "_fresh",
   "generated",
   ".wrangler",
-  ".vitepress",
   "static",
   "fixtures",
 ]);

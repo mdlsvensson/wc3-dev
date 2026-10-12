@@ -9,6 +9,7 @@
     "dev:home": "deno task --cwd home dev --port 5174",
     "content": "deno run --frozen --allow-env=VSCODE_TEXTMATE_DEBUG --allow-read --allow-write=docs/generated tools/content/prepare.ts",
     "test": "deno test --frozen --allow-env=VSCODE_TEXTMATE_DEBUG,PATH,DENO_DEPLOYMENT_ID,GITHUB_SHA,CI_COMMIT_SHA --allow-read --allow-write --allow-run=git,sh tests/",
+    "test:preview": "deno test --frozen --allow-read --allow-net tests/preview_test.ts -- http://localhost:5173 http://localhost:5174",
     "build:docs": "deno task --cwd docs build",
     "build:home": "deno task --cwd home build",
     "build": "deno task build:docs && deno task build:home",

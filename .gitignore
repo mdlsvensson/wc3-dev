@@ -1,8 +1,4 @@
 node_modules/
-docs/.vitepress/dist/
-docs/.vitepress/cache/
-home/.vitepress/dist/
-home/.vitepress/cache/
 home/_fresh/
 docs/_fresh/
 docs/generated/
@@ -10,3 +6,4 @@ home/.wrangler/
 docs/.wrangler/
 .wrangler/
 .build-tools/
+.verification/
