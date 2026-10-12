@@ -41,6 +41,8 @@ export interface PageRecord {
   source: string;
   url: string;
   title: string;
+  /** The page's meta description, as plain text. */
+  description: string;
   section: SectionId | null;
   html: string;
   headings: readonly Heading[];

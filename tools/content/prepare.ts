@@ -58,8 +58,8 @@ export interface PrepareOptions {
 
 /** What the Worker bundles of a page. Search text and links stay in the build. */
 export function pageRecord(page: CompiledPage): PageRecord {
-  const { source, url, title, section, html, headings } = page;
-  return { source, url, title, section, html, headings };
+  const { source, url, title, description, section, html, headings } = page;
+  return { source, url, title, description, section, html, headings };
 }
 
 export async function prepareDocumentation(

@@ -57,6 +57,19 @@ function visibleText(tokens: readonly Token[]): string {
   }).join("");
 }
 
+/** A page's meta description: its first paragraph, cut at a word near 160 characters, or else its title. */
+export function pageDescription(
+  paragraph: string | undefined,
+  title: string,
+): string {
+  const squeeze = (text: string) => text.replace(/\s+/g, " ").trim();
+  const text = squeeze(paragraph ?? "") || squeeze(title);
+  if (text.length <= 160) return text;
+  const cut = text.slice(0, 160);
+  const space = cut.lastIndexOf(" ");
+  return `${cut.slice(0, space > 80 ? space : 160).replace(/[\s,;:.]+$/, "")}…`;
+}
+
 export function visitTokens(
   tokens: readonly Token[],
   visit: (token: Token) => void,
@@ -337,11 +350,19 @@ export async function createRenderer() {
           });
         }
       });
+      // The first paragraph that is not inside a list, a quote or a block.
+      const first = tokens.findIndex((token) =>
+        token.type === "paragraph_open" && token.level === 0
+      );
+      const paragraph = first < 0
+        ? undefined
+        : visibleText(tokens[first + 1].children ?? []);
       return {
         tokens,
         headings,
         code,
         links,
+        paragraph,
         text: text.join(" ").replace(/\s+/g, " ").trim(),
       };
     },

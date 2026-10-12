@@ -1,7 +1,7 @@
 import type { CompiledPage, NavSection } from "../../shared/types.ts";
 import { navSources } from "../../docs/sidebar.ts";
 import { resolveContentLink, sourceUrl } from "./links.ts";
-import { createRenderer, visitTokens } from "./render.ts";
+import { createRenderer, pageDescription, visitTokens } from "./render.ts";
 import {
   landingCards,
   landingName,
@@ -24,6 +24,7 @@ export function compileLandingPage(
     source: "landing",
     url: "/",
     title: landingName,
+    description: landingTagline,
     section: null,
     html: "",
     headings: [],
@@ -84,17 +85,21 @@ export async function compileDocumentation(
         ...renderer.parse(source, sources.get(source)!),
       };
     });
-    const pages: CompiledPage[] = parsed.map((page) => ({
-      source: page.source,
-      url: page.url,
-      title: page.headings.find((heading) => heading.level === 1)!.text,
-      section: page.section,
-      html: "",
-      headings: page.headings,
-      links: page.links,
-      text: page.text,
-      code: page.code,
-    }));
+    const pages: CompiledPage[] = parsed.map((page) => {
+      const title = page.headings.find((heading) => heading.level === 1)!.text;
+      return {
+        source: page.source,
+        url: page.url,
+        title,
+        description: pageDescription(page.paragraph, title),
+        section: page.section,
+        html: "",
+        headings: page.headings,
+        links: page.links,
+        text: page.text,
+        code: page.code,
+      };
+    });
     // Pass two has the complete heading and URL map, including forward references.
     for (let i = 0; i < parsed.length; i++) {
       const page = parsed[i];

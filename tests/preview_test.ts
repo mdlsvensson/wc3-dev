@@ -102,7 +102,7 @@ Deno.test({
     for (const page of records) {
       const aliases = page.url.endsWith("/")
         ? [page.url.slice(0, -1), `${page.url}index`, `${page.url}index.html`]
-        : [`${page.url}.html`];
+        : [`${page.url}.html`, `${page.url}/`];
       for (const alias of aliases) {
         for (const method of ["GET", "HEAD"]) {
           const response = await request(
@@ -166,11 +166,14 @@ Deno.test({
       for (const { page: other, text } of probes) {
         const count = html.split(text).length - 1;
         if (other === page) {
-          // The article is in the response once. A second copy is a record given to an island.
+          // The article is in the response once, and once more in the meta description when the
+          // description (plain text, as the probe is) holds the probe. Anything above that is a
+          // record given to an island.
+          const expected = 1 + (page.description.includes(text) ? 1 : 0);
           assertEquals(
             count,
-            1,
-            `${page.url} holds its own text ${count} times`,
+            expected,
+            `${page.url} holds its own text ${count} times, not ${expected}`,
           );
         } else if (!page.html.includes(text)) {
           assertEquals(count, 0, `${page.url} holds text of ${other.url}`);

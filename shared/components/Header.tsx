@@ -19,8 +19,10 @@ export function GitHubLink(): VNode {
 }
 
 export function Header(
-  { items, children, leading }: {
+  { items, current, children, leading }: {
     items: readonly NavItem[];
+    /** The `href` of the current section's item. */
+    current?: string;
     children?: ComponentChildren;
     leading?: ComponentChildren;
   },
@@ -45,7 +47,13 @@ export function Header(
           <div class="header-controls">
             <nav class="desktop-nav" aria-label="Main navigation">
               {items.map((item) => (
-                <a key={item.href} href={item.href}>{item.text}</a>
+                <a
+                  key={item.href}
+                  href={item.href}
+                  aria-current={item.href === current ? "true" : undefined}
+                >
+                  {item.text}
+                </a>
               ))}
             </nav>
             <div class="desktop-social">

@@ -19,11 +19,13 @@ export function DocPage({ page, sidebar }: DocPageProps): VNode {
     text: "wrappers",
     href: "/wrappers/",
   }, { text: "systems", href: "/systems/" }];
+  const current = page.section ? `/${page.section}/` : undefined;
   const menu = docMenuProps(page, sidebar);
   const hasOutline = menu.headings.length > 0;
   return (
     <Document
       title={`${page.title} | wc3.dev`}
+      description={page.description}
       head={
         <>
           <script dangerouslySetInnerHTML={{ __html: languageScript }} />
@@ -32,8 +34,8 @@ export function DocPage({ page, sidebar }: DocPageProps): VNode {
       }
     >
       <div class="documentation" id="top">
-        <Header items={items} leading={<Search />}>
-          <MobileNav items={items} />
+        <Header items={items} current={current} leading={<Search />}>
+          <MobileNav items={items} current={current} />
         </Header>
         <DocMenu {...menu} />
         <aside class="doc-sidebar">

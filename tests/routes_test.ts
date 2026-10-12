@@ -56,7 +56,7 @@ Deno.test("docs redirect the aliases of every page and nothing else", async () =
   for (const page of pages) {
     const aliases = page.url.endsWith("/")
       ? [page.url.slice(0, -1), `${page.url}index`, `${page.url}index.html`]
-      : [`${page.url}.html`];
+      : [`${page.url}.html`, `${page.url}/`];
     for (const alias of aliases) {
       const response = await handler(
         new Request(`https://docs.wc3.dev${alias}?q=x%2Fy`),
@@ -82,6 +82,7 @@ Deno.test("unknown paths and missing assets return readable 404s", async () => {
         "/moonwells",
         "/wrappers-extra",
         "/unknown",
+        "/unknown/",
         "/unknown.html",
         "/unknown/index",
         "/unknown/index.html",
@@ -202,6 +203,7 @@ Deno.test("render failures are logged and return a generic 500", async () => {
     source: "moonwell/index.md",
     url: "/moonwell/",
     title: "Moonwell",
+    description: "",
     section: "moonwell",
     headings: [],
     get html(): string {

@@ -33,6 +33,7 @@ function page(
     source: `${title}.md`,
     url: `/${title}/`,
     title,
+    description: "",
     text,
     html: `<h1 id="${title}">${title}</h1><p>${text}</p>`,
     section: "moonwell",

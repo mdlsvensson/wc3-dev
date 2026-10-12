@@ -132,6 +132,10 @@ button {
 .desktop-nav a:hover {
   color: var(--brand);
 }
+.desktop-nav a[aria-current],
+.mobile-menu a[aria-current] {
+  color: var(--brand);
+}
 .github-link {
   color: var(--text-secondary);
   display: flex;

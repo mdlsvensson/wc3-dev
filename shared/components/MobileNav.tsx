@@ -3,7 +3,13 @@ import { useLayoutEffect, useRef, useState } from "preact/hooks";
 import type { NavItem } from "../types.ts";
 import { GitHubLink } from "./Header.tsx";
 
-export function MobileNav({ items }: { items: readonly NavItem[] }): VNode {
+export function MobileNav(
+  { items, current }: {
+    items: readonly NavItem[];
+    /** The `href` of the current section's item. */
+    current?: string;
+  },
+): VNode {
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const dismiss = () => {
@@ -49,8 +55,15 @@ export function MobileNav({ items }: { items: readonly NavItem[] }): VNode {
           ) dismiss();
         }}
       >
-        {items.map((item) => <a key={item.href} href={item.href}>{item.text}
-        </a>)}
+        {items.map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            aria-current={item.href === current ? "true" : undefined}
+          >
+            {item.text}
+          </a>
+        ))}
         <div class="mobile-social">
           <GitHubLink />
         </div>

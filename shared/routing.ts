@@ -14,7 +14,7 @@ export function findDocsPage<T extends { url: string }>(
   return pages.find((page) => {
     const aliases = page.url.endsWith("/")
       ? [page.url.slice(0, -1), `${page.url}index`, `${page.url}index.html`]
-      : [`${page.url}.html`];
+      : [`${page.url}.html`, `${page.url}/`];
     return page.url === pathname || aliases.includes(pathname);
   });
 }
