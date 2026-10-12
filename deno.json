@@ -7,6 +7,8 @@
   "tasks": {
     "dev": "deno task --cwd docs dev --port 5173",
     "dev:home": "deno task --cwd home dev --port 5174",
+    "dev:sample": "deno task --cwd docs dev:sample --port 5173",
+    "build:sample": "deno task --cwd docs build:sample",
     "content": "deno run --frozen --allow-env=VSCODE_TEXTMATE_DEBUG --allow-read --allow-write=docs/generated tools/content/prepare.ts",
     "test": "deno test --frozen --allow-env=VSCODE_TEXTMATE_DEBUG,PATH,DENO_DEPLOYMENT_ID,GITHUB_SHA,CI_COMMIT_SHA --allow-read --allow-write --allow-run=git,sh tests/",
     "test:preview": "deno test --frozen --allow-read --allow-net tests/preview_test.ts -- http://localhost:5173 http://localhost:5174",

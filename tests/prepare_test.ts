@@ -1,6 +1,8 @@
 import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { pathToFileURL } from "node:url";
 import { prepareDocumentation } from "../tools/content/prepare.ts";
+import { navigation } from "./fixtures/site/navigation.ts";
+import { sampleContent } from "./support/site.ts";
 
 async function copy(from: URL, to: URL) {
   await Deno.mkdir(to, { recursive: true });
@@ -15,27 +17,38 @@ Deno.test("invalid content preserves the generated page/search pair and recovery
   const temporary = await Deno.makeTempDir();
   const root = pathToFileURL(`${temporary}/`);
   try {
-    for (const directory of ["docs/content/", "shared/static/"]) {
-      await copy(
-        new URL(`../${directory}`, import.meta.url),
-        new URL(directory, root),
-      );
+    await copy(sampleContent, new URL("content/", root));
+    await copy(
+      new URL("../shared/static/", import.meta.url),
+      new URL("shared/static/", root),
+    );
+    const options = { root, content: new URL("content/", root), navigation };
+    await prepareDocumentation(options);
+    const module = await Deno.readTextFile(
+      new URL("docs/generated/pages.ts", root),
+    );
+    assertStringIncludes(module, "export const pages: readonly PageRecord[]");
+    assertStringIncludes(module, "export const sidebars: Sidebars");
+    assertStringIncludes(module, '"title": "Reference"');
+    // A record's own keys are indented by four spaces; a heading's "text" is deeper.
+    assertStringIncludes(module, '\n    "html":');
+    for (const key of ['\n    "text":', '\n    "links":', "landingPage"]) {
+      assertEquals(module.includes(key), false, key);
     }
-    await prepareDocumentation(root);
     const outputs = ["pages.ts", "search.json"].map((name) =>
       new URL(`docs/generated/${name}`, root)
     );
     const before = await Promise.all(
       outputs.map((path) => Deno.readFile(path)),
     );
-    const source = new URL("docs/content/moonwell/index.md", root);
+    const source = new URL("content/moonwell/index.md", root);
     const original = await Deno.readTextFile(source);
     await Deno.writeTextFile(
       source,
       `${original}\n[broken](missing-task6.md)\n`,
     );
     await assertRejects(
-      () => prepareDocumentation(root),
+      () => prepareDocumentation(options),
       Error,
       "missing-task6.md",
     );
@@ -47,18 +60,18 @@ Deno.test("invalid content preserves the generated page/search pair and recovery
       source,
       `${original}\n## Task Six Recovery\n\nRecovered content.\n`,
     );
-    await prepareDocumentation(root);
+    await prepareDocumentation(options);
     for (const path of outputs) {
       assertStringIncludes(await Deno.readTextFile(path), "Task Six Recovery");
     }
     const recovered = await Promise.all(
       outputs.map((path) => Deno.readFile(path)),
     );
-    const section = new URL("docs/content/moonwell/", root);
+    const section = new URL("content/moonwell/", root);
     const moved = new URL("removed-section/", root);
     await Deno.rename(section, moved);
     await assertRejects(
-      () => prepareDocumentation(root),
+      () => prepareDocumentation(options),
       Error,
       "missing navigation source",
     );
@@ -67,7 +80,7 @@ Deno.test("invalid content preserves the generated page/search pair and recovery
       recovered,
     );
     await Deno.rename(moved, section);
-    await prepareDocumentation(root);
+    await prepareDocumentation(options);
     assertEquals(
       await Promise.all(outputs.map((path) => Deno.readFile(path))),
       recovered,

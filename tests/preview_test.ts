@@ -1,16 +1,21 @@
 import { assertEquals, assertMatch, assertStringIncludes } from "@std/assert";
+import type { PageRecord } from "../shared/types.ts";
 
 // Opt in with test:preview after building and starting both independent Workers.
 const [docsOrigin, homeOrigin] = Deno.args;
 const enabled = Boolean(docsOrigin && homeOrigin);
 const sections = ["moonwell", "wrappers", "systems"];
-const docsPaths = [
-  "/",
-  ...sections.flatMap((section) => [
-    `/${section}/`,
-    `/${section}/getting-started`,
-  ]),
-];
+// The records of the last docs build: authored after build:docs, the sample after build:sample.
+const records: readonly PageRecord[] = enabled
+  ? (await import("../docs/generated/pages.ts")).pages
+  : [];
+const docsPaths = ["/", ...records.map((page) => page.url)];
+
+/** A stretch of a page's first paragraph that survives HTML and JSON escaping unchanged. */
+function probe(page: PageRecord): string | undefined {
+  const paragraph = page.html.match(/<p>([\s\S]*?)<\/p>/)?.[1] ?? "";
+  return paragraph.replace(/<[^>]*>/g, "").match(/[A-Za-z0-9 ,.]{24,}/)?.[0];
+}
 
 async function request(
   origin: string,
@@ -70,31 +75,34 @@ Deno.test({
   name: "built docs aliases and both home hosts preserve redirect queries",
   ignore: !enabled,
   async fn() {
-    for (const section of sections) {
-      const aliases = [
-        [`/${section}`, `/${section}/`],
-        [`/${section}/index`, `/${section}/`],
-        [`/${section}/index.html`, `/${section}/`],
-        [`/${section}/getting-started.html`, `/${section}/getting-started`],
-      ];
-      for (const [path, target] of aliases) {
+    for (const page of records) {
+      const aliases = page.url.endsWith("/")
+        ? [page.url.slice(0, -1), `${page.url}index`, `${page.url}index.html`]
+        : [`${page.url}.html`];
+      for (const alias of aliases) {
         for (const method of ["GET", "HEAD"]) {
-          const response = await request(docsOrigin, `${path}?q=x%2Fy`, method);
-          assertEquals(response.status, 301);
+          const response = await request(
+            docsOrigin,
+            `${alias}?q=x%2Fy`,
+            method,
+          );
+          assertEquals(response.status, 301, alias);
           assertEquals(
             response.headers.get("location"),
-            `https://docs.wc3.dev${target}?q=x%2Fy`,
+            `https://docs.wc3.dev${page.url}?q=x%2Fy`,
           );
           if (method === "HEAD") assertEquals(await response.text(), "");
           else await response.body?.cancel();
         }
       }
+    }
+    for (const section of sections) {
       for (const host of ["wc3.dev", "www.wc3.dev"]) {
         for (
           const path of [
             `/${section}`,
             `/${section}/`,
-            `/${section}/getting-started.html`,
+            `/${section}/any-page.html`,
           ]
         ) {
           for (const method of ["GET", "HEAD"]) {
@@ -113,6 +121,27 @@ Deno.test({
             );
             assertEquals(await response.text(), "");
           }
+        }
+      }
+    }
+  },
+});
+
+Deno.test({
+  name: "a built page holds its own text once and no other page's text",
+  ignore: !enabled,
+  async fn() {
+    for (const page of records) {
+      const html = await (await request(docsOrigin, page.url)).text();
+      for (const other of records) {
+        const text = probe(other);
+        if (!text) continue;
+        const count = html.split(text).length - 1;
+        if (other === page) {
+          // Once in the article, and once more when the description holds it (Task 9).
+          assertEquals(count >= 1 && count <= 2, true, `${page.url}: ${count}`);
+        } else if (!page.html.includes(text)) {
+          assertEquals(count, 0, `${page.url} holds text of ${other.url}`);
         }
       }
     }

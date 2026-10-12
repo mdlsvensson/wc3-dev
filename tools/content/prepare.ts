@@ -1,4 +1,10 @@
+import type {
+  CompiledPage,
+  NavSection,
+  PageRecord,
+} from "../../shared/types.ts";
 import { navigation } from "../../docs/navigation.ts";
+import { buildSidebars } from "../../docs/sidebar.ts";
 import { compileDocumentation, compileLandingPage } from "./compile.ts";
 import { buildSearchPayload } from "../../docs/search/index.ts";
 
@@ -42,23 +48,42 @@ export async function readSources(content: URL): Promise<Map<string, string>> {
   return sources;
 }
 
-export async function prepareDocumentation(root: URL = repo): Promise<void> {
-  const sources = await readSources(new URL("docs/content/", root));
+export interface PrepareOptions {
+  /** The checkout that holds shared/static/ and receives docs/generated/. */
+  root?: URL;
+  /** The folder of Markdown. Default: docs/content/ under the root. */
+  content?: URL;
+  navigation?: readonly NavSection[];
+}
+
+/** What the Worker bundles of a page. Search text and links stay in the build. */
+export function pageRecord(page: CompiledPage): PageRecord {
+  const { source, url, title, section, html, headings } = page;
+  return { source, url, title, section, html, headings };
+}
+
+export async function prepareDocumentation(
+  options: PrepareOptions = {},
+): Promise<void> {
+  const root = options.root ?? repo;
+  const content = options.content ?? new URL("docs/content/", root);
+  const sections = options.navigation ?? navigation;
+  const sources = await readSources(content);
   const assets = new Set(
     (await listFiles(new URL("shared/static/", root))).map((asset) =>
       `/${asset}`
     ),
   );
-  const pages = await compileDocumentation(sources, navigation, assets);
+  const pages = await compileDocumentation(sources, sections, assets);
   const landingPage = compileLandingPage(pages, assets);
   const search = JSON.stringify(buildSearchPayload([landingPage, ...pages]));
   const module =
-    'import type { CompiledPage } from "../../shared/types.ts";\n\n' +
-    `export const pages: readonly CompiledPage[] = ${
-      JSON.stringify(pages, null, 2)
+    'import type { PageRecord, Sidebars } from "../../shared/types.ts";\n\n' +
+    `export const pages: readonly PageRecord[] = ${
+      JSON.stringify(pages.map(pageRecord), null, 2)
     };\n\n` +
-    `export const landingPage: CompiledPage = ${
-      JSON.stringify(landingPage, null, 2)
+    `export const sidebars: Sidebars = ${
+      JSON.stringify(buildSidebars(pages, sections), null, 2)
     };\n`;
   // Validate once, stage both outputs, then publish while the Vite plugin withholds
   // requests and reloads. Retain the previous pair if filesystem publication fails.

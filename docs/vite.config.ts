@@ -2,25 +2,44 @@ import { fresh } from "@fresh/plugin-vite";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { defineConfig } from "vite";
+import { prepareDocumentation } from "../tools/content/prepare.ts";
 import { documentationPreparation } from "../tools/content/watch.ts";
+import { navigation as sampleNavigation } from "../tests/fixtures/site/navigation.ts";
 import { navigation } from "./navigation.ts";
 
-// Keep navigation in Vite's config dependency graph so an edit restarts preparation.
+// Keep both navigations in Vite's config dependency graph so an edit restarts preparation.
 void navigation;
+void sampleNavigation;
 
+const sampleContent = new URL(
+  "../tests/fixtures/site/content/",
+  import.meta.url,
+);
 const root = fileURLToPath(new URL(".", import.meta.url));
 const configPath = fileURLToPath(
   new URL("../wrangler.docs.jsonc", import.meta.url),
 );
 
-export default defineConfig(({ command }) => ({
+// The mode comes from the command line of a task and is read only here, while the
+// configuration is built; no request can change it.
+export default defineConfig(({ command, mode }) => ({
   root,
   resolve: {
     // Resolve Fresh's entry before writeBundle creates its on-disk wrapper.
     alias: [{ find: "./_fresh/server.js", replacement: "fresh:server_entry" }],
   },
   plugins: [
-    documentationPreparation(),
+    mode === "sample"
+      ? documentationPreparation(
+        () =>
+          prepareDocumentation({
+            content: sampleContent,
+            navigation: sampleNavigation,
+          }),
+        undefined,
+        fileURLToPath(sampleContent),
+      )
+      : documentationPreparation(),
     {
       name: "documentation-search-asset",
       enforce: "pre",

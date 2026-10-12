@@ -31,13 +31,14 @@ type ContentWatcher = AsyncIterable<Deno.FsEvent> & { close(): void };
 
 /** Own generated-file publication instead of allowing Vite to observe partial writes. */
 export function documentationPreparation(
-  prepareContent = prepareDocumentation,
+  prepareContent: () => Promise<void> = prepareDocumentation,
   watchContent: (path: string) => ContentWatcher = (path) =>
     Deno.watchFs(path, { recursive: true }),
-): Plugin {
-  const content = fileURLToPath(
+  contentDirectory: string = fileURLToPath(
     new URL("../../docs/content/", import.meta.url),
-  );
+  ),
+): Plugin {
+  const content = contentDirectory;
   const generated = fileURLToPath(
     new URL("../../docs/generated/", import.meta.url),
   );
