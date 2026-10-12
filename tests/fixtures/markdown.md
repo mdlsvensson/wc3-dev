@@ -31,6 +31,6 @@
 local value = "<img src=x onerror=alert(1)>"
 ```
 
-```not-a-language
+```text
 <img src=x onerror=alert(1)>
 ```

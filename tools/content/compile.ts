@@ -33,6 +33,7 @@ export function compileLandingPage(
       landingTagline,
       ...landingCards.flatMap((card) => [card.title, card.description]),
     ].join(" "),
+    code: [],
   };
 }
 
@@ -92,6 +93,7 @@ export async function compileDocumentation(
       headings: page.headings,
       links: page.links,
       text: page.text,
+      code: page.code,
     }));
     // Pass two has the complete heading and URL map, including forward references.
     for (let i = 0; i < parsed.length; i++) {

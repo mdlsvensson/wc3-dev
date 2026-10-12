@@ -47,6 +47,11 @@
     "shiki/core": "npm:shiki@4.5.0/core",
     "shiki/engine/javascript": "npm:shiki@4.5.0/engine/javascript",
     "shiki/langs/lua.mjs": "npm:shiki@4.5.0/langs/lua.mjs",
+    "shiki/langs/pkl.mjs": "npm:shiki@4.5.0/langs/pkl.mjs",
+    "shiki/langs/toml.mjs": "npm:shiki@4.5.0/langs/toml.mjs",
+    "shiki/langs/json.mjs": "npm:shiki@4.5.0/langs/json.mjs",
+    "shiki/langs/shellscript.mjs": "npm:shiki@4.5.0/langs/shellscript.mjs",
+    "shiki/langs/powershell.mjs": "npm:shiki@4.5.0/langs/powershell.mjs",
     "shiki/themes/github-dark.mjs": "npm:shiki@4.5.0/themes/github-dark.mjs",
     "minisearch": "npm:minisearch@7.2.0",
     "@std/assert": "jsr:@std/assert@1.0.19"

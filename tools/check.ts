@@ -8,6 +8,7 @@ const excluded = new Set([
   ".wrangler",
   "static",
   "fixtures",
+  "grammars",
 ]);
 
 async function sourceFiles(directory: URL, prefix: string): Promise<string[]> {

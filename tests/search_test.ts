@@ -31,6 +31,7 @@ function page(
     section: "moonwell",
     headings: [{ id: title, text: title, level: 1 }],
     links: [],
+    code: [],
     ...extra,
   };
 }

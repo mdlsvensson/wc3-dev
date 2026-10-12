@@ -471,6 +471,27 @@ code {
   margin: 16px 0;
   overflow-wrap: normal;
 }
+.code-block {
+  position: relative;
+  margin: 16px 0;
+}
+.code-block > pre {
+  margin: 0;
+  padding-top: 40px;
+}
+.code-block::before {
+  content: attr(data-label);
+  position: absolute;
+  top: 8px;
+  left: 24px;
+  font: var(--jersey-10);
+  font-synthesis: none;
+  color: var(--text-secondary);
+}
+.code-block[data-lang="text"] > pre {
+  background: #24292e;
+  color: #e1e4e8;
+}
 .doc-prose table {
   display: block;
   width: max-content;

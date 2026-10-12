@@ -45,9 +45,20 @@ export interface PageRecord {
   html: string;
   headings: readonly Heading[];
 }
+export interface CodeBlock {
+  /** A `CodeLanguage` name. */
+  language: string;
+  code: string;
+  /** 1-based line of the fence in its Markdown file. */
+  line: number;
+  skip: boolean;
+  /** Index of its code group on the page, or null. */
+  group: number | null;
+}
 export interface CompiledPage extends PageRecord {
   links: readonly SourceLink[];
   text: string;
+  code: readonly CodeBlock[];
 }
 export interface NavItem {
   text: string;
