@@ -57,6 +57,13 @@ reports its error and keeps the previous valid generation available until correc
 Vite's configuration. Home development shares the components and assets; the home production build also validates
 every documentation and landing link.
 
+`docs/versions.json` holds the release each section documents and, in `written`, the sections whose pages are
+written. `deno task test` fails where a page names another version of Moonwell or of a library: in
+`moonwell@<version>`, after the word Moonwell, in the `tag` that follows a library's `github` line, in a link to a
+library's repository at a tag, and after a library's name (`moonwell-wrappers v0.10.1`). It also fails when the
+overview of a written section does not name its version. After a release, change the file first: the test then
+names every line to rewrite.
+
 A code block names its language: `yue` (or `yuescript`), `lua`, `pkl`, `toml`, `json`, `sh` (or `bash`, `shell`),
 `powershell` (or `ps1`) or `text`. The table is `shared/code-languages.ts`. A language is added in three places: a row
 there, its Shiki grammar as a line of the imports in `deno.json` (each grammar is mapped by its file), and the grammar's
