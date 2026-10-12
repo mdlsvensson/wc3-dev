@@ -73,10 +73,32 @@ Deno.test("a skipped fence still counts as present for the pairing of a code gro
   assertEquals(report, { checked: 1, skipped: 1, failures: [] });
 });
 
-Deno.test("a compiler program that does not exist is named by its variable and path", async () => {
-  const before = Deno.env.get("MOONWELL_YUE");
-  Deno.env.set("MOONWELL_YUE", "C:/no/such/folder/yue.exe");
+/** Runs `body` with the two compiler variables set as given (undefined: unset), then restores the exact old values. */
+async function withCompilers(
+  yue: string | undefined,
+  luac: string | undefined,
+  body: () => Promise<void> | void,
+): Promise<void> {
+  const names = { MOONWELL_YUE: yue, MOONWELL_LUAC: luac };
+  const before = Object.keys(names).map((name) =>
+    [name, Deno.env.get(name)] as const
+  );
   try {
+    for (const [name, value] of Object.entries(names)) {
+      if (value === undefined) Deno.env.delete(name);
+      else Deno.env.set(name, value);
+    }
+    await body();
+  } finally {
+    for (const [name, value] of before) {
+      if (value === undefined) Deno.env.delete(name);
+      else Deno.env.set(name, value);
+    }
+  }
+}
+
+Deno.test("a compiler program that does not exist is named by its variable and path", async () => {
+  await withCompilers("C:/no/such/folder/yue.exe", "luac", async () => {
     let message = "";
     try {
       await compilerRunner()("yue", "x = 1\n");
@@ -85,10 +107,33 @@ Deno.test("a compiler program that does not exist is named by its variable and p
     }
     assertStringIncludes(message, "MOONWELL_YUE");
     assertStringIncludes(message, "C:/no/such/folder/yue.exe");
-  } finally {
-    if (before === undefined) Deno.env.delete("MOONWELL_YUE");
-    else Deno.env.set("MOONWELL_YUE", before);
-  }
+  });
+});
+
+Deno.test("a missing compiler variable is named when the runner is made, before any block is run", async () => {
+  const messageOf = () => {
+    try {
+      compilerRunner();
+    } catch (error) {
+      return (error as Error).message;
+    }
+    return "";
+  };
+  await withCompilers(undefined, undefined, () => {
+    assertEquals(
+      messageOf(),
+      "MOONWELL_YUE is not set; MOONWELL_LUAC is not set",
+    );
+  });
+  await withCompilers("yue", undefined, () => {
+    assertEquals(messageOf(), "MOONWELL_LUAC is not set");
+  });
+  await withCompilers(undefined, "luac", () => {
+    assertEquals(messageOf(), "MOONWELL_YUE is not set");
+  });
+  await withCompilers("yue", "luac", () => {
+    assertEquals(messageOf(), "");
+  });
 });
 
 Deno.test({

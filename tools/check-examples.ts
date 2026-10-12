@@ -56,16 +56,26 @@ export async function checkExamples(
   return report;
 }
 
-/** Runs the YueScript compiler and Lua 5.3's luac on standard input. The two programs are named by variables. */
+/**
+ * Runs the YueScript compiler and Lua 5.3's luac on standard input. The two programs are named by variables, and both
+ * are read here, before any block is looked at: a missing one is an error that names it.
+ */
 export function compilerRunner(): RunCompiler {
   const programs = {
     yue: { variable: "MOONWELL_YUE", args: ["-"] },
     lua: { variable: "MOONWELL_LUAC", args: ["-p", "-"] },
   };
+  const named = {
+    yue: Deno.env.get(programs.yue.variable),
+    lua: Deno.env.get(programs.lua.variable),
+  };
+  const missing = (["yue", "lua"] as const).filter((language) =>
+    !named[language]
+  ).map((language) => `${programs[language].variable} is not set`);
+  if (missing.length) throw new Error(missing.join("; "));
   return async (language, code) => {
     const { variable, args } = programs[language];
-    const program = Deno.env.get(variable);
-    if (!program) throw new Error(`${variable} is not set`);
+    const program = named[language]!;
     let child: Deno.ChildProcess;
     try {
       child = new Deno.Command(program, {
@@ -102,7 +112,14 @@ if (import.meta.main) {
   );
   const assets = await staticAssetPaths(new URL("../", import.meta.url));
   const pages = await compileDocumentation(sources, navigation, assets);
-  const report = await checkExamples(pages, compilerRunner());
+  let run: RunCompiler;
+  try {
+    run = compilerRunner();
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    Deno.exit(1);
+  }
+  const report = await checkExamples(pages, run);
   for (const failure of report.failures) console.error(failure);
   console.log(
     `${report.checked} examples checked, ${report.skipped} skipped, ${report.failures.length} failed`,
