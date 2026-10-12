@@ -42,7 +42,6 @@
     "npm:@remix-run/node-fetch-server@0.12": "0.12.0",
     "npm:@types/babel__core@7.20.5": "7.20.5",
     "npm:@types/babel__core@^7.20.5": "7.20.5",
-    "npm:@types/markdown-it-container@4.0.1": "4.0.1",
     "npm:@types/markdown-it@14.2.0": "14.2.0",
     "npm:esbuild-wasm@~0.25.11": "0.25.12",
     "npm:esbuild@0.25.7": "0.25.7",
@@ -1328,12 +1327,6 @@
     "@types/linkify-it@5.0.0": {
       "integrity": "sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q=="
     },
-    "@types/markdown-it-container@4.0.1": {
-      "integrity": "sha512-lGoaXzFY51sfUiBZ+L9V7n/Ah2q/46G2MGERUXN/4Djq0aCFOEUxysC8xftAdf5EdnvKfb2QkQnGNMoaKwjI1Q==",
-      "dependencies": [
-        "@types/markdown-it"
-      ]
-    },
     "@types/markdown-it@14.2.0": {
       "integrity": "sha512-NoQ2yGlLWj4wpxMs+TYmRKk3thDrQ97agr7sFqfLsAlvoS8SNQuTrlObhFqG9iugdTtgOE9jpJ6FNM4ZGsa5xQ==",
       "dependencies": [
@@ -2020,7 +2013,6 @@
       "npm:@cloudflare/vite-plugin@1.63.1",
       "npm:@preact/signals@2.11.3",
       "npm:@types/babel__core@7.20.5",
-      "npm:@types/markdown-it-container@4.0.1",
       "npm:@types/markdown-it@14.2.0",
       "npm:markdown-it-container@4.0.0",
       "npm:markdown-it@14.1.1",

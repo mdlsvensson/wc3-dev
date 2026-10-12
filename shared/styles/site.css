@@ -514,13 +514,19 @@ code {
 .callout-warning {
   border-left-color: var(--brand);
 }
-.callout > .callout-title {
+.callout > .callout-title,
+.callout[aria-label]::before {
   margin: 0 0 4px;
   font: var(--jersey-10);
   font-synthesis: none;
   color: var(--text);
 }
-.callout-warning > .callout-title {
+.callout[aria-label]::before {
+  content: attr(aria-label);
+  display: block;
+}
+.callout-warning > .callout-title,
+.callout-warning[aria-label]::before {
   color: var(--brand);
 }
 .callout > :last-child {

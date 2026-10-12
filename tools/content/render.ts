@@ -1,6 +1,5 @@
 // @deno-types="@types/markdown-it"
 import MarkdownIt from "markdown-it";
-// @deno-types="@types/markdown-it-container"
 import container from "markdown-it-container";
 import { createHighlighterCore, type LanguageRegistration } from "shiki/core";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
@@ -19,16 +18,18 @@ import {
   codeLanguage,
 } from "../../shared/code-languages.ts";
 import type { CodeBlock, Heading, SourceLink } from "../../shared/types.ts";
-import { checkContainers } from "./containers.ts";
+import {
+  checkContainers,
+  containerName,
+  containerNames,
+  containerTitle,
+} from "./containers.ts";
 
-/**
- * The types of `markdown-it-container` are written for the CommonJS typings of markdown-it, which Deno does not
- * pair with the module typings `MarkdownIt` comes from, so the plugin is typed here as `use` takes it.
- */
-const containerPlugin = container as unknown as (
-  markdown: MarkdownIt,
-  ...params: unknown[]
-) => void;
+/** What a note or a warning is called when its author wrote no title. */
+const calloutTitles: Record<string, string> = {
+  note: "Note",
+  warning: "Warning",
+};
 
 /** The Shiki grammar of each language of the table. `text` has none. */
 const grammars: Record<string, string> = {
@@ -84,32 +85,45 @@ export async function createRenderer() {
   const markdown = new MarkdownIt({ html: false });
   // Parse unsafe targets too, so validation reports their source and target instead of silently hiding them.
   markdown.validateLink = () => true;
-  for (const [name, title] of [["note", "Note"], ["warning", "Warning"]]) {
-    markdown.use(containerPlugin, name, {
+  for (const name of containerNames) {
+    // The checks read a block's name with `containerName` too, so that the plugin and they agree on what a block is.
+    const validate = (params: string) => containerName(params) === name;
+    if (name === "code-group") {
+      markdown.use(container, name, {
+        validate,
+        render(tokens: Token[], index: number) {
+          const token = tokens[index];
+          if (token.nesting !== 1) return "</div>\n";
+          const tabs = (token.meta as { languages: CodeLanguage[] }).languages
+            .map(
+              ({ name, label }) =>
+                `<button type="button" role="tab" class="code-tab" data-lang="${name}" ` +
+                `aria-label="${label}"></button>`,
+            ).join("\n");
+          return '<div class="code-group">\n' +
+            '<div class="code-tabs" role="tablist" aria-label="Code language">\n' +
+            `${tabs}\n</div>\n`;
+        },
+      });
+      continue;
+    }
+    markdown.use(container, name, {
+      validate,
       render(tokens: Token[], index: number) {
         const token = tokens[index];
         if (token.nesting !== 1) return "</aside>\n";
-        const written = token.info.trim().slice(name.length).trim();
-        return `<aside class="callout callout-${name}"><p class="callout-title">${
-          markdown.utils.escapeHtml(written || title)
-        }</p>\n`;
+        const written = containerTitle(token.info);
+        // A default title is a label drawn by CSS from `aria-label`, so it is no text of the page.
+        return written
+          ? `<aside class="callout callout-${name}"><p class="callout-title">${
+            markdown.utils.escapeHtml(written)
+          }</p>\n`
+          : `<aside class="callout callout-${name}" aria-label="${
+            calloutTitles[name]
+          }">\n`;
       },
     });
   }
-  markdown.use(containerPlugin, "code-group", {
-    render(tokens: Token[], index: number) {
-      const token = tokens[index];
-      if (token.nesting !== 1) return "</div>\n";
-      const tabs = (token.meta as { languages: CodeLanguage[] }).languages.map(
-        ({ name, label }) =>
-          `<button type="button" role="tab" class="code-tab" data-lang="${name}" ` +
-          `aria-label="${label}"></button>`,
-      ).join("\n");
-      return '<div class="code-group">\n' +
-        '<div class="code-tabs" role="tablist" aria-label="Code language">\n' +
-        `${tabs}\n</div>\n`;
-    },
-  });
   markdown.renderer.rules.fence = (tokens, index) => {
     const token = tokens[index];
     const { language } = token.meta as FenceMeta;
@@ -124,8 +138,8 @@ export async function createRenderer() {
   };
   return {
     parse(source: string, content: string) {
-      checkContainers(source, content);
       const tokens = markdown.parse(content, {});
+      checkContainers(source, tokens, content.split(/\r?\n/));
       const headings: Heading[] = [];
       const code: CodeBlock[] = [];
       const blockOf = new Map<Token, CodeBlock>();
@@ -153,6 +167,11 @@ export async function createRenderer() {
         }
         if (token.type === "inline") {
           text.push(visibleText(token.children ?? []));
+        }
+        if (/^container_(note|warning)_open$/.test(token.type)) {
+          // A written title is the author's prose and searchable; a default title is a label and is not.
+          const written = containerTitle(token.info);
+          if (written) text.push(written);
         }
         if (token.type === "fence" || token.type === "code_block") {
           const line = (token.map?.[0] ?? 0) + 1;
