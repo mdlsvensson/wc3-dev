@@ -145,14 +145,16 @@ export async function createRenderer() {
         const token = tokens[index];
         if (token.nesting !== 1) return "</aside>\n";
         const written = containerTitle(token.info);
-        // A default title is a label drawn by CSS from `aria-label`, so it is no text of the page.
+        const kind = calloutTitles[name];
+        // `aria-label` tells every callout's kind. A default title is drawn by CSS from `data-title`, so it is no text
+        // of the page.
+        const open =
+          `<aside class="callout callout-${name}" role="note" aria-label="${kind}"`;
         return written
-          ? `<aside class="callout callout-${name}"><p class="callout-title">${
+          ? `${open}><p class="callout-title">${
             markdown.utils.escapeHtml(written)
           }</p>\n`
-          : `<aside class="callout callout-${name}" aria-label="${
-            calloutTitles[name]
-          }">\n`;
+          : `${open} data-title="${kind}">\n`;
       },
     });
   }

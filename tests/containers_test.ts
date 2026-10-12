@@ -59,7 +59,7 @@ Deno.test("a note with no title is labelled by an attribute, not by text", async
   const [page] = await compile("## Sec\n\n::: warning\nIt desyncs.\n:::\n");
   assertStringIncludes(
     page.html,
-    '<aside class="callout callout-warning" aria-label="Warning">',
+    '<aside class="callout callout-warning" role="note" aria-label="Warning" data-title="Warning">',
   );
   assertEquals(page.html.includes("callout-title"), false);
   assertEquals(buildSearchPayload([page]).entries[1].excerpt, "It desyncs.");
@@ -73,13 +73,41 @@ Deno.test("a written title is the author's prose, in the page and in its section
   );
   assertStringIncludes(
     page.html,
-    '<aside class="callout callout-note"><p class="callout-title">Measured on 3.0.0.24268</p>',
+    '<aside class="callout callout-note" role="note" aria-label="Note"><p class="callout-title">Measured on 3.0.0.24268</p>',
   );
-  assertEquals(page.html.includes('aria-label="Note"'), false);
+  assertEquals(page.html.includes("data-title"), false);
   assertStringIncludes(page.html, "<em>removed</em>");
   assertStringIncludes(page.text, "Measured on 3.0.0.24268");
   const excerpt = buildSearchPayload([page]).entries[1].excerpt;
   assertEquals(excerpt.startsWith("Measured on 3.0.0.24268"), true);
+});
+
+Deno.test("a callout tells its kind, with a written title and without one", async () => {
+  const [page] = await compile(
+    "::: warning Desyncs\nText.\n:::\n\n::: note\nText.\n:::\n",
+  );
+  assertStringIncludes(
+    page.html,
+    '<aside class="callout callout-warning" role="note" aria-label="Warning"><p class="callout-title">Desyncs</p>',
+  );
+  assertStringIncludes(
+    page.html,
+    '<aside class="callout callout-note" role="note" aria-label="Note" data-title="Note">',
+  );
+  assertEquals(page.html.split("data-title").length - 1, 1);
+  assertEquals(page.html.split("callout-title").length - 1, 1);
+});
+
+Deno.test("the default title is drawn from data-title, which only a callout without a written title has", async () => {
+  const css = await Deno.readTextFile(
+    new URL("../shared/styles/site.css", import.meta.url),
+  );
+  assertStringIncludes(
+    css,
+    ".callout[data-title]::before {\n  content: attr(data-title);",
+  );
+  // Every callout has aria-label, so a rule that selects it would draw a second title on a titled one.
+  assertEquals(/\.callout[\w-]*\[aria-label/.test(css), false);
 });
 
 Deno.test("a title is escaped", async () => {
@@ -94,7 +122,7 @@ Deno.test("a tab after the name of a block is read as the plugin reads it", asyn
   const [page] = await compile("::: note\ttitle\nText.\n:::\n");
   assertStringIncludes(
     page.html,
-    '<aside class="callout callout-note"><p class="callout-title">title</p>',
+    '<aside class="callout callout-note" role="note" aria-label="Note"><p class="callout-title">title</p>',
   );
 });
 
