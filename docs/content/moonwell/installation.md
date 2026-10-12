@@ -8,8 +8,8 @@ These pages describe Moonwell 0.12.3.
 - **Windows or Linux on x86-64.** Moonwell is built for these two systems.
 - **Warcraft III Reforged, with its World Editor.** The game plays your map, and World Editor edits the map that a
   project builds from. Installing Moonwell and building a map need neither.
-- **An editor of your choice.** Moonwell needs none in particular. [Editor setup](./editor-setup) shows what VS Code
-  adds to a project.
+- **An editor of your choice.** Moonwell needs none in particular. [Editor setup](./editor-setup) shows how to set up
+  VS Code for a project.
 
 ## Install Moonwell
 
@@ -63,8 +63,9 @@ lines:
 gameExecutable = 'C:\Program Files (x86)\Warcraft III\_retail_\x86_64\Warcraft III.exe'
 ```
 
-That is the game where Battle.net installs it by default. The script says where the file is and asks you to check the
-path. It never changes a `config.toml` that is already there.
+That is where Battle.net installs the game on Windows by default. The Linux script writes the same line, with this
+Windows path. The script says where the file is and asks you to check the path. It never changes a `config.toml` that
+is already there.
 
 `moonwell test` reads the game's path from this file, and [Settings](./reference/settings) lists everything else it
 can hold.
@@ -137,13 +138,13 @@ dependencies {
 Then run `pkl project resolve` in the project folder. It writes `PklProject.deps.json` beside `PklProject`, and that
 is the file Moonwell reads the package's version from.
 
-The other way works too: keep the project as it is and install the Moonwell it names, with the line under
-[Installing one version](#installing-one-version).
-
 ::: note
 If you have no `pkl` command for this step, `moonwell setup` gives you one: see [Pkl](#pkl). In a project that is not
 moved yet, `setup` still copies Pkl, and then stops with the version error.
 :::
+
+The other way works too: keep the project as it is and install the Moonwell it names, with the line under
+[Installing one version](#installing-one-version).
 
 ## See also
 
