@@ -45,21 +45,22 @@ writes its long reference page. `deno task dev:sample` serves it and `deno task 
 pages, grouped sidebars and wide tables can be looked at and measured before such pages are authored. A sample run
 writes into the same `docs/generated/` and `docs/_fresh/` as a real one. To run `deno task test:preview` against the
 sample, build in this order: `deno task build:home`, then `deno task build:sample`, then start both previews, then run
-the test. (`build:home` prepares the authored content, and would overwrite the generated records that the test reads
-if it ran after the sample build.) End a sample run with `deno task build:docs`, so that the generated files and the
-docs build are the authored site again.
+the test. (`build:home`, `deno task check`, `deno task content` and `deno task dev` prepare the authored content, and
+would overwrite the generated records that the test reads if they ran after the sample build.) End a sample run with
+`deno task build:docs`, so that the generated files and the docs build are the authored site again.
 
 Authored Markdown is in `docs/content/`. `docs/navigation.ts` lists each section's groups and pages: a group with a
-`title` opens and closes in the sidebar, and a page's sidebar label is its `label` or else its first heading. A page
-must be listed there. Docs development waits for initial compilation, then watches Markdown changes. Successful
-validation publishes the page/search pair and reloads the browser. An invalid edit reports its error and keeps the
-previous valid generation available until corrected. Editing navigation restarts Vite's configuration. Home
-development shares the components and assets; the home production build also validates every documentation and
-landing link.
+`title` opens and closes in the sidebar, and a page's sidebar label is its `label` or else its `h1` heading, of which a
+page has exactly one. A page must be listed there. Docs development waits for initial compilation, then watches
+Markdown changes. Successful validation publishes the page/search pair and reloads the browser. An invalid edit
+reports its error and keeps the previous valid generation available until corrected. Editing navigation restarts
+Vite's configuration. Home development shares the components and assets; the home production build also validates
+every documentation and landing link.
 
 A code block names its language: `yue` (or `yuescript`), `lua`, `pkl`, `toml`, `json`, `sh` (or `bash`, `shell`),
-`powershell` (or `ps1`) or `text`. The table is `shared/code-languages.ts`; a language is added by a row there and its
-grammar in `tools/content/render.ts`. Three blocks are written between `:::` lines, and a block may not stand inside
+`powershell` (or `ps1`) or `text`. The table is `shared/code-languages.ts`. A language is added in three places: a row
+there, its Shiki grammar as a line of the imports in `deno.json` (each grammar is mapped by its file), and the grammar's
+use in `tools/content/render.ts`. Three blocks are written between `:::` lines, and a block may not stand inside
 another:
 
 ````md
@@ -84,14 +85,16 @@ Text.
 A code group holds two or more code blocks, each in a different language. A note or a warning without a written title
 shows "Note" or "Warning"; a written title is plain text.
 
-A heading takes a hand-written id from a trailing `{#id}`, of lower-case letters, digits, `.`, `_` and `-`. The marker
-must end the heading, and an id that is written by hand cannot be the id of another heading of the page. To show a
-literal `{#...}` in a heading, put it in inline code. Without a marker the id is made from the heading's text.
+A heading takes a hand-written id from a trailing `{#id}`: it starts with a lower-case letter or a digit and goes on
+with lower-case letters, digits, `.`, `_` and `-`. The marker must end the heading, and an id that is written by hand
+cannot be the id of another heading of the page. To show a literal `{#...}` in a heading, put it in inline code.
+Without a marker the id is made from the heading's text.
 
 `deno task check:examples` compiles the `yue` and `lua` blocks of the authored pages. `MOONWELL_YUE` names the
-YueScript compiler and `MOONWELL_LUAC` names Lua 5.3's `luac`; both must be set. A block that cannot stand alone is
-written `lua skip` or `yue skip`: it is counted and not compiled. A code group with one of `yue` and `lua` needs the
-other.
+YueScript compiler and `MOONWELL_LUAC` names Lua 5.3's `luac`. The task reads both when it starts, and stops with a
+line that names each one that is missing, whether or not the pages hold a block of that language. A block that cannot
+stand alone is written `lua skip` or `yue skip`: it is counted and not compiled. A code group with one of `yue` and
+`lua` needs the other.
 
 Content preparation fails, with the file and the line, on an unknown code language, a code block without a language,
 an unknown block name, a block that is not closed or that stands inside another, and a heading id that is written
@@ -107,11 +110,13 @@ production rendering uses bundled records and never reads the authored Markdown.
 and MiniSearch client only when opened. Static font licences and provenance stay beside the fonts.
 
 Contract tests compare the shared asset bytes with their original git objects, so run `deno task test` from a Git
-checkout with history. Tests of pages run against the sample site in `tests/fixtures/site/`; no test names an authored
-page. `deno task test` passes without `MOONWELL_YUE` and `MOONWELL_LUAC`; the test of the real compilers is then
-skipped. Clean source archives can install frozen dependencies and build both Workers without git history.
-`deno task test:preview` exercises the actual built routes, redirect queries, both home hosts, missing pages/assets and
-empty HEAD bodies, then checks all shared asset types and bytes.
+checkout with history. Tests of what a page can hold run against the sample site in `tests/fixtures/site/`. The authored
+pages are held only to contracts that fit any page: each is served with one `h1`, its title and its place in the
+sidebar, and the first page of a section is its overview. No test names an authored page. `deno task test` passes
+without `MOONWELL_YUE` and `MOONWELL_LUAC`; the test of the real compilers is then skipped. Clean source archives can
+install frozen dependencies and build both Workers without git history. `deno task test:preview` exercises the actual
+built routes, redirect queries, both home hosts, missing pages/assets and empty HEAD bodies, checks that a built page
+holds its own text and no other page's, then checks all shared asset types and bytes.
 
 The repository's `.gitattributes` keeps source files with LF line ends, and authored Markdown, the sample's Markdown,
 static files and the vendored grammar byte-exact.
