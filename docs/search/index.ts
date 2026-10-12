@@ -38,7 +38,15 @@ function sectionText(html: string): string {
 export function buildSearchPayload(
   pages: readonly CompiledPage[],
 ): SearchPayload {
-  const documents: (SearchEntry & { text: string })[] = [];
+  const entries: SearchEntry[] = [];
+  // What the index reads. A section is indexed by its own heading and text only: the page's title is shown with
+  // its entry, but indexing it there would tie the page with all of its sections.
+  const documents: {
+    id: string;
+    title: string;
+    heading: string;
+    text: string;
+  }[] = [];
   for (const page of pages) {
     const boundaries = [
       ...page.html.matchAll(
@@ -54,13 +62,18 @@ export function buildSearchPayload(
         boundaries[0]?.index ?? page.html.length,
       ))
       : page.text;
-    documents.push({
+    entries.push({
       id: page.source,
       url: page.url,
       title: page.title,
       heading: "",
-      text: intro,
       excerpt: excerpt(intro),
+    });
+    documents.push({
+      id: page.source,
+      title: page.title,
+      heading: "",
+      text: intro,
     });
     for (let i = 0; i < boundaries.length; i++) {
       const match = boundaries[i];
@@ -72,20 +85,18 @@ export function buildSearchPayload(
         match.index! + match[0].length,
         boundaries[i + 1]?.index ?? page.html.length,
       ));
-      documents.push({
-        id: `${page.source}#${heading.id}`,
+      const id = `${page.source}#${heading.id}`;
+      entries.push({
+        id,
         url: `${page.url}#${heading.id}`,
         title: page.title,
         heading: heading.text,
-        text,
         excerpt: excerpt(text),
       });
+      documents.push({ id, title: "", heading: heading.text, text });
     }
   }
   const index = new MiniSearch(searchOptions);
   index.addAll(documents);
-  return {
-    index: JSON.stringify(index),
-    entries: documents.map(({ text: _text, ...entry }) => entry),
-  };
+  return { index: JSON.stringify(index), entries };
 }

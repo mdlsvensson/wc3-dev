@@ -8,7 +8,7 @@ import { buildSearchPayload } from "../docs/search/index.ts";
 import { createSearchEngine } from "../docs/search/engine.ts";
 import { createSearchLoader } from "../docs/search/loader.ts";
 import { tabBoundaryTarget } from "../docs/search/focus.ts";
-import { searchTerms } from "../docs/search/terms.ts";
+import { searchTerms, searchWords, wordParts } from "../docs/search/terms.ts";
 import { resultLimit, resultStatus } from "../docs/search/limit.ts";
 import type { SearchEngine } from "../docs/search/types.ts";
 import type { CompiledPage } from "../shared/types.ts";
@@ -62,7 +62,13 @@ Deno.test("serialized search covers the landing page and every sample page, with
     ),
     true,
   );
-  assertEquals(engine.search("Pixel LICENSE README").length, 0);
+  // Static files such as the fonts and their licences are not documentation.
+  for (const entry of payload.entries) {
+    for (const name of ["fonts", "README", "LICENSE"]) {
+      assertEquals(entry.url.includes(name), false, entry.url);
+      assertEquals(entry.id.includes(name), false, entry.id);
+    }
+  }
 });
 
 Deno.test("search ranks title and heading matches above body matches", () => {
@@ -237,22 +243,153 @@ Deno.test("modal tab boundaries wrap in both directions including focused result
 
 Deno.test("a word is a term whole and by its parts", () => {
   assertEquals(searchTerms("Unit.issueTargetOrder(target)"), [
+    "Unit.issueTargetOrder",
     "Unit",
-    "issueTargetOrder",
     "issue",
     "Target",
     "Order",
     "target",
   ]);
   assertEquals(searchTerms("moonwell_library v2beta"), [
+    "moonwell_library",
     "moonwell",
     "library",
     "v2beta",
-    "v",
-    "2",
     "beta",
   ]);
+  assertEquals(searchTerms("EVENT_PLAYER_UNIT_DEATH"), [
+    "EVENT_PLAYER_UNIT_DEATH",
+    "EVENT",
+    "PLAYER",
+    "UNIT",
+    "DEATH",
+  ]);
+  assertEquals(searchTerms("End of a sentence. Next one."), [
+    "End",
+    "of",
+    "a",
+    "sentence",
+    "Next",
+    "one",
+  ]);
+  assertEquals(searchTerms("local u=Unit.create(x+1)"), [
+    "local",
+    "u",
+    "Unit.create",
+    "Unit",
+    "create",
+    "x",
+    "1",
+  ]);
+  assertEquals(searchTerms("moonwell.toml and v0.12.2"), [
+    "moonwell.toml",
+    "moonwell",
+    "toml",
+    "and",
+    "v0.12.2",
+    "12",
+  ]);
   assertEquals(searchTerms("... :: --"), []);
+});
+
+Deno.test("a word has parts where it changes case, meets a digit or has a dot or underscore", () => {
+  assertEquals(wordParts("issueT"), ["issue"]);
+  assertEquals(wordParts("Unit"), []);
+  assertEquals(wordParts("getLife"), ["get", "Life"]);
+  assertEquals(searchWords("a_b. .c x.y."), ["a_b", "c", "x.y"]);
+});
+
+async function sampleEngine() {
+  const { pages } = await loadSampleSite();
+  const landing = compileLandingPage(pages, await staticAssets());
+  return createSearchEngine(
+    JSON.parse(JSON.stringify(buildSearchPayload([landing, ...pages]))),
+  );
+}
+
+Deno.test("a name cut short finds what its whole part finds and no more", async () => {
+  const engine = await sampleEngine();
+  const issue = engine.search("issue").map((entry) => entry.url).sort();
+  const cut = engine.search("issueT").map((entry) => entry.url).sort();
+  assertEquals(cut, issue);
+  assertEquals(cut.length < 10, true);
+  assertEquals(
+    cut.filter((url) => url.startsWith("/wrappers/reference/unit#issue"))
+      .length >= 2,
+    true,
+  );
+});
+
+Deno.test("a name finds its section first and few others", async () => {
+  const engine = await sampleEngine();
+  for (const query of ["getLife", "Unit.getLife"]) {
+    const results = engine.search(query);
+    assertEquals(
+      results[0].url,
+      "/wrappers/reference/unit#getlife",
+      query,
+    );
+    assertEquals(results.length < 10, true, `${query}: ${results.length}`);
+  }
+});
+
+Deno.test("the title of a page finds the page before its sections", async () => {
+  const engine = await sampleEngine();
+  for (const query of ["unit", "wrappers.unit"]) {
+    assertEquals(
+      engine.search(query)[0].url,
+      "/wrappers/reference/unit",
+      query,
+    );
+  }
+});
+
+Deno.test("words of a name find it from the sample, with a dot or run together", async () => {
+  const engine = await sampleEngine();
+  const target = "/wrappers/reference/unit#issuetargetorder";
+  assertEquals(
+    engine.search("target order").some((entry) => entry.url === target),
+    true,
+  );
+  const together = engine.search("TargetOrder").map((entry) => entry.url);
+  assertEquals(together[0], target);
+  assertEquals(
+    engine.search("map.folder").some((entry) =>
+      entry.url.startsWith("/moonwell/first-map")
+    ),
+    true,
+  );
+});
+
+Deno.test("a name that no page mentions gives no results", () => {
+  const engine = createSearchEngine(
+    buildSearchPayload([page("Guide", "Some words about maps.")]),
+  );
+  for (const query of ["getL", "issueT", "Unit.getLife"]) {
+    assertEquals(engine.search(query), [], query);
+  }
+});
+
+Deno.test("a whole name decides over names that share its parts", () => {
+  const engine = createSearchEngine(
+    buildSearchPayload([
+      page("Events", "", {
+        html: '<h1 id="events">Events</h1>' +
+          '<h3 id="death">EVENT_PLAYER_UNIT_DEATH</h3><p>A unit died.</p>' +
+          '<h3 id="attacked">EVENT_PLAYER_UNIT_ATTACKED</h3>' +
+          "<p>A player&#39;s unit event, not a death.</p>",
+        headings: [
+          { id: "events", text: "Events", level: 1 },
+          { id: "death", text: "EVENT_PLAYER_UNIT_DEATH", level: 3 },
+          { id: "attacked", text: "EVENT_PLAYER_UNIT_ATTACKED", level: 3 },
+        ],
+      }),
+    ]),
+  );
+  assertEquals(
+    engine.search("EVENT_PLAYER_UNIT_DEATH")[0].url,
+    "/Events/#death",
+  );
 });
 
 Deno.test("parts of a function name find it, and the whole name ranks first", () => {

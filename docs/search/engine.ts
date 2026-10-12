@@ -1,11 +1,14 @@
-import MiniSearch from "minisearch";
-import { searchTerms } from "./terms.ts";
+import MiniSearch, { type Query } from "minisearch";
+import { searchTerms, searchWords, wordParts } from "./terms.ts";
 import type { SearchEngine, SearchPayload } from "./types.ts";
 
+// The index is cut into words and their parts by searchTerms. A query is cut by createSearchEngine into a tree whose
+// leaves are single terms, so the search-time tokenizer must keep a leaf whole.
 export const searchOptions = {
   fields: ["title", "heading", "text"],
   tokenize: searchTerms,
   searchOptions: {
+    tokenize: (term: string) => [term],
     boost: { title: 4, heading: 3 },
     prefix: true,
     fuzzy: 0.2,
@@ -33,8 +36,23 @@ export function createSearchEngine(payload: unknown): SearchEngine {
   const index = MiniSearch.loadJSON(data.index, searchOptions);
   return {
     search(query) {
-      if (!searchTerms(query).length) return [];
-      return index.search(query).map((result) => {
+      const words = searchWords(query);
+      if (!words.length) return [];
+      // Words of the query stay alternatives. A word matches whole, or by all of its parts: 'issueT' must not
+      // match every word that starts with 't'.
+      const tree: Query = {
+        combineWith: "OR",
+        queries: words.map((word): Query => {
+          const parts = wordParts(word);
+          return parts.length
+            ? {
+              combineWith: "OR",
+              queries: [word, { combineWith: "AND", queries: parts }],
+            }
+            : word;
+        }),
+      };
+      return index.search(tree).map((result) => {
         const entry = entries.get(String(result.id));
         if (!entry) throw new Error("Missing documentation search entry");
         return entry;
