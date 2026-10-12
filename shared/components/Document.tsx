@@ -4,9 +4,15 @@ export function Document(
   {
     title,
     children,
+    head,
     description =
       "Moonwell, a multilingual modding framework for Warcraft III: Reforged.",
-  }: { title: string; children: ComponentChildren; description?: string },
+  }: {
+    title: string;
+    children: ComponentChildren;
+    head?: ComponentChildren;
+    description?: string;
+  },
 ): VNode {
   return (
     <html lang="en-US">
@@ -19,6 +25,7 @@ export function Document(
           content={description}
         />
         <link rel="icon" type="image/png" href="/mw-moonwell.png" />
+        {head}
       </head>
       <body>{children}</body>
     </html>

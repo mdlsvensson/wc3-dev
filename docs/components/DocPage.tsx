@@ -2,6 +2,7 @@ import type { VNode } from "preact";
 import type { PageRecord, SidebarTree } from "../../shared/types.ts";
 import { Document } from "../../shared/components/Document.tsx";
 import { Header } from "../../shared/components/Header.tsx";
+import { languageCss, languageScript } from "../behaviour/head.ts";
 import MobileNav from "../islands/MobileNav.tsx";
 import DocMenu from "../islands/DocMenu.tsx";
 import Search from "../islands/Search.tsx";
@@ -21,7 +22,15 @@ export function DocPage({ page, sidebar }: DocPageProps): VNode {
   const menu = docMenuProps(page, sidebar);
   const hasOutline = menu.headings.length > 0;
   return (
-    <Document title={`${page.title} | wc3.dev`}>
+    <Document
+      title={`${page.title} | wc3.dev`}
+      head={
+        <>
+          <script dangerouslySetInnerHTML={{ __html: languageScript }} />
+          <style dangerouslySetInnerHTML={{ __html: languageCss() }} />
+        </>
+      }
+    >
       <div class="documentation" id="top">
         <Header items={items} leading={<Search />}>
           <MobileNav items={items} />

@@ -517,6 +517,63 @@ code {
 .code-tabs {
   display: none;
 }
+html.js .code-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  border-radius: 8px 8px 0 0;
+  background: #1f2428;
+}
+.code-tab {
+  padding: 8px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font: var(--jersey-10);
+  font-synthesis: none;
+  color: var(--text-secondary);
+}
+.code-tab::before {
+  content: attr(aria-label);
+}
+.code-tab[aria-selected="true"] {
+  color: var(--text);
+  border-bottom-color: var(--brand);
+}
+html.js .code-group > .code-block::before {
+  content: none;
+}
+html.js .code-group > .code-block > pre {
+  padding-top: 20px;
+  border-radius: 0 0 8px 8px;
+}
+html.js .code-group > .code-block + .code-block {
+  margin-top: 0;
+}
+html.js .code-group:not([data-ready]) > .code-block ~ .code-block {
+  display: none;
+}
+.code-copy {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-raised);
+  font-size: 12px;
+  color: var(--text-secondary);
+  opacity: 0;
+}
+.code-block:hover > .code-copy,
+.code-copy:focus-visible {
+  opacity: 1;
+}
+@media (hover: none) {
+  .code-copy {
+    opacity: 1;
+  }
+}
 .callout {
   margin: 16px 0;
   padding: 12px 16px;
@@ -611,6 +668,9 @@ code {
 .outline-links a:hover {
   color: var(--brand);
 }
+.outline-links a[aria-current="location"] {
+  color: var(--brand);
+}
 .outline-nested {
   padding-left: 16px;
 }
@@ -700,6 +760,8 @@ code {
   .doc-outline .outline-links {
     position: sticky;
     top: 96px;
+    max-height: calc(100vh - 128px);
+    overflow-y: auto;
   }
 }
 
