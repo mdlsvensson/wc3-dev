@@ -6,6 +6,7 @@ import {
 } from "@std/assert";
 import { codeLanguage, codeLanguages } from "../shared/code-languages.ts";
 import { compileDocumentation } from "../tools/content/compile.ts";
+import { commentColour, themeCommentColour } from "../tools/content/render.ts";
 import { flatSection } from "./support/site.ts";
 
 const nav = [flatSection("moonwell", ["moonwell/index.md"])];
@@ -82,6 +83,36 @@ for (const [name, sample] of Object.entries(samples)) {
     }]);
   });
 }
+
+for (
+  const [name, sample] of [
+    ["lua", "-- a comment\nlocal x = 1\n"],
+    ["yue", "-- a comment\nx = 1\n"],
+    ["sh", "# a comment\nls\n"],
+  ]
+) {
+  Deno.test(`a comment in a ${name} fence is drawn in the palette's secondary text colour`, async () => {
+    const [page] = await compile("```" + name + "\n" + sample + "```\n");
+    assertEquals(page.html.toLowerCase().includes(themeCommentColour), false);
+    assertEquals(tokenColours(page.html).has(themeCommentColour), false);
+    // The span that holds the comment's own text.
+    const span = /<span style="color:(#[0-9A-Fa-f]{6})">[^<]*a comment/.exec(
+      page.html,
+    );
+    assertEquals(span?.[1].toLowerCase(), commentColour);
+  });
+}
+
+Deno.test("the colour that replaces the theme's comment colour is the palette's secondary text colour", async () => {
+  const css = await Deno.readTextFile(
+    new URL("../shared/styles/site.css", import.meta.url),
+  );
+  const root = /:root\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+  const secondary = /--text-secondary:\s*(#[0-9A-Fa-f]{6})\s*;/.exec(root)?.[1];
+  assertEquals(commentColour, secondary?.toLowerCase());
+  // Shiki looks a colour up by its lower-case form, so a key in another case would replace nothing.
+  assertEquals(themeCommentColour, themeCommentColour.toLowerCase());
+});
 
 Deno.test("an alias is stored and drawn as its language", async () => {
   const [page] = await compile("```bash\necho hi\n```\n");

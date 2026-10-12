@@ -7,5 +7,6 @@ Sample marker wrappers timer. This page is sample text for tests, not documentat
 ### create
 
 ```lua
+-- Sample comment: created paused.
 local timer = Timer.create()
 ```

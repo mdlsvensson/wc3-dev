@@ -42,6 +42,10 @@ const grammars: Record<string, string> = {
   powershell: "powershell",
 };
 
+// The theme's comment colour (3.05 to 1) is under the site's contrast rule; it becomes the palette's `--text-secondary`.
+export const themeCommentColour = "#6a737d";
+export const commentColour = "#8fa8c8";
+
 // The ids the page shell, the search and the page script give their own elements: a heading must not be a second one.
 const reservedIds = new Set([
   "top",
@@ -160,6 +164,7 @@ export async function createRenderer() {
       ? highlighter.codeToHtml(token.content, {
         lang: grammar,
         theme: "github-dark",
+        colorReplacements: { [themeCommentColour]: commentColour },
       })
       : `<pre><code>${markdown.utils.escapeHtml(token.content)}</code></pre>`;
     return `<div class="code-block" data-lang="${language.name}" data-label="${language.label}">${body}</div>\n`;
