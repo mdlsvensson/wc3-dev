@@ -48,6 +48,12 @@ export async function readSources(content: URL): Promise<Map<string, string>> {
   return sources;
 }
 
+/** The public paths of the files under `shared/static/` of a checkout ("/fonts/x.woff2"). */
+export async function staticAssetPaths(root: URL): Promise<Set<string>> {
+  const files = await listFiles(new URL("shared/static/", root));
+  return new Set(files.map((file) => `/${file}`));
+}
+
 export interface PrepareOptions {
   /** The checkout that holds shared/static/ and receives docs/generated/. */
   root?: URL;
@@ -69,11 +75,7 @@ export async function prepareDocumentation(
   const content = options.content ?? new URL("docs/content/", root);
   const sections = options.navigation ?? navigation;
   const sources = await readSources(content);
-  const assets = new Set(
-    (await listFiles(new URL("shared/static/", root))).map((asset) =>
-      `/${asset}`
-    ),
-  );
+  const assets = await staticAssetPaths(root);
   const pages = await compileDocumentation(sources, sections, assets);
   const landingPage = compileLandingPage(pages, assets);
   const search = JSON.stringify(buildSearchPayload([landingPage, ...pages]));

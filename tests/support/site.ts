@@ -1,7 +1,7 @@
 import type { NavSection, SectionId } from "../../shared/types.ts";
 import { buildSidebars } from "../../docs/sidebar.ts";
 import { compileDocumentation } from "../../tools/content/compile.ts";
-import { listFiles, readSources } from "../../tools/content/prepare.ts";
+import { readSources, staticAssetPaths } from "../../tools/content/prepare.ts";
 import { navigation as sampleNavigation } from "../fixtures/site/navigation.ts";
 
 export const sampleContent = new URL(
@@ -18,11 +18,8 @@ export function flatSection(
   return { id, label, groups: [{ pages: sources }] };
 }
 
-export async function staticAssets(): Promise<Set<string>> {
-  const files = await listFiles(
-    new URL("../../shared/static/", import.meta.url),
-  );
-  return new Set(files.map((file) => `/${file}`));
+export function staticAssets(): Promise<Set<string>> {
+  return staticAssetPaths(new URL("../../", import.meta.url));
 }
 
 export async function loadSampleSite() {
