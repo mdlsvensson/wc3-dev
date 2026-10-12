@@ -236,6 +236,78 @@ Deno.test("retiring preparation drains before replacement and never reloads the 
   httpServer.emit("close");
 });
 
+Deno.test("a given content folder is the one watched and the one Vite's watcher ignores", async () => {
+  const folder = "C:\\project\\sample\\content\\";
+  const watched: string[] = [];
+  let prepared = 0;
+  let emit!: (event: Deno.FsEvent | null) => void;
+  const contentWatcher = {
+    async *[Symbol.asyncIterator]() {
+      while (true) {
+        const event = await new Promise<Deno.FsEvent | null>((resolve) =>
+          emit = resolve
+        );
+        if (!event) return;
+        yield event;
+      }
+    },
+    close() {
+      emit(null);
+    },
+  };
+  const watcher = new EventEmitter();
+  const server = {
+    watcher,
+    ws: { send() {} },
+    config: {
+      configFileDependencies: [],
+      logger: {
+        error(error: string) {
+          throw new Error(error);
+        },
+      },
+    },
+    middlewares: { use() {} },
+  } as unknown as ViteDevServer;
+  const plugin = documentationPreparation(
+    () => {
+      prepared++;
+      return Promise.resolve();
+    },
+    (path) => {
+      watched.push(path);
+      return contentWatcher;
+    },
+    folder,
+  );
+  if (
+    typeof plugin.config !== "function" ||
+    typeof plugin.configureServer !== "function" ||
+    typeof plugin.closeBundle !== "function"
+  ) throw new Error("Missing lifecycle hooks");
+  const config = await plugin.config.call({} as never, {}, {
+    command: "serve",
+    mode: "sample",
+  });
+  const afterConfiguration = await plugin.configureServer.call(
+    {} as never,
+    server,
+  );
+  afterConfiguration?.();
+  await plugin.closeBundle.call({} as never);
+  assertEquals(prepared, 1);
+  assertEquals(watched, [folder]);
+  const ignored = config?.server?.watch?.ignored;
+  if (!Array.isArray(ignored)) throw new Error("Missing ignore list");
+  const patterns = ignored.map(String);
+  assertEquals(patterns.includes("C:/project/sample/content/**"), true);
+  assertEquals(
+    patterns.filter((pattern) => pattern.includes("/docs/content")),
+    [],
+  );
+  assertEquals(watcher.listenerCount("all"), 0);
+});
+
 Deno.test("directory-only content events report failed revalidation and reload on recovery", async () => {
   let emit!: (event: Deno.FsEvent | null) => void;
   let consumed!: () => void;

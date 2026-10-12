@@ -1,20 +1,44 @@
 import { assertEquals, assertMatch, assertStringIncludes } from "@std/assert";
-import type { PageRecord } from "../shared/types.ts";
+import type { PageRecord, Sidebars } from "../shared/types.ts";
 
 // Opt in with test:preview after building and starting both independent Workers.
 const [docsOrigin, homeOrigin] = Deno.args;
 const enabled = Boolean(docsOrigin && homeOrigin);
 const sections = ["moonwell", "wrappers", "systems"];
-// The records of the last docs build: authored after build:docs, the sample after build:sample.
-const records: readonly PageRecord[] = enabled
-  ? (await import("../docs/generated/pages.ts")).pages
-  : [];
+// What the last docs build wrote: authored after build:docs, the sample after build:sample.
+const generated: { pages: readonly PageRecord[]; sidebars: Sidebars } = enabled
+  ? await import("../docs/generated/pages.ts")
+  : { pages: [], sidebars: {} };
+const records = generated.pages;
 const docsPaths = ["/", ...records.map((page) => page.url)];
 
-/** A stretch of a page's first paragraph that survives HTML and JSON escaping unchanged. */
+// The words a page shows outside its article: titles, outline headings and the sidebar.
+const chrome: readonly string[] = [
+  ...records.flatMap((page) => [
+    page.title,
+    ...page.headings.map((heading) => heading.text),
+  ]),
+  ...Object.values(generated.sidebars).flatMap((tree) => [
+    tree.label,
+    ...tree.groups.flatMap((group) => [
+      group.title ?? "",
+      ...group.items.map((item) => item.label),
+    ]),
+  ]),
+];
+
+/**
+ * Text to look for in a response: 24 or more letters, digits, spaces, commas and full stops that
+ * stand between two tags of the page's article, exactly once in the article, with no space at
+ * either end. HTML and JSON write such text unchanged, so any copy of the article holds it. Text
+ * that a title, a heading or the sidebar holds is passed over: pages show those elsewhere too.
+ */
 function probe(page: PageRecord): string | undefined {
-  const paragraph = page.html.match(/<p>([\s\S]*?)<\/p>/)?.[1] ?? "";
-  return paragraph.replace(/<[^>]*>/g, "").match(/[A-Za-z0-9 ,.]{24,}/)?.[0];
+  const runs = page.html.replace(/<[^>]*>/g, "\n").match(/[A-Za-z0-9 ,.]+/g);
+  return (runs ?? []).map((run) => run.trim()).find((text) =>
+    text.length >= 24 && page.html.split(text).length === 2 &&
+    !chrome.some((words) => words.includes(text))
+  );
 }
 
 async function request(
@@ -131,15 +155,23 @@ Deno.test({
   name: "a built page holds its own text once and no other page's text",
   ignore: !enabled,
   async fn() {
+    const probes = records.flatMap((page) => {
+      const text = probe(page);
+      return text ? [{ page, text }] : [];
+    });
+    // Without a probe the loops below would pass without looking at anything.
+    assertEquals(probes.length > 0, true, "no page yields text to look for");
     for (const page of records) {
       const html = await (await request(docsOrigin, page.url)).text();
-      for (const other of records) {
-        const text = probe(other);
-        if (!text) continue;
+      for (const { page: other, text } of probes) {
         const count = html.split(text).length - 1;
         if (other === page) {
-          // Once in the article, and once more when the description holds it (Task 9).
-          assertEquals(count >= 1 && count <= 2, true, `${page.url}: ${count}`);
+          // The article is in the response once. A second copy is a record given to an island.
+          assertEquals(
+            count,
+            1,
+            `${page.url} holds its own text ${count} times`,
+          );
         } else if (!page.html.includes(text)) {
           assertEquals(count, 0, `${page.url} holds text of ${other.url}`);
         }

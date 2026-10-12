@@ -34,11 +34,10 @@ export function documentationPreparation(
   prepareContent: () => Promise<void> = prepareDocumentation,
   watchContent: (path: string) => ContentWatcher = (path) =>
     Deno.watchFs(path, { recursive: true }),
-  contentDirectory: string = fileURLToPath(
+  content: string = fileURLToPath(
     new URL("../../docs/content/", import.meta.url),
   ),
 ): Plugin {
-  const content = contentDirectory;
   const generated = fileURLToPath(
     new URL("../../docs/generated/", import.meta.url),
   );
