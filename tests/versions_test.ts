@@ -29,6 +29,7 @@ Deno.test("a page that names the versions held has no mistake", () => {
     "",
     "Use it with moonwell-systems v0.6.1. Pkl 0.32.1 and YueScript 0.34.3 are other programs.",
     "See https://github.com/mdlsvensson/moonwell-wrappers/tree/v0.10.1/src.",
+    "It is written for Moonwell\n0.12.3 and works with moonwell-wrappers\nv0.10.1.",
   ].join("\n");
   assertEquals(
     versionMistakes(pages({ "moonwell/installation.md": page }), held),
@@ -54,6 +55,24 @@ Deno.test("each form of another version is reported at its line", () => {
     "moonwell/objects.md:7: moonwell-systems is v0.6.1, not v0.6.0",
     "moonwell/objects.md:8: moonwell-systems is v0.6.1, not v0.5.2",
   ]);
+});
+
+Deno.test("a name at the end of a line and its version at the start of the next is seen", () => {
+  const page = [
+    "# Libraries",
+    "",
+    "This page was written for Moonwell",
+    "0.11.0 and",
+    "uses moonwell-wrappers",
+    "v0.9.2.",
+  ].join("\n");
+  assertEquals(
+    versionMistakes(pages({ "moonwell/libraries.md": page }), held),
+    [
+      "moonwell/libraries.md:3: Moonwell is 0.12.3, not 0.11.0",
+      "moonwell/libraries.md:5: moonwell-wrappers is v0.10.1, not v0.9.2",
+    ],
+  );
 });
 
 Deno.test("the Overview of a written section names its version, and a placeholder section is not asked", () => {

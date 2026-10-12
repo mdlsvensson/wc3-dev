@@ -41,7 +41,7 @@ export function versionMistakes(
       }
     };
     hold(`\\bmoonwell@(${version})`, versions.moonwell, "Moonwell");
-    hold(`\\bMoonwell (${version})`, versions.moonwell, "Moonwell");
+    hold(`\\bMoonwell\\s+(${version})`, versions.moonwell, "Moonwell");
     for (const [section, repository] of libraries) {
       const wanted = versions[section];
       hold(
@@ -49,7 +49,7 @@ export function versionMistakes(
         wanted,
         repository,
       );
-      hold(`${repository} (v${version})`, wanted, repository);
+      hold(`${repository}\\s+(v${version})`, wanted, repository);
       // A `[[libraries]]` entry: the tag that follows the repository, before the next table or the fence's end.
       hold(
         `github\\s*=\\s*"mdlsvensson/${repository}"[^\\[\`]*?\\btag\\s*=\\s*"([^"]*)"`,
