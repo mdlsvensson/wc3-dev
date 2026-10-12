@@ -62,6 +62,19 @@ Deno.test("the heading being read is the last one at or above the line", () => {
   assertEquals(currentHeading([], 112), undefined);
 });
 
+Deno.test("at the bottom of the document the heading being read is the last one", () => {
+  // The last sections of a page are too short to scroll their headings up to the line.
+  const tops = [{ id: "a", top: -400 }, { id: "b", top: 90 }, {
+    id: "c",
+    top: 700,
+  }];
+  assertEquals(currentHeading(tops, 112, true), "c");
+  assertEquals(currentHeading([{ id: "a", top: 300 }], 112, true), "a");
+  assertEquals(currentHeading([], 112, true), undefined);
+  assertEquals(currentHeading(tops, 112, false), "b");
+  assertEquals(currentHeading([{ id: "a", top: 300 }], 112, false), undefined);
+});
+
 Deno.test("the generated CSS has one rule pair per language and nothing else", () => {
   const css = languageCss();
   for (const { name } of codeLanguages) {

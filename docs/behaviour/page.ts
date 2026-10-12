@@ -150,6 +150,7 @@ function outlineMark(): void {
         top: heading.getBoundingClientRect().top,
       })),
       112,
+      innerHeight + scrollY >= document.documentElement.scrollHeight - 2,
     );
     for (const link of links) {
       const on = id !== undefined &&
