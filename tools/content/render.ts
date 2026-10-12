@@ -16,6 +16,7 @@ import yueGrammar from "./grammars/yuescript.tmLanguage.json" with {
 import {
   type CodeLanguage,
   codeLanguage,
+  codeLanguages,
 } from "../../shared/code-languages.ts";
 import type { CodeBlock, Heading, SourceLink } from "../../shared/types.ts";
 import {
@@ -57,7 +58,15 @@ const reservedIds = new Set([
   "doc-mobile-sidebar",
   "doc-mobile-outline",
 ]);
-const reservedIdPatterns = [/^search-result-\d+$/, /^code-\d+-./];
+// The page script names a grouped code block `code-<n>-<language>` and its tab the same with `-tab`.
+const reservedIdPatterns = [
+  /^search-result-\d+$/,
+  new RegExp(
+    `^code-\\d+-(?:${
+      codeLanguages.map((language) => language.name).join("|")
+    })(?:-tab)?$`,
+  ),
+];
 const isReservedId = (id: string) =>
   reservedIds.has(id) || reservedIdPatterns.some((pattern) => pattern.test(id));
 

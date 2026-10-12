@@ -135,6 +135,16 @@ for (
       "## Code {#code-0-lua}\n",
       "3: heading id code-0-lua is used by the page itself: write another as {#id}",
     ],
+    [
+      "a made id of the form the page script gives a code block",
+      "## Code 0 lua\n",
+      "3: heading id code-0-lua is used by the page itself: write another as {#id}",
+    ],
+    [
+      "a hand-written id of the form the page script gives a code block's tab",
+      "## X {#code-12-powershell-tab}\n",
+      "3: heading id code-12-powershell-tab is used by the page itself: write another as {#id}",
+    ],
   ] as const
 ) {
   Deno.test(`rejects ${name}`, async () => {
@@ -154,6 +164,18 @@ Deno.test("an id that only starts like one of the page's own is kept, and a hand
     "code-0",
     "search-result",
     "the-top",
+  ]);
+});
+
+Deno.test("only the ids the page script gives a code block are kept from a heading that starts with code and a number", async () => {
+  const [page] = await compile(
+    "## Code 404 errors\n\n## Code 0\n\n## Code 0\n\n## Code 1 lua lessons\n",
+  );
+  assertEquals(page.headings.slice(1).map((heading) => heading.id), [
+    "code-404-errors",
+    "code-0",
+    "code-0-1",
+    "code-1-lua-lessons",
   ]);
 });
 
