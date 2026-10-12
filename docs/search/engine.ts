@@ -1,9 +1,10 @@
 import MiniSearch from "minisearch";
-import type { SearchEngine } from "./types.ts";
-import type { SearchEntry, SearchPayload } from "./types.ts";
+import { searchTerms } from "./terms.ts";
+import type { SearchEngine, SearchPayload } from "./types.ts";
 
 export const searchOptions = {
   fields: ["title", "heading", "text"],
+  tokenize: searchTerms,
   searchOptions: {
     boost: { title: 4, heading: 3 },
     prefix: true,
@@ -18,7 +19,7 @@ export function createSearchEngine(payload: unknown): SearchEngine {
     !("entries" in payload) || !Array.isArray(payload.entries) ||
     !payload.entries.every((entry: unknown) =>
       entry !== null && typeof entry === "object" &&
-      ["id", "url", "title", "heading", "text", "excerpt"].every((field) =>
+      ["id", "url", "title", "heading", "excerpt"].every((field) =>
         field in entry &&
         typeof (entry as Record<string, unknown>)[field] === "string"
       )
@@ -29,10 +30,10 @@ export function createSearchEngine(payload: unknown): SearchEngine {
   if (entries.size !== data.entries.length) {
     throw new Error("Duplicate documentation search entries");
   }
-  const index = MiniSearch.loadJSON<SearchEntry>(data.index, searchOptions);
+  const index = MiniSearch.loadJSON(data.index, searchOptions);
   return {
     search(query) {
-      if (!query.trim()) return [];
+      if (!searchTerms(query).length) return [];
       return index.search(query).map((result) => {
         const entry = entries.get(String(result.id));
         if (!entry) throw new Error("Missing documentation search entry");

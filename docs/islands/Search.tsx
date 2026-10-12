@@ -2,6 +2,7 @@ import type { VNode } from "preact";
 import { useLayoutEffect, useMemo, useRef, useState } from "preact/hooks";
 import { createSearchLoader } from "../search/loader.ts";
 import { tabBoundaryTarget } from "../search/focus.ts";
+import { resultLimit, resultStatus } from "../search/limit.ts";
 import type { SearchEngine } from "../search/types.ts";
 
 const loadEngine = createSearchLoader(async () => {
@@ -19,7 +20,8 @@ export default function Search(): VNode {
   );
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(0);
-  const results = useMemo(() => engine?.search(query) ?? [], [engine, query]);
+  const matches = useMemo(() => engine?.search(query) ?? [], [engine, query]);
+  const results = useMemo(() => matches.slice(0, resultLimit), [matches]);
   useLayoutEffect(() => setSelected(0), [results]);
   useLayoutEffect(() => {
     if (!dialog.current?.open) return;
@@ -173,9 +175,9 @@ export default function Search(): VNode {
             ? "Search could not be loaded."
             : !query.trim()
             ? "Type to search documentation."
-            : !results.length
+            : !matches.length
             ? <>No results for “{query}”.</>
-            : `${results.length} results`}
+            : resultStatus(matches.length)}
         </div>
         {status === "failed" && (
           <button

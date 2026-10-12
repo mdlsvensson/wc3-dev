@@ -8,6 +8,8 @@ import { buildSearchPayload } from "../docs/search/index.ts";
 import { createSearchEngine } from "../docs/search/engine.ts";
 import { createSearchLoader } from "../docs/search/loader.ts";
 import { tabBoundaryTarget } from "../docs/search/focus.ts";
+import { searchTerms } from "../docs/search/terms.ts";
+import { resultLimit, resultStatus } from "../docs/search/limit.ts";
 import type { SearchEngine } from "../docs/search/types.ts";
 import type { CompiledPage } from "../shared/types.ts";
 import { createDocsApp } from "../docs/app.tsx";
@@ -60,7 +62,7 @@ Deno.test("serialized search covers the landing page and every sample page, with
     ),
     true,
   );
-  assertEquals(engine.search("PixelCode LICENSE README").length, 0);
+  assertEquals(engine.search("Pixel LICENSE README").length, 0);
 });
 
 Deno.test("search ranks title and heading matches above body matches", () => {
@@ -231,4 +233,101 @@ Deno.test("modal tab boundaries wrap in both directions including focused result
   assertEquals(tabBoundaryTarget(stops, "result-option", true), "retry");
   assertEquals(tabBoundaryTarget(stops, null, false), "input");
   assertEquals(tabBoundaryTarget([], null, false), undefined);
+});
+
+Deno.test("a word is a term whole and by its parts", () => {
+  assertEquals(searchTerms("Unit.issueTargetOrder(target)"), [
+    "Unit",
+    "issueTargetOrder",
+    "issue",
+    "Target",
+    "Order",
+    "target",
+  ]);
+  assertEquals(searchTerms("moonwell_library v2beta"), [
+    "moonwell",
+    "library",
+    "v2beta",
+    "v",
+    "2",
+    "beta",
+  ]);
+  assertEquals(searchTerms("... :: --"), []);
+});
+
+Deno.test("parts of a function name find it, and the whole name ranks first", () => {
+  const payload = buildSearchPayload([
+    page("Unit", "", {
+      html:
+        '<h1 id="unit">Unit</h1><h3 id="issueorder">issueOrder</h3><p>Gives an order.</p>' +
+        '<h3 id="issuetargetorder">issueTargetOrder</h3><p>Gives an order with a target.</p>',
+      headings: [
+        { id: "unit", text: "Unit", level: 1 },
+        { id: "issueorder", text: "issueOrder", level: 3 },
+        { id: "issuetargetorder", text: "issueTargetOrder", level: 3 },
+      ],
+    }),
+  ]);
+  const engine = createSearchEngine(JSON.parse(JSON.stringify(payload)));
+  assertEquals(
+    engine.search("issueTargetOrder")[0].url,
+    "/Unit/#issuetargetorder",
+  );
+  for (const query of ["target order", "TargetOrder"]) {
+    assertEquals(
+      engine.search(query).some((entry) =>
+        entry.url === "/Unit/#issuetargetorder"
+      ),
+      true,
+      query,
+    );
+  }
+});
+
+Deno.test("the shipped entries hold what the dialog draws and no full text", () => {
+  const payload = buildSearchPayload([
+    page("Guide", "", {
+      html:
+        '<h1 id="guide">Guide</h1><p>Opening words.</p><h2 id="setup">Setup</h2><p>Hidden treasure.</p>',
+      headings: [
+        { id: "guide", text: "Guide", level: 1 },
+        { id: "setup", text: "Setup", level: 2 },
+      ],
+    }),
+  ]);
+  for (const entry of payload.entries) {
+    assertEquals(Object.keys(entry).sort(), [
+      "excerpt",
+      "heading",
+      "id",
+      "title",
+      "url",
+    ]);
+  }
+  assertEquals(payload.entries[0].excerpt, "Opening words.");
+  const engine = createSearchEngine(payload);
+  // Text under a heading is indexed in that heading's entry only.
+  assertEquals(engine.search("treasure").map((entry) => entry.url), [
+    "/Guide/#setup",
+  ]);
+  assertEquals(engine.search("opening").map((entry) => entry.url), [
+    "/Guide/",
+  ]);
+});
+
+Deno.test("a query with no word in it has no results and does not throw", () => {
+  const engine = createSearchEngine(
+    buildSearchPayload([page("Guide", "words")]),
+  );
+  for (const query of ["...", "::", " - ", ""]) {
+    assertEquals(engine.search(query), []);
+  }
+});
+
+Deno.test("the status line counts every match and names the limit", () => {
+  assertEquals(resultLimit, 20);
+  assertEquals(resultStatus(1), "1 result");
+  assertEquals(resultStatus(20), "20 results");
+  assertEquals(resultStatus(21), "20 of 21 results");
+  assertEquals(resultStatus(143), "20 of 143 results");
 });

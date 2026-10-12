@@ -38,21 +38,30 @@ function sectionText(html: string): string {
 export function buildSearchPayload(
   pages: readonly CompiledPage[],
 ): SearchPayload {
-  const entries: SearchEntry[] = [];
+  const documents: (SearchEntry & { text: string })[] = [];
   for (const page of pages) {
-    entries.push({
-      id: page.source,
-      url: page.url,
-      title: page.title,
-      heading: "",
-      text: page.text,
-      excerpt: excerpt(page.text),
-    });
     const boundaries = [
       ...page.html.matchAll(
         /<h([23])\b[^>]*\bid="([^"]*)"[^>]*>[\s\S]*?<\/h\1>/g,
       ),
     ];
+    // A page's own entry is its title and what stands before its first h2 or h3. A record without HTML (the
+    // landing page) is indexed by its text.
+    const titleEnd = page.html.indexOf("</h1>");
+    const intro = page.html
+      ? sectionText(page.html.slice(
+        titleEnd < 0 ? 0 : titleEnd + 5,
+        boundaries[0]?.index ?? page.html.length,
+      ))
+      : page.text;
+    documents.push({
+      id: page.source,
+      url: page.url,
+      title: page.title,
+      heading: "",
+      text: intro,
+      excerpt: excerpt(intro),
+    });
     for (let i = 0; i < boundaries.length; i++) {
       const match = boundaries[i];
       const heading = page.headings.find((heading) => heading.id === match[2]);
@@ -63,7 +72,7 @@ export function buildSearchPayload(
         match.index! + match[0].length,
         boundaries[i + 1]?.index ?? page.html.length,
       ));
-      entries.push({
+      documents.push({
         id: `${page.source}#${heading.id}`,
         url: `${page.url}#${heading.id}`,
         title: page.title,
@@ -73,7 +82,10 @@ export function buildSearchPayload(
       });
     }
   }
-  const index = new MiniSearch<SearchEntry>(searchOptions);
-  index.addAll(entries);
-  return { index: JSON.stringify(index), entries };
+  const index = new MiniSearch(searchOptions);
+  index.addAll(documents);
+  return {
+    index: JSON.stringify(index),
+    entries: documents.map(({ text: _text, ...entry }) => entry),
+  };
 }

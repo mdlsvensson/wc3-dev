@@ -3,7 +3,6 @@ export interface SearchEntry {
   url: string;
   title: string;
   heading: string;
-  text: string;
   excerpt: string;
 }
 export interface SearchPayload {
