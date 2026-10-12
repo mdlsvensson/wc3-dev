@@ -151,7 +151,9 @@ function outlineMark(): void {
         top: heading.getBoundingClientRect().top,
       })),
       112,
-      innerHeight + scrollY >= document.documentElement.scrollHeight - 2,
+      // A page that fits the window is at its bottom without a scroll: there the line alone decides.
+      scrollY > 0 &&
+        innerHeight + scrollY >= document.documentElement.scrollHeight - 2,
     );
     for (const link of links) {
       const on = id !== undefined &&
