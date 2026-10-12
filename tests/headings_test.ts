@@ -110,6 +110,31 @@ for (
       "## Foo {#a}{#b}\n",
       "3: heading id marker must end the heading: {#a}",
     ],
+    [
+      "a made id that the page shell uses",
+      "## Fine\n\n## Top\n",
+      "5: heading id top is used by the page itself: write another as {#id}",
+    ],
+    [
+      "a hand-written id that the page shell uses",
+      "## X {#main-content}\n",
+      "3: heading id main-content is used by the page itself: write another as {#id}",
+    ],
+    [
+      "a made id that the search uses",
+      "## Search results\n",
+      "3: heading id search-results is used by the page itself: write another as {#id}",
+    ],
+    [
+      "a hand-written id of the form the search gives a result",
+      "## Results {#search-result-3}\n",
+      "3: heading id search-result-3 is used by the page itself: write another as {#id}",
+    ],
+    [
+      "a hand-written id of the form the page script gives a code block",
+      "## Code {#code-0-lua}\n",
+      "3: heading id code-0-lua is used by the page itself: write another as {#id}",
+    ],
   ] as const
 ) {
   Deno.test(`rejects ${name}`, async () => {
@@ -118,6 +143,19 @@ for (
     assertStringIncludes(error.message, `moonwell/index.md:${message}`);
   });
 }
+
+Deno.test("an id that only starts like one of the page's own is kept, and a hand-written id is the way out", async () => {
+  const [page] = await compile(
+    "## Topic\n\n## Codes\n\n## Code 0\n\n## Search result\n\n## Top {#the-top}\n",
+  );
+  assertEquals(page.headings.slice(1).map((heading) => heading.id), [
+    "topic",
+    "codes",
+    "code-0",
+    "search-result",
+    "the-top",
+  ]);
+});
 
 Deno.test("made ids are unchanged: repeats take a suffix and Unicode is kept", async () => {
   const [page] = await compile("## A heading\n\n## A heading\n\n## Ångström\n");

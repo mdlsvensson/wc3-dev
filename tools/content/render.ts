@@ -42,6 +42,21 @@ const grammars: Record<string, string> = {
   powershell: "powershell",
 };
 
+// The ids the page shell, the search and the page script give their own elements: a heading must not be a second one.
+const reservedIds = new Set([
+  "top",
+  "main-content",
+  "search-label",
+  "search-results",
+  "docs-search-input",
+  "mobile-menu",
+  "doc-mobile-sidebar",
+  "doc-mobile-outline",
+]);
+const reservedIdPatterns = [/^search-result-\d+$/, /^code-\d+-./];
+const isReservedId = (id: string) =>
+  reservedIds.has(id) || reservedIdPatterns.some((pattern) => pattern.test(id));
+
 interface FenceMeta {
   language: CodeLanguage;
   skip: boolean;
@@ -245,6 +260,11 @@ export async function createRenderer() {
               }
               if (!used.has(id)) break;
             }
+          }
+          if (isReservedId(id)) {
+            throw new Error(
+              `${source}:${line}: heading id ${id} is used by the page itself: write another as {#id}`,
+            );
           }
           // `used` holds made ids only, so that a made id steps over made ids alone.
           if (!written.has(token)) used.add(id);
