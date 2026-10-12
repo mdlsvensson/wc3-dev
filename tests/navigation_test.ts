@@ -5,8 +5,11 @@ import {
   assertRejects,
   assertStringIncludes,
 } from "@std/assert";
+import { isValidElement, type VNode } from "preact";
 import type { NavSection } from "../shared/types.ts";
 import { createDocsApp } from "../docs/app.tsx";
+import { DocPage } from "../docs/components/DocPage.tsx";
+import DocMenu from "../docs/islands/DocMenu.tsx";
 import { buildSidebars, docMenuProps, sidebarItems } from "../docs/sidebar.ts";
 import { compileDocumentation } from "../tools/content/compile.ts";
 
@@ -140,6 +143,42 @@ Deno.test("the menu island is given the sidebar, the address and h2/h3 headings 
   const sent = JSON.stringify(props);
   assertEquals(sent.includes(marker), false);
   assertEquals(sent.includes("<h1"), false);
+});
+
+/** The first vnode of a type in a tree that was built and not rendered: through `props.children`, arrays included. */
+function findVNode(
+  node: unknown,
+  type: unknown,
+): VNode<Record<string, unknown>> | undefined {
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const found = findVNode(child, type);
+      if (found) return found;
+    }
+    return undefined;
+  }
+  if (!isValidElement(node)) return undefined;
+  if (node.type === type) return node as VNode<Record<string, unknown>>;
+  return findVNode((node.props as { children?: unknown }).children, type);
+}
+
+// A handler test cannot see what an island is given: only a built app serialises an island's properties.
+Deno.test("the page hands the menu island the sidebar, the address and the headings, and no page's text", () => {
+  const page = pages.find((p) => p.url === "/moonwell/")!;
+  const menu = findVNode(
+    DocPage({ page, sidebar: sidebars.moonwell! }),
+    DocMenu,
+  );
+  assertNotEquals(menu, undefined);
+  assertEquals(Object.keys(menu!.props).sort(), [
+    "current",
+    "headings",
+    "sidebar",
+  ]);
+  const sent = JSON.stringify(menu!.props);
+  // The page's HTML as JSON writes it: its quotes are escaped there.
+  assertEquals(sent.includes(JSON.stringify(page.html).slice(1, -1)), false);
+  assertEquals(sent.includes(marker), false);
 });
 
 for (
