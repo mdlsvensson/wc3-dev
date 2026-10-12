@@ -2,7 +2,7 @@
 
 Sample marker moonwell commands. This page is sample text for tests, not documentation.
 
-## build
+## build {#build}
 
 Builds the map.
 
@@ -14,6 +14,6 @@ moonwell build --minify
 
 Checks the project without writing a map.
 
-## test
+## moonwell test {#test}
 
 Builds the map and starts the game.

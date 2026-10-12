@@ -136,6 +136,17 @@ export async function createRenderer() {
       : `<pre><code>${markdown.utils.escapeHtml(token.content)}</code></pre>`;
     return `<div class="code-block" data-lang="${language.name}" data-label="${language.label}">${body}</div>\n`;
   };
+  // A heading is always the three tokens `heading_open`, `inline`, `heading_close`.
+  markdown.renderer.rules.heading_close = (tokens, index) => {
+    const open = tokens[index - 2];
+    const level = Number(open.tag.slice(1));
+    if (level < 2 || level > 4) return `</${open.tag}>\n`;
+    const escape = markdown.utils.escapeHtml;
+    const text = (open.meta as { text: string }).text;
+    return `<a class="heading-anchor" href="#${
+      escape(open.attrGet("id")!)
+    }" aria-label="${escape(`Link to ${text}`)}"></a></${open.tag}>\n`;
+  };
   return {
     parse(source: string, content: string) {
       const tokens = markdown.parse(content, {});
@@ -146,19 +157,65 @@ export async function createRenderer() {
       const used = new Set<string>();
       const links: SourceLink[] = [];
       const text: string[] = [];
+      // Hand-written ids are all known before a made id is checked against them.
+      const written = new Map<Token, string>();
+      const writtenIds = new Set<string>();
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].type !== "heading_open") continue;
+        const line = (tokens[i].map?.[0] ?? 0) + 1;
+        const last = tokens[i + 1].children?.at(-1);
+        const marker = last?.type === "text"
+          ? /\s*\{#([^}]*)\}\s*$/.exec(last.content)
+          : null;
+        if (!marker || !last) continue;
+        const id = marker[1];
+        if (!/^[a-z0-9][a-z0-9._-]*$/.test(id)) {
+          throw new Error(
+            `${source}:${line}: heading id may hold a-z, 0-9, '.', '_' and '-': ${id}`,
+          );
+        }
+        if (writtenIds.has(id)) {
+          throw new Error(
+            `${source}:${line}: heading id ${id} is written twice`,
+          );
+        }
+        last.content = last.content.slice(0, marker.index);
+        writtenIds.add(id);
+        written.set(tokens[i], id);
+      }
       for (let i = 0; i < tokens.length; i++) {
         const token = tokens[i];
         if (token.type === "heading_open") {
-          const headingText = visibleText(tokens[i + 1].children ?? []);
-          const slug = headingText.toLowerCase().replace(
-            /[^\p{L}\p{N}\p{M}_\s-]/gu,
-            "",
-          )
-            .trim().replace(/\s+/g, "-");
-          let id = slug;
-          for (let suffix = 1; used.has(id); suffix++) id = `${slug}-${suffix}`;
+          const line = (token.map?.[0] ?? 0) + 1;
+          const headingText = visibleText(tokens[i + 1].children ?? []).trim();
+          if (!headingText) {
+            throw new Error(`${source}:${line}: heading has no text`);
+          }
+          let id = written.get(token);
+          if (id === undefined) {
+            const slug = headingText.toLowerCase().replace(
+              /[^\p{L}\p{N}\p{M}_\s-]/gu,
+              "",
+            )
+              .trim().replace(/\s+/g, "-");
+            if (!slug) {
+              throw new Error(
+                `${source}:${line}: heading has no id: write one as {#id}`,
+              );
+            }
+            if (writtenIds.has(slug)) {
+              throw new Error(
+                `${source}:${line}: heading id ${slug} is also written by hand`,
+              );
+            }
+            id = slug;
+            for (let suffix = 1; used.has(id); suffix++) {
+              id = `${slug}-${suffix}`;
+            }
+          }
           used.add(id);
           token.attrSet("id", id);
+          token.meta = { text: headingText };
           headings.push({
             id,
             text: headingText,

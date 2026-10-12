@@ -303,7 +303,7 @@ Deno.test("compiler canonicalizes known overview aliases before checking fragmen
     assertEquals(page.links.some((link) => link.target === target), true);
   }
   assertEquals(
-    [...page.html.matchAll(/href="([^"]*)"/g)].map((match) => match[1]),
+    [...page.html.matchAll(/<a href="([^"]*)"/g)].map((match) => match[1]),
     targets.map(([, expected]) => expected),
   );
 });
