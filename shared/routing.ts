@@ -9,20 +9,24 @@ export function homeRedirect(url: URL): Response | null {
   return Response.redirect(`https://docs.wc3.dev${path}${url.search}`, 301);
 }
 
+export function findDocsPage(
+  pathname: string,
+  pages: readonly CompiledPage[],
+): CompiledPage | undefined {
+  return pages.find((page) => {
+    const aliases = page.url.endsWith("/")
+      ? [page.url.slice(0, -1), `${page.url}index`, `${page.url}index.html`]
+      : [`${page.url}.html`];
+    return page.url === pathname || aliases.includes(pathname);
+  });
+}
+
 export function docsRedirect(
   url: URL,
   pages: readonly CompiledPage[],
 ): Response | null {
-  for (const page of pages) {
-    const aliases = page.url.endsWith("/")
-      ? [page.url.slice(0, -1), `${page.url}index`, `${page.url}index.html`]
-      : [`${page.url}.html`];
-    if (aliases.includes(url.pathname)) {
-      return Response.redirect(
-        `https://docs.wc3.dev${page.url}${url.search}`,
-        301,
-      );
-    }
-  }
-  return null;
+  const page = findDocsPage(url.pathname, pages);
+  return page && page.url !== url.pathname
+    ? Response.redirect(`https://docs.wc3.dev${page.url}${url.search}`, 301)
+    : null;
 }

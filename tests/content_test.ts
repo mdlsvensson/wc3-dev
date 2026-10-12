@@ -229,6 +229,139 @@ Deno.test("links resolve against complete page records preserving queries and fr
   }
 });
 
+for (const origin of ["https://wc3.dev", "https://www.wc3.dev"]) {
+  Deno.test(`compiler accepts actual home targets at ${origin}`, async () => {
+    const targets = [
+      `${origin}/?from=docs%2Fhome`,
+      `${origin}/?from=docs%2Fhome#main-content`,
+      `${origin}/mw.gif?v=1#frame`,
+      `${origin}/fonts/Jersey10-Regular.woff2?v=2`,
+    ];
+    const [page] = await compileDocumentation(
+      new Map([[
+        "moonwell/index.md",
+        `# Moonwell\n\n${
+          targets.map((target) => `[Home](${target})`).join("\n")
+        }\n` +
+        `\n![Moonwell](${origin}/mw.gif?v=1#frame)\n`,
+      ]]),
+      sections,
+      new Set(["/mw.gif", "/fonts/Jersey10-Regular.woff2"]),
+    );
+    for (const target of targets) {
+      assertStringIncludes(page.html, `href="${target}"`);
+      assertEquals(page.links.some((link) => link.target === target), true);
+    }
+    assertStringIncludes(page.html, `src="${origin}/mw.gif?v=1#frame"`);
+  });
+}
+
+Deno.test("compiler preserves the actual docs landing fragment", async () => {
+  const [page] = await compileDocumentation(
+    new Map([[
+      "moonwell/index.md",
+      "# Moonwell\n\n[Landing](https://docs.wc3.dev/?q=1#main-content)\n",
+    ]]),
+    sections,
+    new Set(),
+  );
+  assertStringIncludes(page.html, 'href="/?q=1#main-content"');
+});
+
+Deno.test("compiler canonicalizes known overview aliases before checking fragments", async () => {
+  const nav: readonly NavSection[] = ["moonwell", "wrappers", "systems"].map(
+    (id) => ({
+      id: id as NavSection["id"],
+      label: id,
+      sources: [`${id}/index.md`],
+    }),
+  );
+  const targets: [string, string][] = [];
+  for (const section of nav) {
+    for (const alias of ["index", "index.html"]) {
+      for (
+        const prefix of [
+          "../",
+          "",
+          "/",
+          "https://docs.wc3.dev/",
+          "https://wc3.dev/",
+          "https://www.wc3.dev/",
+        ]
+      ) {
+        targets.push([
+          `${prefix}${section.id}/${alias}?from=docs%2Falias#details`,
+          `/${section.id}/?from=docs%2Falias#details`,
+        ]);
+      }
+    }
+  }
+  targets.push([
+    "./index.html?from=local#details",
+    "/moonwell/?from=local#details",
+  ]);
+  const sources = new Map(nav.map((section) => [
+    section.sources[0],
+    `# ${section.label}\n\n## Details\n` +
+    (section.id === "moonwell"
+      ? targets.map(([target]) => `\n[Overview](${target})`).join("")
+      : ""),
+  ]));
+  const [page] = await compileDocumentation(sources, nav, new Set());
+  for (const [target] of targets) {
+    assertEquals(page.links.some((link) => link.target === target), true);
+  }
+  assertEquals(
+    [...page.html.matchAll(/href="([^"]*)"/g)].map((match) => match[1]),
+    targets.map(([, expected]) => expected),
+  );
+});
+
+Deno.test("compiler still rejects missing home targets and invalid overview fragments", async () => {
+  for (
+    const target of [
+      "https://wc3.dev/missing",
+      "https://www.wc3.dev/missing",
+      "https://wc3.dev/missing.gif",
+      "https://www.wc3.dev/fonts/missing.woff2",
+      "https://wc3.dev/?q=1#absent",
+      "https://www.wc3.dev/?q=1#absent",
+      "https://docs.wc3.dev/?q=1#absent",
+      "https://wc3.dev/?q=1#%FF",
+      "https://docs.wc3.dev/moonwell/index.html?q=1#absent",
+      "https://wc3.dev/moonwell/index?q=1#absent",
+      "https://www.wc3.dev/moonwell/index.html?q=1#absent",
+      "https://docs.wc3.dev/moonwell/index.html?q=1#%FF",
+      "./index#absent",
+      "/unknown/index",
+      "/unknown/index.html",
+      "/moonwell/missing/index.html",
+      "https://docs.wc3.dev/unknown/index.html",
+      "https://wc3.dev/moonwell/missing/index",
+      "https://www.wc3.dev/unknown/index",
+    ]
+  ) {
+    const error = await assertRejects(() =>
+      compileDocumentation(
+        new Map([[
+          "moonwell/index.md",
+          `# Moonwell\n\n[Missing](${target})\n`,
+        ]]),
+        sections,
+        new Set(["/mw.gif"]),
+      )
+    );
+    assertInstanceOf(error, Error);
+    assertStringIncludes(error.message, "moonwell/index.md");
+    assertStringIncludes(error.message, target);
+    if (target.includes("#absent")) {
+      assertStringIncludes(error.message, "fragment");
+    } else if (target.includes("#%FF")) {
+      assertStringIncludes(error.message, "invalid fragment encoding");
+    }
+  }
+});
+
 Deno.test("heading slugs never collide with authored numeric suffixes", async () => {
   const [page] = await compileDocumentation(
     new Map([["moonwell/index.md", "# Moonwell\n\n## A\n\n## A\n\n## A-1\n"]]),

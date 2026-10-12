@@ -1,4 +1,5 @@
 import type { CompiledPage } from "../../shared/types.ts";
+import { findDocsPage } from "../../shared/routing.ts";
 
 const docsOrigin = "https://docs.wc3.dev";
 const homeOrigins = new Set(["https://wc3.dev", "https://www.wc3.dev"]);
@@ -43,13 +44,9 @@ export function resolveContentLink(
     if (absolute.origin !== docsOrigin && !homeOrigins.has(absolute.origin)) {
       return target;
     }
-    if (
-      homeOrigins.has(absolute.origin) &&
-      !sections.has(absolute.pathname.split("/")[1])
-    ) {
-      fail("home URL has no documentation redirect");
-    }
   }
+  const homeTarget = absolute && homeOrigins.has(absolute.origin) &&
+    !sections.has(absolute.pathname.split("/")[1]);
   const hashAt = target.indexOf("#");
   const beforeHash = hashAt < 0 ? target : target.slice(0, hashAt);
   const fragment = hashAt < 0 ? "" : target.slice(hashAt);
@@ -67,42 +64,40 @@ export function resolveContentLink(
     return fail("invalid path encoding");
   }
   const pageSource = pathname.endsWith(".md") ? pathname.slice(1) : undefined;
-  const route = pathname.replace(/\.html$/, "");
-  let page = pages.find((p) =>
-    pageSource
-      ? p.source === pageSource
-      : p.url === route || p.url === `${route}/`
-  );
+  let page = homeTarget
+    ? undefined
+    : pageSource
+    ? pages.find((p) => p.source === pageSource)
+    : findDocsPage(pathname, pages);
   if (
     !page && !pageSource && !absolute && path && !path.startsWith("/") &&
     !assets.has(pathname)
   ) {
-    const siteRoute = new URL(path, `${docsOrigin}/`).pathname.replace(
-      /\.html$/,
-      "",
-    );
-    page = pages.find((p) => p.url === siteRoute || p.url === `${siteRoute}/`);
+    const siteRoute = new URL(path, `${docsOrigin}/`).pathname;
+    page = findDocsPage(siteRoute, pages);
   }
   const resolvedQuery = absolute?.search ?? query;
   const resolvedFragment = absolute?.hash ?? fragment;
   if (!page && !assets.has(pathname) && pathname !== "/") {
     fail("missing page or asset");
   }
-  if (resolvedFragment && page) {
+  if (resolvedFragment && (page || pathname === "/")) {
     let id: string;
     try {
       id = decodeURIComponent(resolvedFragment.slice(1));
     } catch {
       return fail("invalid fragment encoding");
     }
-    if (!page.headings.some((heading) => heading.id === id)) {
+    if (page && !page.headings.some((heading) => heading.id === id)) {
       fail("missing heading fragment");
+    } else if (!page && id !== "main-content") {
+      fail("missing landing heading fragment");
     }
-  } else if (resolvedFragment && pathname === "/" && !page) {
-    fail("missing landing heading fragment");
   }
   // Fragment-only links keep their concise authored form; other links become canonical paths.
   return !absolute && !path
     ? `${resolvedQuery}${resolvedFragment}`
-    : `${page?.url ?? pathname}${resolvedQuery}${resolvedFragment}`;
+    : `${homeTarget ? absolute?.origin : ""}${
+      page?.url ?? pathname
+    }${resolvedQuery}${resolvedFragment}`;
 }
