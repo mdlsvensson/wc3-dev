@@ -88,8 +88,10 @@ shows "Note" or "Warning"; a written title is plain text.
 A heading takes a hand-written id from a trailing `{#id}`: it starts with a lower-case letter or a digit and goes on
 with lower-case letters, digits, `.`, `_` and `-`. The marker must end the heading, and an id that is written by hand
 cannot be the id of another heading of the page. To show a literal `{#...}` in a heading, put it in inline code.
-Without a marker the id is made from the heading's text. An id that the page itself uses (such as `top` or
-`main-content`) is refused, for a made id and a hand-written one alike: the way out is another hand-written id.
+Without a marker the id is made from the heading's text. A dot stays in a made id where it stands between two
+letters or digits (`unit.create`, `moonwell.toml`), and is dropped anywhere else. An id that the page itself uses (such
+as `top` or `main-content`) is refused, for a made id and a hand-written one alike: the way out is another
+hand-written id.
 
 `deno task check:examples` compiles the `yue` and `lua` blocks of the authored pages. `MOONWELL_YUE` names the
 YueScript compiler and `MOONWELL_LUAC` names Lua 5.3's `luac`. The task reads both when it starts, and stops with a

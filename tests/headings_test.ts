@@ -30,6 +30,29 @@ Deno.test("a hand-written id replaces the made one and its marker is not shown",
   assertStringIncludes(page.html, '<a href="#create">up</a>');
 });
 
+Deno.test("a made id keeps a dot between two letters or digits and drops every other dot", async () => {
+  const [page] = await compile(
+    [
+      "## The project: `moonwell.toml`",
+      "### Unit.create",
+      "### Pkl 0.32.1 is pinned.",
+      "### e.g. this",
+      "### `.luarc.json`",
+      "### `Unit.create(player, typeId)`",
+    ].join("\n\n") + "\n",
+  );
+  assertEquals(page.headings.slice(1).map((heading) => heading.id), [
+    "the-project-moonwell.toml",
+    "unit.create",
+    "pkl-0.32.1-is-pinned",
+    "e.g-this",
+    "luarc.json",
+    "unit.createplayer-typeid",
+  ]);
+  assertStringIncludes(page.html, '<h3 id="unit.create">');
+  assertStringIncludes(page.html, 'href="#unit.create"');
+});
+
 Deno.test("h2 to h4 link to themselves with a name, h1 does not, and search text has no link text", async () => {
   const [page] = await compile(
     '## One & "two"\n\nFirst.\n\n### Three\n\n#### Four\n\nLast.\n',

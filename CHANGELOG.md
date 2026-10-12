@@ -17,3 +17,4 @@
 - Add `check:examples` and a sample site for tests and visual checks.
 - Refuse a heading id that the page itself uses, such as `top`, for a made id and a hand-written one alike.
 - Draw code comments in the palette's secondary text colour, for contrast.
+- Keep a dot in a made heading id where it stands between two letters or digits.

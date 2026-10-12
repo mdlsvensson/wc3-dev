@@ -256,10 +256,10 @@ export async function createRenderer() {
           }
           let id = written.get(token);
           if (id === undefined) {
-            const slug = headingText.toLowerCase().replace(
-              /[^\p{L}\p{N}\p{M}_\s-]/gu,
-              "",
-            )
+            // A dot stays only between two letters or digits: `unit.create`, `moonwell.toml`, `0.32.1`.
+            const slug = headingText.toLowerCase()
+              .replace(/(?<![\p{L}\p{N}])\.|\.(?![\p{L}\p{N}])/gu, "")
+              .replace(/[^\p{L}\p{N}\p{M}_\s.-]/gu, "")
               .trim().replace(/\s+/g, "-");
             if (!slug) {
               throw new Error(
