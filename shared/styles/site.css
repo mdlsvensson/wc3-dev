@@ -575,7 +575,9 @@ html.js .code-group:not([data-ready]) > .code-block ~ .code-block {
 html.js .code-group > .code-block > .code-copy {
   top: -34px;
 }
+/* The tab row belongs to the group, not to the block: the pointer anywhere on the group shows the button in the row. */
 .code-block:hover > .code-copy,
+html.js .code-group:hover > .code-block > .code-copy,
 .code-copy:focus-visible {
   opacity: 1;
 }

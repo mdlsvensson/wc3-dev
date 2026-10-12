@@ -108,7 +108,8 @@ function copyButtons(): void {
     button.className = "code-copy";
     button.textContent = "Copy";
     button.setAttribute("aria-live", "polite");
-    block.append(button);
+    // Before the code, so that the keyboard reaches the button where it is drawn: above the code.
+    block.prepend(button);
   }
   document.addEventListener("click", (event) => {
     const button = event.target instanceof Element
