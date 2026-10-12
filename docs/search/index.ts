@@ -39,13 +39,15 @@ export function buildSearchPayload(
   pages: readonly CompiledPage[],
 ): SearchPayload {
   const entries: SearchEntry[] = [];
-  // What the index reads. A section is indexed by its own heading and text only: the page's title is shown with
-  // its entry, but indexing it there would tie the page with all of its sections.
+  // What the index reads. A section's 'title' stays empty: were the page's title there, a match on it would tie the
+  // page with every one of its sections. The title is in the lightly boosted 'page' field instead, so that a
+  // qualified name (Unit.kill) finds a section whose own words do not say its page's name.
   const documents: {
     id: string;
     title: string;
     heading: string;
     text: string;
+    page: string;
   }[] = [];
   for (const page of pages) {
     const boundaries = [
@@ -74,6 +76,7 @@ export function buildSearchPayload(
       title: page.title,
       heading: "",
       text: intro,
+      page: "",
     });
     for (let i = 0; i < boundaries.length; i++) {
       const match = boundaries[i];
@@ -93,7 +96,13 @@ export function buildSearchPayload(
         heading: heading.text,
         excerpt: excerpt(text),
       });
-      documents.push({ id, title: "", heading: heading.text, text });
+      documents.push({
+        id,
+        title: "",
+        heading: heading.text,
+        text,
+        page: page.title,
+      });
     }
   }
   const index = new MiniSearch(searchOptions);

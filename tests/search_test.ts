@@ -8,7 +8,12 @@ import { buildSearchPayload } from "../docs/search/index.ts";
 import { createSearchEngine } from "../docs/search/engine.ts";
 import { createSearchLoader } from "../docs/search/loader.ts";
 import { tabBoundaryTarget } from "../docs/search/focus.ts";
-import { searchTerms, searchWords, wordParts } from "../docs/search/terms.ts";
+import {
+  searchTerms,
+  searchWords,
+  segmentParts,
+  wordSegments,
+} from "../docs/search/terms.ts";
 import { resultLimit, resultStatus } from "../docs/search/limit.ts";
 import type { SearchEngine } from "../docs/search/types.ts";
 import type { CompiledPage } from "../shared/types.ts";
@@ -245,6 +250,7 @@ Deno.test("a word is a term whole and by its parts", () => {
   assertEquals(searchTerms("Unit.issueTargetOrder(target)"), [
     "Unit.issueTargetOrder",
     "Unit",
+    "issueTargetOrder",
     "issue",
     "Target",
     "Order",
@@ -287,15 +293,24 @@ Deno.test("a word is a term whole and by its parts", () => {
     "toml",
     "and",
     "v0.12.2",
+    "v0",
     "12",
+  ]);
+  assertEquals(searchTerms("issueTargetOrder"), [
+    "issueTargetOrder",
+    "issue",
+    "Target",
+    "Order",
   ]);
   assertEquals(searchTerms("... :: --"), []);
 });
 
-Deno.test("a word has parts where it changes case, meets a digit or has a dot or underscore", () => {
-  assertEquals(wordParts("issueT"), ["issue"]);
-  assertEquals(wordParts("Unit"), []);
-  assertEquals(wordParts("getLife"), ["get", "Life"]);
+Deno.test("a word has segments at dots and underscores, and parts at case and digits", () => {
+  assertEquals(wordSegments("Unit.getLife"), ["Unit", "getLife"]);
+  assertEquals(wordSegments("getLife"), ["getLife"]);
+  assertEquals(segmentParts("getLife"), ["get", "Life"]);
+  assertEquals(segmentParts("issueT"), ["issue"]);
+  assertEquals(segmentParts("Unit"), []);
   assertEquals(searchWords("a_b. .c x.y."), ["a_b", "c", "x.y"]);
 });
 
@@ -365,7 +380,7 @@ Deno.test("a name that no page mentions gives no results", () => {
   const engine = createSearchEngine(
     buildSearchPayload([page("Guide", "Some words about maps.")]),
   );
-  for (const query of ["getL", "issueT", "Unit.getLife"]) {
+  for (const query of ["getL", "issueT", "Unit.getLife", "Math.lerp"]) {
     assertEquals(engine.search(query), [], query);
   }
 });
@@ -467,4 +482,99 @@ Deno.test("the status line counts every match and names the limit", () => {
   assertEquals(resultStatus(20), "20 results");
   assertEquals(resultStatus(21), "20 of 21 results");
   assertEquals(resultStatus(143), "20 of 143 results");
+});
+
+function moduleEngine(
+  title: string,
+  sections: readonly (readonly [string, string])[],
+) {
+  const slug = (name: string) => name.toLowerCase().replace(/\W+/g, "");
+  return createSearchEngine(
+    buildSearchPayload([
+      page(title, "", {
+        html: `<h1 id="top">${title}</h1>` +
+          sections.map(([name, text]) =>
+            `<h3 id="${slug(name)}">${name}</h3><p>${text}</p>`
+          ).join(""),
+        headings: [
+          { id: "top", text: title, level: 1 },
+          ...sections.map(([name]) => ({
+            id: slug(name),
+            text: name,
+            level: 3,
+          })),
+        ],
+      }),
+    ]),
+  );
+}
+
+Deno.test("a qualified name finds a section that does not say its page's name", () => {
+  const math = moduleEngine("wrappers.math", [
+    ["lerp", "Interpolates between two numbers."],
+    ["clamp", "Keeps a number in a range."],
+    ["angleBetween", "The angle from one point to another."],
+  ]);
+  const base = "/wrappers.math/";
+  assertEquals(math.search("Math.lerp")[0].url, `${base}#lerp`);
+  assertEquals(
+    math.search("Math.angleBetween")[0].url,
+    `${base}#anglebetween`,
+  );
+  assertEquals(math.search("wrappers.math.lerp")[0].url, `${base}#lerp`);
+  assertEquals(math.search("math")[0].url, base);
+  assertEquals(math.search("lerp")[0].url, `${base}#lerp`);
+  const unit = moduleEngine("wrappers.unit", [[
+    "kill",
+    "Removes it from play.",
+  ]]);
+  for (const query of ["Unit.kill", "unit.kill"]) {
+    assertEquals(unit.search(query)[0].url, "/wrappers.unit/#kill", query);
+  }
+});
+
+Deno.test("a qualified heading is found by its bare name and by its qualified name", () => {
+  const engine = moduleEngine("Reference", [[
+    "Unit.getLife",
+    "Returns the life.",
+  ]]);
+  for (
+    const query of [
+      "getLife",
+      "getlife",
+      "Unit.getLife",
+      "unit.getlife",
+      "get life",
+    ]
+  ) {
+    assertEquals(
+      engine.search(query)[0].url,
+      "/Reference/#unitgetlife",
+      query,
+    );
+  }
+});
+
+Deno.test("the sample ranks a page by its title and a function by its name", async () => {
+  const engine = await sampleEngine();
+  for (const query of ["unit", "wrappers.unit"]) {
+    assertEquals(
+      engine.search(query)[0].url,
+      "/wrappers/reference/unit",
+      query,
+    );
+  }
+  assertEquals(
+    engine.search("installation")[0].url,
+    "/moonwell/installation",
+  );
+  assertEquals(
+    engine.search("TargetOrder")[0].url,
+    "/wrappers/reference/unit#issuetargetorder",
+  );
+  for (const query of ["getLife", "Unit.getLife"]) {
+    const results = engine.search(query);
+    assertEquals(results[0].url, "/wrappers/reference/unit#getlife", query);
+    assertEquals(results.length < 10, true, query);
+  }
 });
