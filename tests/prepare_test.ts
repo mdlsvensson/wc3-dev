@@ -32,7 +32,14 @@ Deno.test("invalid content preserves the generated page/search pair and recovery
     assertStringIncludes(module, '"title": "Reference"');
     // A record's own keys are indented by four spaces; a heading's "text" is deeper.
     assertStringIncludes(module, '\n    "html":');
-    for (const key of ['\n    "text":', '\n    "links":', "landingPage"]) {
+    for (
+      const key of [
+        '\n    "text":',
+        '\n    "links":',
+        '\n    "code":',
+        "landingPage",
+      ]
+    ) {
       assertEquals(module.includes(key), false, key);
     }
     const outputs = ["pages.ts", "search.json"].map((name) =>

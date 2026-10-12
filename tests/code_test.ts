@@ -26,6 +26,13 @@ const samples: Record<string, string> = {
   powershell: 'irm https://example.org/install.ps1 | iex\nWrite-Host "done"\n',
 };
 
+const tokenColours = (html: string) =>
+  new Set(
+    [...html.matchAll(/<span style="color:(#[0-9A-Fa-f]{6})/g)].map((m) =>
+      m[1].toLowerCase()
+    ),
+  );
+
 Deno.test("the table has the eight languages and resolves their aliases", () => {
   assertEquals(codeLanguages.map((language) => language.name), [
     "yue",
@@ -59,10 +66,13 @@ for (const [name, sample] of Object.entries(samples)) {
       `<div class="code-block" data-lang="${name}" data-label="${label}">`,
     );
     assertStringIncludes(page.html, 'class="shiki github-dark"');
-    const colours = new Set(
-      [...page.html.matchAll(/color:(#[0-9A-Fa-f]{6})/g)].map((m) => m[1]),
+    // Token spans only: Shiki's own <pre style="background-color:..;color:.."> must not count.
+    const colours = tokenColours(page.html);
+    assertEquals(
+      colours.size >= 2,
+      true,
+      `${name}: ${colours.size} token colours, expected at least two`,
     );
-    assertEquals(colours.size > 1, true, `${name}: one colour only`);
     assertEquals(page.code, [{
       language: name,
       code: sample,
