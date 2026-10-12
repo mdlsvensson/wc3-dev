@@ -11,12 +11,11 @@ import {
   compileLandingPage,
 } from "../tools/content/compile.ts";
 import { resolveContentLink } from "../tools/content/links.ts";
+import { flatSection } from "./support/site.ts";
 
-const sections: readonly NavSection[] = [{
-  id: "moonwell",
-  label: "moonwell",
-  sources: ["moonwell/index.md"],
-}];
+const sections: readonly NavSection[] = [
+  flatSection("moonwell", ["moonwell/index.md"]),
+];
 const simple = new Map([[
   "moonwell/index.md",
   "# Moonwell\n\n## A *heading*\n\n## A heading\n\n## Ångström\n",
@@ -48,10 +47,9 @@ Deno.test("fixture renders Markdown, escaped HTML and searchable code without ne
     "moonwell/getting-started.md",
     "# Start\n",
   ]]);
-  const nav: readonly NavSection[] = [{
-    ...sections[0],
-    sources: [...sources.keys()],
-  }];
+  const nav: readonly NavSection[] = [
+    flatSection("moonwell", [...sources.keys()]),
+  ];
   const [page] = await compileDocumentation(sources, nav, new Set(["/mw.gif"]));
   for (
     const html of [
@@ -154,18 +152,16 @@ for (
       sections,
       "moonwell/other.md",
     ],
-    ["duplicate nav source", simple, [{
-      ...sections[0],
-      sources: ["moonwell/index.md", "moonwell/index.md"],
-    }], "moonwell/index.md"],
-    ["missing nav source", simple, [{
-      ...sections[0],
-      sources: ["moonwell/index.md", "moonwell/absent.md"],
-    }], "moonwell/absent.md"],
+    ["duplicate nav source", simple, [
+      flatSection("moonwell", ["moonwell/index.md", "moonwell/index.md"]),
+    ], "moonwell/index.md"],
+    ["missing nav source", simple, [
+      flatSection("moonwell", ["moonwell/index.md", "moonwell/absent.md"]),
+    ], "moonwell/absent.md"],
     [
       "duplicate canonical URL",
       new Map([["moonwell.md", "# One"], ["moonwell/index.md", "# Two"]]),
-      [{ ...sections[0], sources: ["moonwell.md", "moonwell/index.md"] }],
+      [flatSection("moonwell", ["moonwell.md", "moonwell/index.md"])],
       "moonwell/index.md",
     ],
   ] as const
@@ -184,10 +180,9 @@ Deno.test("links resolve against complete page records preserving queries and fr
     "moonwell/getting-started.md",
     "# Start\n\n## Install\n",
   ]]);
-  const nav: readonly NavSection[] = [{
-    ...sections[0],
-    sources: [...sources.keys()],
-  }];
+  const nav: readonly NavSection[] = [
+    flatSection("moonwell", [...sources.keys()]),
+  ];
   const pages = await compileDocumentation(sources, nav, new Set(["/mw.gif"]));
   for (
     const [target, expected] of [
@@ -270,11 +265,7 @@ Deno.test("compiler preserves the actual docs landing fragment", async () => {
 
 Deno.test("compiler canonicalizes known overview aliases before checking fragments", async () => {
   const nav: readonly NavSection[] = ["moonwell", "wrappers", "systems"].map(
-    (id) => ({
-      id: id as NavSection["id"],
-      label: id,
-      sources: [`${id}/index.md`],
-    }),
+    (id) => flatSection(id as NavSection["id"], [`${id}/index.md`]),
   );
   const targets: [string, string][] = [];
   for (const section of nav) {
@@ -301,7 +292,7 @@ Deno.test("compiler canonicalizes known overview aliases before checking fragmen
     "/moonwell/?from=local#details",
   ]);
   const sources = new Map(nav.map((section) => [
-    section.sources[0],
+    `${section.id}/index.md`,
     `# ${section.label}\n\n## Details\n` +
     (section.id === "moonwell"
       ? targets.map(([target]) => `\n[Overview](${target})`).join("")
@@ -381,11 +372,10 @@ Deno.test("clean section links fall back to canonical site paths after source-re
     "moonwell/index.md",
     "# Moonwell\n\n[Wrappers](wrappers/)\n",
   ], ["wrappers/index.md", "# Wrappers\n"]]);
-  const nav: readonly NavSection[] = [sections[0], {
-    id: "wrappers",
-    label: "wrappers",
-    sources: ["wrappers/index.md"],
-  }];
+  const nav: readonly NavSection[] = [
+    sections[0],
+    flatSection("wrappers", ["wrappers/index.md"]),
+  ];
   const pages = await compileDocumentation(sources, nav, new Set());
   assertStringIncludes(pages[0].html, 'href="/wrappers/"');
 });
@@ -395,11 +385,11 @@ Deno.test("landing record prepares shared searchable copy and validates its link
     "wrappers/index.md",
     "# Wrappers",
   ], ["systems/index.md", "# Systems"]]);
-  const nav: readonly NavSection[] = [sections[0], {
-    id: "wrappers",
-    label: "wrappers",
-    sources: ["wrappers/index.md"],
-  }, { id: "systems", label: "systems", sources: ["systems/index.md"] }];
+  const nav: readonly NavSection[] = [
+    sections[0],
+    flatSection("wrappers", ["wrappers/index.md"]),
+    flatSection("systems", ["systems/index.md"]),
+  ];
   const pages = await compileDocumentation(sources, nav, new Set());
   const assets = new Set(["/mw.gif", "/mw-moonwell.png", "/mw-text-edit.png"]);
   const landing = compileLandingPage(pages, assets);

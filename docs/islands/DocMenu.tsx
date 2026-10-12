@@ -1,14 +1,10 @@
 import type { VNode } from "preact";
 import { useLayoutEffect, useRef, useState } from "preact/hooks";
-import type { CompiledPage, NavSection } from "../../shared/types.ts";
 import { Outline, Sidebar } from "../components/DocNavigation.tsx";
+import type { DocMenuProps } from "../sidebar.ts";
 
 export default function DocMenu(
-  { page, pages, sections }: {
-    page: CompiledPage;
-    pages: readonly CompiledPage[];
-    sections: readonly NavSection[];
-  },
+  { sidebar, current, headings }: DocMenuProps,
 ): VNode {
   const [open, setOpen] = useState<"sidebar" | "outline" | null>(null);
   const menuTrigger = useRef<HTMLButtonElement>(null);
@@ -28,9 +24,7 @@ export default function DocMenu(
     globalThis.addEventListener("keydown", onKey);
     return () => globalThis.removeEventListener("keydown", onKey);
   }, [open]);
-  const hasOutline = page.headings.some((heading) =>
-    heading.level === 2 || heading.level === 3
-  );
+  const hasOutline = headings.length > 0;
   return (
     <div
       class={`doc-local-nav${hasOutline ? " has-outline" : ""}${
@@ -76,7 +70,7 @@ export default function DocMenu(
           ) dismiss();
         }}
       >
-        <Sidebar page={page} pages={pages} sections={sections} />
+        <Sidebar tree={sidebar} current={current} />
       </div>
       {hasOutline && (
         <div
@@ -100,7 +94,7 @@ export default function DocMenu(
             }
           }}
         >
-          <Outline headings={page.headings} />
+          <Outline headings={headings} />
         </div>
       )}
     </div>

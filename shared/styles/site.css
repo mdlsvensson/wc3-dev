@@ -368,6 +368,31 @@ code {
 .sidebar-links a:hover {
   color: var(--brand);
 }
+.sidebar-group {
+  margin-top: 12px;
+}
+.sidebar-group > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  font: var(--jersey-10);
+  font-synthesis: none;
+  letter-spacing: 0;
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+}
+.sidebar-group > summary::-webkit-details-marker {
+  display: none;
+}
+.sidebar-group > summary::after {
+  content: "+";
+  color: var(--text-secondary);
+}
+.sidebar-group[open] > summary::after {
+  content: "\2212";
+}
 .doc-layout {
   padding: 32px 24px 96px;
   min-width: 0;

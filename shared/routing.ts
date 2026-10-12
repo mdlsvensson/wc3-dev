@@ -1,5 +1,3 @@
-import type { CompiledPage } from "./types.ts";
-
 export function homeRedirect(url: URL): Response | null {
   const match = /^\/(moonwell|wrappers|systems)(?=\/|$)/.exec(url.pathname);
   if (!match) return null;
@@ -9,10 +7,10 @@ export function homeRedirect(url: URL): Response | null {
   return Response.redirect(`https://docs.wc3.dev${path}${url.search}`, 301);
 }
 
-export function findDocsPage(
+export function findDocsPage<T extends { url: string }>(
   pathname: string,
-  pages: readonly CompiledPage[],
-): CompiledPage | undefined {
+  pages: readonly T[],
+): T | undefined {
   return pages.find((page) => {
     const aliases = page.url.endsWith("/")
       ? [page.url.slice(0, -1), `${page.url}index`, `${page.url}index.html`]
@@ -23,7 +21,7 @@ export function findDocsPage(
 
 export function docsRedirect(
   url: URL,
-  pages: readonly CompiledPage[],
+  pages: readonly { url: string }[],
 ): Response | null {
   const page = findDocsPage(url.pathname, pages);
   return page && page.url !== url.pathname

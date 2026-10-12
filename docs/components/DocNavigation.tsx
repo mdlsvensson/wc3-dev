@@ -1,45 +1,40 @@
 import type { VNode } from "preact";
-import type { CompiledPage, Heading, NavSection } from "../../shared/types.ts";
-
-function navigationLabel(page: CompiledPage): string {
-  if (page.source.endsWith("/index.md")) return "Overview";
-  if (page.source.endsWith("/getting-started.md")) return "Getting started";
-  return page.title;
-}
-
-export function sectionPages(
-  page: CompiledPage,
-  pages: readonly CompiledPage[],
-  sections: readonly NavSection[],
-): CompiledPage[] {
-  return (sections.find((section) => section.id === page.section)?.sources ??
-    [])
-    .flatMap((source) =>
-      pages.filter((candidate) => candidate.source === source)
-    );
-}
+import type { Heading, SidebarGroup, SidebarTree } from "../../shared/types.ts";
+import { sidebarItems } from "../sidebar.ts";
 
 export function Sidebar(
-  { page, pages, sections }: {
-    page: CompiledPage;
-    pages: readonly CompiledPage[];
-    sections: readonly NavSection[];
-  },
+  { tree, current }: { tree: SidebarTree; current: string },
 ): VNode {
+  const currentGroup = tree.groups.findIndex((group) =>
+    group.items.some((item) => item.url === current)
+  );
+  const links = (group: SidebarGroup) =>
+    group.items.map((item) => (
+      <a
+        key={item.url}
+        href={item.url}
+        aria-current={item.url === current ? "page" : undefined}
+      >
+        {item.label}
+      </a>
+    ));
   return (
     <nav aria-label="Documentation navigation" class="sidebar-links">
-      <p class="sidebar-title pixel-heading">
-        {sections.find((section) => section.id === page.section)?.label}
-      </p>
-      {sectionPages(page, pages, sections).map((candidate) => (
-        <a
-          key={candidate.url}
-          href={candidate.url}
-          aria-current={candidate.url === page.url ? "page" : undefined}
-        >
-          {navigationLabel(candidate)}
-        </a>
-      ))}
+      <p class="sidebar-title pixel-heading">{tree.label}</p>
+      {tree.groups.map((group, index) =>
+        group.title
+          ? (
+            <details
+              key={group.title}
+              class="sidebar-group"
+              open={index === 0 || index === currentGroup}
+            >
+              <summary class="pixel-heading">{group.title}</summary>
+              {links(group)}
+            </details>
+          )
+          : links(group)
+      )}
     </nav>
   );
 }
@@ -49,9 +44,7 @@ export function Outline({ headings }: { headings: readonly Heading[] }): VNode {
     <nav aria-label="On this page" class="outline-links">
       <p>On this page</p>
       <ul>
-        {headings.filter((heading) =>
-          heading.level === 2 || heading.level === 3
-        ).map((heading) => (
+        {headings.map((heading) => (
           <li
             key={heading.id}
             class={heading.level === 3 ? "outline-nested" : undefined}
@@ -65,32 +58,24 @@ export function Outline({ headings }: { headings: readonly Heading[] }): VNode {
 }
 
 export function Pager(
-  { page, pages, sections }: {
-    page: CompiledPage;
-    pages: readonly CompiledPage[];
-    sections: readonly NavSection[];
-  },
+  { tree, current }: { tree: SidebarTree; current: string },
 ): VNode {
-  const ordered = sectionPages(page, pages, sections);
-  const current = ordered.findIndex((candidate) => candidate.url === page.url);
-  const previous = ordered[current - 1];
-  const next = ordered[current + 1];
+  const ordered = sidebarItems(tree);
+  const index = ordered.findIndex((item) => item.url === current);
+  const previous = ordered[index - 1];
+  const next = ordered[index + 1];
   return (
     <nav aria-label="Previous and next pages" class="doc-pager">
       {previous && (
         <a rel="prev" href={previous.url}>
           <span>Previous page</span>
-          <strong>
-            {navigationLabel(previous)}
-          </strong>
+          <strong>{previous.label}</strong>
         </a>
       )}
       {next && (
         <a rel="next" href={next.url}>
           <span>Next page</span>
-          <strong>
-            {navigationLabel(next)}
-          </strong>
+          <strong>{next.label}</strong>
         </a>
       )}
     </nav>

@@ -1,4 +1,5 @@
 import type { CompiledPage, NavSection } from "../../shared/types.ts";
+import { navSources } from "../../docs/sidebar.ts";
 import { resolveContentLink, sourceUrl } from "./links.ts";
 import { createRenderer, visitTokens } from "./render.ts";
 import {
@@ -43,7 +44,11 @@ export async function compileDocumentation(
   const ordered: { source: string; section: NavSection["id"] }[] = [];
   const seen = new Set<string>();
   for (const section of sections) {
-    for (const source of section.sources) {
+    const sectionSources = navSources(section);
+    if (!sectionSources.length) {
+      throw new Error(`${section.id}: navigation section has no page`);
+    }
+    for (const source of sectionSources) {
       if (seen.has(source)) {
         throw new Error(`${source}: duplicate navigation source ${source}`);
       }

@@ -5,6 +5,7 @@ import { compileDocumentation } from "../tools/content/compile.ts";
 import MarkdownIt from "markdown-it";
 import { createHomeApp } from "../home/app.tsx";
 import { createDocsApp } from "../docs/app.tsx";
+import { buildSidebars } from "../docs/sidebar.ts";
 import { assertStringIncludes } from "@std/assert";
 
 const baselinePages = [
@@ -60,7 +61,7 @@ Deno.test("all eight public pages retain canonical URLs, baseline prose, alterna
     );
   }
   const pages = await compileDocumentation(sources, navigation, new Set());
-  const docs = createDocsApp(pages).handler();
+  const docs = createDocsApp(pages, buildSidebars(pages, navigation)).handler();
   const home = createHomeApp().handler();
   const urls = [
     "https://wc3.dev/",

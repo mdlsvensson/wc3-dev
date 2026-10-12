@@ -1,35 +1,34 @@
 import type { VNode } from "preact";
-import type { CompiledPage, NavSection } from "../../shared/types.ts";
+import type { PageRecord, SidebarTree } from "../../shared/types.ts";
 import { Document } from "../../shared/components/Document.tsx";
 import { Header } from "../../shared/components/Header.tsx";
 import MobileNav from "../islands/MobileNav.tsx";
 import DocMenu from "../islands/DocMenu.tsx";
 import Search from "../islands/Search.tsx";
+import { docMenuProps } from "../sidebar.ts";
 import { Outline, Pager, Sidebar } from "./DocNavigation.tsx";
 
 export interface DocPageProps {
-  page: CompiledPage;
-  pages: readonly CompiledPage[];
-  sections: readonly NavSection[];
+  page: PageRecord;
+  sidebar: SidebarTree;
 }
 
-export function DocPage({ page, pages, sections }: DocPageProps): VNode {
+export function DocPage({ page, sidebar }: DocPageProps): VNode {
   const items = [{ text: "docs", href: "/moonwell/" }, {
     text: "wrappers",
     href: "/wrappers/",
   }, { text: "systems", href: "/systems/" }];
-  const hasOutline = page.headings.some((heading) =>
-    heading.level === 2 || heading.level === 3
-  );
+  const menu = docMenuProps(page, sidebar);
+  const hasOutline = menu.headings.length > 0;
   return (
     <Document title={`${page.title} | wc3.dev`}>
       <div class="documentation" id="top">
         <Header items={items} leading={<Search />}>
           <MobileNav items={items} />
         </Header>
-        <DocMenu page={page} pages={pages} sections={sections} />
+        <DocMenu {...menu} />
         <aside class="doc-sidebar">
-          <Sidebar page={page} pages={pages} sections={sections} />
+          <Sidebar tree={sidebar} current={page.url} />
         </aside>
         <div class={`doc-layout${hasOutline ? " has-outline" : ""}`}>
           <main id="main-content" class="doc-content">
@@ -37,11 +36,11 @@ export function DocPage({ page, pages, sections }: DocPageProps): VNode {
               class="doc-prose"
               dangerouslySetInnerHTML={{ __html: page.html }}
             />
-            <Pager page={page} pages={pages} sections={sections} />
+            <Pager tree={sidebar} current={page.url} />
           </main>
           {hasOutline && (
             <aside class="doc-outline">
-              <Outline headings={page.headings} />
+              <Outline headings={menu.headings} />
             </aside>
           )}
         </div>

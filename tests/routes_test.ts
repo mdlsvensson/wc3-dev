@@ -2,13 +2,14 @@ import { assertEquals, assertStringIncludes } from "@std/assert";
 import { createHomeApp } from "../home/app.tsx";
 import { createDocsApp } from "../docs/app.tsx";
 import { navigation } from "../docs/navigation.ts";
+import { buildSidebars, navSources } from "../docs/sidebar.ts";
 import { compileDocumentation } from "../tools/content/compile.ts";
-import type { CompiledPage } from "../shared/types.ts";
+import type { PageRecord } from "../shared/types.ts";
 
 const sources = new Map(navigation.flatMap((section) =>
   [
     [
-      section.sources[0],
+      navSources(section)[0],
       `# ${section.label}\n\nOverview.\n\n## Installation\n\n### Details\n\n\`\`\`lua\nprint("${
         "wide ".repeat(60)
       }")\n\`\`\`\n\n| Name | Value |\n| --- | --- |\n| Wide | ${
@@ -16,7 +17,7 @@ const sources = new Map(navigation.flatMap((section) =>
       } |\n`,
     ],
     [
-      section.sources[1],
+      navSources(section)[1],
       `# Getting started with ${section.label}\n\nStart here.`,
     ],
   ] as [string, string][]
@@ -52,7 +53,8 @@ Deno.test("home redirects preserve section paths and queries on both hosts", asy
 });
 
 Deno.test("docs redirect only known section and HTML aliases", async () => {
-  const handler = createDocsApp(pages).handler();
+  const handler = createDocsApp(pages, buildSidebars(pages, navigation))
+    .handler();
   for (const section of ["moonwell", "wrappers", "systems"]) {
     for (
       const [path, target] of [
@@ -75,7 +77,12 @@ Deno.test("docs redirect only known section and HTML aliases", async () => {
 });
 
 Deno.test("unknown paths and missing assets return readable 404s", async () => {
-  for (const app of [createHomeApp(), createDocsApp(pages)]) {
+  for (
+    const app of [
+      createHomeApp(),
+      createDocsApp(pages, buildSidebars(pages, navigation)),
+    ]
+  ) {
     for (
       const path of [
         "/moonwells",
@@ -97,7 +104,7 @@ Deno.test("unknown paths and missing assets return readable 404s", async () => {
     }
   }
   assertEquals(
-    (await createDocsApp(pages).handler()(
+    (await createDocsApp(pages, buildSidebars(pages, navigation)).handler()(
       new Request("https://docs.wc3.dev/moonwell/%2F%2Fevil.example"),
     )).status,
     404,
@@ -111,10 +118,12 @@ Deno.test("GET and HEAD share status and headers while unsupported methods fail"
         "/missing.woff2",
         404,
       ]]],
-      [createDocsApp(pages), [["/", 200], ...pages.map((p) => [p.url, 200]), [
-        "/moonwell",
-        301,
-      ], ["/missing.woff2", 404]]],
+      [createDocsApp(pages, buildSidebars(pages, navigation)), [
+        ["/", 200],
+        ...pages.map((p) => [p.url, 200]),
+        ["/moonwell", 301],
+        ["/missing.woff2", 404],
+      ]],
     ] as const
   ) {
     const handler = app.handler();
@@ -141,7 +150,10 @@ Deno.test("GET and HEAD share status and headers while unsupported methods fail"
 });
 
 Deno.test("documentation sidebar, pager and outline follow authored navigation", async () => {
-  const handler = createDocsApp([...pages].reverse()).handler();
+  const handler = createDocsApp(
+    [...pages].reverse(),
+    buildSidebars(pages, navigation),
+  ).handler();
   for (const page of pages) {
     const html =
       await (await handler(new Request(`https://docs.wc3.dev${page.url}`)))
@@ -189,14 +201,12 @@ Deno.test("documentation sidebar, pager and outline follow authored navigation",
 });
 
 Deno.test("render failures are logged and return a generic 500", async () => {
-  const broken: CompiledPage = {
+  const broken: PageRecord = {
     source: "moonwell/index.md",
     url: "/moonwell/",
     title: "Moonwell",
     section: "moonwell",
     headings: [],
-    links: [],
-    text: "Moonwell",
     get html(): string {
       throw new Error("private failure detail");
     },

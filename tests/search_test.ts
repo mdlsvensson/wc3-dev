@@ -13,6 +13,7 @@ import type { CompiledPage } from "../shared/types.ts";
 import { landingPage, pages } from "../docs/generated/pages.ts";
 import { createDocsApp } from "../docs/app.tsx";
 import { compileDocumentation } from "../tools/content/compile.ts";
+import { flatSection } from "./support/site.ts";
 
 function page(
   title: string,
@@ -115,7 +116,7 @@ Deno.test("compiled inline headings and highlighted code retain decoded searchab
       "moonwell/index.md",
       '# Guide\n\nEarlier text\n\n## A *heading* & `value`\n\nEncoded &copy; &amp; &#x1F600; &lt;script&gt;\n\n```lua\nlocal value = "<script>"\n```\n\n### Next\n\nAnother section\n',
     ]]),
-    [{ id: "moonwell", label: "moonwell", sources: ["moonwell/index.md"] }],
+    [flatSection("moonwell", ["moonwell/index.md"])],
     new Set(),
   );
   const payload = buildSearchPayload(compiled);
@@ -144,7 +145,7 @@ Deno.test("heading section text keeps table cells separate for search", async ()
       "moonwell/index.md",
       "# Guide\n\n## Table\n\n| Name | Value |\n| --- | --- |\n| Moonwell | wrappers |\n",
     ]]),
-    [{ id: "moonwell", label: "moonwell", sources: ["moonwell/index.md"] }],
+    [flatSection("moonwell", ["moonwell/index.md"])],
     new Set(),
   );
   const payload = buildSearchPayload(compiled);
