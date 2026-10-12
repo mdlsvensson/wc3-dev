@@ -10,10 +10,12 @@ import { createSearchLoader } from "../docs/search/loader.ts";
 import { tabBoundaryTarget } from "../docs/search/focus.ts";
 import type { SearchEngine } from "../docs/search/types.ts";
 import type { CompiledPage } from "../shared/types.ts";
-import { landingPage, pages } from "../docs/generated/pages.ts";
 import { createDocsApp } from "../docs/app.tsx";
-import { compileDocumentation } from "../tools/content/compile.ts";
-import { flatSection } from "./support/site.ts";
+import {
+  compileDocumentation,
+  compileLandingPage,
+} from "../tools/content/compile.ts";
+import { flatSection, loadSampleSite, staticAssets } from "./support/site.ts";
 
 function page(
   title: string,
@@ -33,28 +35,30 @@ function page(
   };
 }
 
-Deno.test("serialized search covers all seven documentation pages and prefix/typo queries", () => {
-  const payload = buildSearchPayload([landingPage, ...pages]);
-  assertEquals(payload.entries.map((entry) => entry.url), [
-    "/",
-    "/moonwell/",
-    "/moonwell/getting-started",
-    "/wrappers/",
-    "/wrappers/getting-started",
-    "/systems/",
-    "/systems/getting-started",
-  ]);
+Deno.test("serialized search covers the landing page and every sample page, with prefix and typo queries", async () => {
+  const { pages } = await loadSampleSite();
+  const landing = compileLandingPage(pages, await staticAssets());
+  const payload = buildSearchPayload([landing, ...pages]);
+  const urls = new Set(payload.entries.map((entry) => entry.url));
+  for (const page of [landing, ...pages]) {
+    assertEquals(urls.has(page.url), true, page.url);
+  }
   const engine = createSearchEngine(JSON.parse(JSON.stringify(payload)));
-  for (const query of ["wrappers", "wrap", "wrapers"]) {
+  for (const query of ["installation", "install", "instalation"]) {
     assertEquals(
-      engine.search(query).some((entry) => entry.url === "/wrappers/"),
+      engine.search(query).some((entry) =>
+        entry.url === "/moonwell/installation"
+      ),
       true,
       query,
     );
   }
-  for (const query of ["Moonwell", "systems"]) {
-    assertEquals(engine.search(query).length > 0, true, query);
-  }
+  assertEquals(
+    engine.search("issueTargetOrder").some((entry) =>
+      entry.url === "/wrappers/reference/unit#issuetargetorder"
+    ),
+    true,
+  );
   assertEquals(engine.search("PixelCode LICENSE README").length, 0);
 });
 

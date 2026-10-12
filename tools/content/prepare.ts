@@ -12,7 +12,10 @@ async function removeTemporary(path: URL): Promise<void> {
   }
 }
 
-async function listFiles(directory: URL, prefix = ""): Promise<string[]> {
+export async function listFiles(
+  directory: URL,
+  prefix = "",
+): Promise<string[]> {
   const files: string[] = [];
   for await (const entry of Deno.readDir(directory)) {
     const relative = `${prefix}${entry.name}`;
@@ -28,14 +31,19 @@ async function listFiles(directory: URL, prefix = ""): Promise<string[]> {
   return files.sort();
 }
 
-export async function prepareDocumentation(root: URL = repo): Promise<void> {
-  const content = new URL("docs/content/", root);
+/** Every Markdown file under a content folder, keyed by its path from that folder. */
+export async function readSources(content: URL): Promise<Map<string, string>> {
   const sources = new Map<string, string>();
   for (const source of await listFiles(content)) {
     if (source.endsWith(".md")) {
       sources.set(source, await Deno.readTextFile(new URL(source, content)));
     }
   }
+  return sources;
+}
+
+export async function prepareDocumentation(root: URL = repo): Promise<void> {
+  const sources = await readSources(new URL("docs/content/", root));
   const assets = new Set(
     (await listFiles(new URL("shared/static/", root))).map((asset) =>
       `/${asset}`

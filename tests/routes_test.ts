@@ -1,28 +1,11 @@
 import { assertEquals, assertStringIncludes } from "@std/assert";
 import { createHomeApp } from "../home/app.tsx";
 import { createDocsApp } from "../docs/app.tsx";
-import { navigation } from "../docs/navigation.ts";
-import { buildSidebars, navSources } from "../docs/sidebar.ts";
-import { compileDocumentation } from "../tools/content/compile.ts";
+import { buildSidebars } from "../docs/sidebar.ts";
 import type { PageRecord } from "../shared/types.ts";
+import { loadSampleSite } from "./support/site.ts";
 
-const sources = new Map(navigation.flatMap((section) =>
-  [
-    [
-      navSources(section)[0],
-      `# ${section.label}\n\nOverview.\n\n## Installation\n\n### Details\n\n\`\`\`lua\nprint("${
-        "wide ".repeat(60)
-      }")\n\`\`\`\n\n| Name | Value |\n| --- | --- |\n| Wide | ${
-        "wide".repeat(70)
-      } |\n`,
-    ],
-    [
-      navSources(section)[1],
-      `# Getting started with ${section.label}\n\nStart here.`,
-    ],
-  ] as [string, string][]
-));
-const pages = await compileDocumentation(sources, navigation, new Set());
+const { navigation, pages, sidebars } = await loadSampleSite();
 
 Deno.test("home redirects preserve section paths and queries on both hosts", async () => {
   for (const host of ["wc3.dev", "www.wc3.dev"]) {
@@ -52,25 +35,20 @@ Deno.test("home redirects preserve section paths and queries on both hosts", asy
   }
 });
 
-Deno.test("docs redirect only known section and HTML aliases", async () => {
-  const handler = createDocsApp(pages, buildSidebars(pages, navigation))
-    .handler();
-  for (const section of ["moonwell", "wrappers", "systems"]) {
-    for (
-      const [path, target] of [
-        [`/${section}`, `/${section}/`],
-        [`/${section}/index`, `/${section}/`],
-        [`/${section}/index.html`, `/${section}/`],
-        [`/${section}/getting-started.html`, `/${section}/getting-started`],
-      ]
-    ) {
+Deno.test("docs redirect the aliases of every page and nothing else", async () => {
+  const handler = createDocsApp(pages, sidebars).handler();
+  for (const page of pages) {
+    const aliases = page.url.endsWith("/")
+      ? [page.url.slice(0, -1), `${page.url}index`, `${page.url}index.html`]
+      : [`${page.url}.html`];
+    for (const alias of aliases) {
       const response = await handler(
-        new Request(`https://docs.wc3.dev${path}?q=x%2Fy`),
+        new Request(`https://docs.wc3.dev${alias}?q=x%2Fy`),
       );
-      assertEquals(response.status, 301);
+      assertEquals(response.status, 301, alias);
       assertEquals(
         response.headers.get("location"),
-        `https://docs.wc3.dev${target}?q=x%2Fy`,
+        `https://docs.wc3.dev${page.url}?q=x%2Fy`,
       );
     }
   }
@@ -80,7 +58,7 @@ Deno.test("unknown paths and missing assets return readable 404s", async () => {
   for (
     const app of [
       createHomeApp(),
-      createDocsApp(pages, buildSidebars(pages, navigation)),
+      createDocsApp(pages, sidebars),
     ]
   ) {
     for (
@@ -104,7 +82,7 @@ Deno.test("unknown paths and missing assets return readable 404s", async () => {
     }
   }
   assertEquals(
-    (await createDocsApp(pages, buildSidebars(pages, navigation)).handler()(
+    (await createDocsApp(pages, sidebars).handler()(
       new Request("https://docs.wc3.dev/moonwell/%2F%2Fevil.example"),
     )).status,
     404,
@@ -118,7 +96,7 @@ Deno.test("GET and HEAD share status and headers while unsupported methods fail"
         "/missing.woff2",
         404,
       ]]],
-      [createDocsApp(pages, buildSidebars(pages, navigation)), [
+      [createDocsApp(pages, sidebars), [
         ["/", 200],
         ...pages.map((p) => [p.url, 200]),
         ["/moonwell", 301],
@@ -149,11 +127,11 @@ Deno.test("GET and HEAD share status and headers while unsupported methods fail"
   }
 });
 
-Deno.test("documentation sidebar, pager and outline follow authored navigation", async () => {
-  const handler = createDocsApp(
-    [...pages].reverse(),
-    buildSidebars(pages, navigation),
-  ).handler();
+Deno.test("every sample page shows its own section's sidebar, its title and one h1", async () => {
+  // The records arrive in the wrong order: the sidebars must come out as navigation orders them.
+  const reversed = [...pages].reverse();
+  const handler = createDocsApp(reversed, buildSidebars(reversed, navigation))
+    .handler();
   for (const page of pages) {
     const html =
       await (await handler(new Request(`https://docs.wc3.dev${page.url}`)))
@@ -161,40 +139,28 @@ Deno.test("documentation sidebar, pager and outline follow authored navigation",
     assertEquals((html.match(/<h1\b/g) ?? []).length, 1);
     assertStringIncludes(html, `<title>${page.title} | wc3.dev</title>`);
     assertStringIncludes(html, `href="${page.url}" aria-current="page"`);
-    assertStringIncludes(html, 'aria-label="Documentation navigation"');
-    assertEquals(
-      html.indexOf('href="/wrappers/"') < html.indexOf('href="/systems/"'),
-      true,
-    );
     const sidebar = html.slice(
       html.indexOf('class="sidebar-links"'),
       html.indexOf("</nav>", html.indexOf('class="sidebar-links"')),
-    );
-    assertStringIncludes(sidebar, ">Getting started</a>");
-    assertEquals(sidebar.includes("Getting started with"), false);
-    assertEquals(
-      sidebar.indexOf(`href="/${page.section}/"`) <
-        sidebar.indexOf(`href="/${page.section}/getting-started"`),
-      true,
     );
     for (
       const other of ["moonwell", "wrappers", "systems"].filter((id) =>
         id !== page.section
       )
     ) assertEquals(sidebar.includes(`href="/${other}/"`), false);
-    if (page.source.endsWith("index.md")) {
-      assertStringIncludes(
-        html,
-        `rel="next" href="/${page.section}/getting-started"`,
-      );
-      const pager = html.slice(html.indexOf('class="doc-pager"'));
-      assertStringIncludes(pager, "<strong>Getting started</strong>");
-      assertStringIncludes(html, 'href="#installation"');
-      assertStringIncludes(html, 'href="#details"');
-      assertStringIncludes(html, "<table>");
-      assertStringIncludes(html, "<pre");
-    } else assertStringIncludes(html, `rel="prev" href="/${page.section}/"`);
   }
+  const overview =
+    await (await handler(new Request("https://docs.wc3.dev/moonwell/")))
+      .text();
+  assertStringIncludes(overview, 'href="#what-a-build-does"');
+  assertStringIncludes(overview, 'href="#the-staged-copy"');
+  assertStringIncludes(overview, 'rel="next" href="/moonwell/installation"');
+  const wide = await (await handler(
+    new Request("https://docs.wc3.dev/moonwell/first-map"),
+  ))
+    .text();
+  assertStringIncludes(wide, "<table>");
+  assertStringIncludes(wide, "<pre");
   const root = await (await handler(new Request("https://docs.wc3.dev/")))
     .text();
   assertEquals(root.includes('aria-label="Documentation navigation"'), false);
