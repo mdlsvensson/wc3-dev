@@ -22,6 +22,10 @@
   --brand-dark: #176094;
   --brand-soft: rgba(30, 191, 249, 0.16);
   --button-hover: #0d5fb8;
+  /* The highlighter theme's colours (github-dark), as it writes them on a block, and its darker header shade. */
+  --code-surface: #24292e;
+  --code-text: #e1e4e8;
+  --code-header: #1f2428;
   color: var(--text);
   background: var(--surface);
   font-family: var(--font-base);
@@ -506,8 +510,8 @@ code {
   color: var(--text-secondary);
 }
 .code-block[data-lang="text"] > pre {
-  background: #24292e;
-  color: #e1e4e8;
+  background: var(--code-surface);
+  color: var(--code-text);
 }
 .code-group {
   margin: 16px 0;
@@ -526,7 +530,7 @@ html.js .code-tabs {
   gap: 4px;
   padding: 0 16px;
   border-radius: 8px 8px 0 0;
-  background: #1f2428;
+  background: var(--code-header);
 }
 .code-tab {
   padding: 8px;
