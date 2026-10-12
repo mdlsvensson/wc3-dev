@@ -53,12 +53,12 @@ Deno.test("invalid content preserves the generated page/search pair and recovery
     const original = await Deno.readTextFile(source);
     await Deno.writeTextFile(
       source,
-      `${original}\n[broken](missing-task6.md)\n`,
+      `${original}\n[broken](missing-page.md)\n`,
     );
     await assertRejects(
       () => prepareDocumentation(options),
       Error,
-      "missing-task6.md",
+      "missing-page.md",
     );
     assertEquals(
       await Promise.all(outputs.map((path) => Deno.readFile(path))),
@@ -66,11 +66,11 @@ Deno.test("invalid content preserves the generated page/search pair and recovery
     );
     await Deno.writeTextFile(
       source,
-      `${original}\n## Task Six Recovery\n\nRecovered content.\n`,
+      `${original}\n## Recovered heading\n\nRecovered content.\n`,
     );
     await prepareDocumentation(options);
     for (const path of outputs) {
-      assertStringIncludes(await Deno.readTextFile(path), "Task Six Recovery");
+      assertStringIncludes(await Deno.readTextFile(path), "Recovered heading");
     }
     const recovered = await Promise.all(
       outputs.map((path) => Deno.readFile(path)),

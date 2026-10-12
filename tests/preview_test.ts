@@ -5,7 +5,8 @@ import type { PageRecord, Sidebars } from "../shared/types.ts";
 const [docsOrigin, homeOrigin] = Deno.args;
 const enabled = Boolean(docsOrigin && homeOrigin);
 const sections = ["moonwell", "wrappers", "systems"];
-// What the last docs build wrote: authored after build:docs, the sample after build:sample.
+// What content preparation wrote last: the sample after build:sample or dev:sample, the authored pages after
+// build:docs, build:home, check, content or dev. Run this test against Workers built from those same records.
 const generated: { pages: readonly PageRecord[]; sidebars: Sidebars } = enabled
   ? await import("../docs/generated/pages.ts")
   : { pages: [], sidebars: {} };
