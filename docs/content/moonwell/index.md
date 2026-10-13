@@ -23,7 +23,9 @@ written in Pkl, and files to import into the map.
 9. It replaces `dist/stage/<map.folder>` with a copy of the source map and writes the planned files into the copy.
 10. It packs that map into one archive, `<build.folder>/<map.folder>`.
 
-Nothing of the map is written before step 9: the first step that fails ends the build with its error.
+Nothing of the map is written before step 9: the first step that fails ends the build with its error. `build`
+removes the archive of the build before after step 2, so a build that fails later leaves no archive
+([Commands](./reference/commands#build)).
 
 A build never changes the source map: it only reads it. It writes the built map in two forms. The folder
 `dist/stage/<map.folder>` is the staged copy, the built map as a folder. The archive is the built map as one file,
@@ -41,8 +43,8 @@ and to edit the map a project builds from, and an editor of your choice for the 
 
 ## The two libraries
 
-A library is a folder of modules that your code imports, and a project takes one from a tag on GitHub. Two are
-written for Moonwell, and each has its own section of these pages.
+A project can add libraries, which [Libraries](./libraries) describes. Two are written for Moonwell, and each has its
+own section of these pages.
 
 - [moonwell-wrappers](../wrappers/) is an annotated Lua library that wraps the game's natives: players, units, timers,
   triggers, frames and more, with completion in your editor and explicit cleanup.

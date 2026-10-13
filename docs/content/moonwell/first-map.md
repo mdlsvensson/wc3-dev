@@ -20,8 +20,9 @@ World Editor saved as a folder, gameplay code in `src/main.yue`, one custom unit
 in `moonwell.toml`, and the files your editor reads. [Project layout](./project-layout) describes every file.
 
 `init` also runs Pkl, which fetches the `moonwell` Pkl package that the project's object file is written against, so
-it needs a network connection. When Moonwell has to download Pkl itself, as [Installation](./installation#pkl)
-describes, that download comes first.
+it needs a network connection. The block above is from a machine with Pkl 0.32 or newer on its PATH. When
+Moonwell has to download Pkl itself, as [Installation](./installation#pkl) describes, that download comes first, and
+`init` prints the line `Downloading Pkl 0.32.1...` before the one above.
 
 The other commands of this page run in the project folder:
 
@@ -160,7 +161,7 @@ run the command again.
 
 ## The template's Captain
 
-The Captain is not one of the game's units. The project makes it, in `objects/units.pkl`:
+The template's Captain is a custom unit. The project makes it, in `objects/units.pkl`:
 
 ```pkl
 // Custom units. Every file under objects/ amends ObjectFile.pkl; gameplay code uses them from src/generated/objects.yue.
@@ -256,8 +257,9 @@ moonwell check
 Check passed: 2 module(s) reachable from main, 0 asset(s).
 ```
 
-It differs from a check of `dev` in one thing. `dev` writes the module of ids as a build does; `check` leaves the
-file alone, and fails when it is missing or does not match the objects ([Commands](./reference/commands#check)).
+It differs from a check of `dev` in one thing. `dev` writes the module of ids as a build does. `check` leaves the
+file alone, and fails when it does not match the objects, or is missing in a project with objects
+([Commands](./reference/commands#check)).
 
 ## See also
 
