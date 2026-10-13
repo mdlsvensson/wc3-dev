@@ -21,17 +21,14 @@ tag = "v0.10.1"
 [Settings](./reference/settings#libraries) has the rule of each setting.
 
 The next command that brings the libraries up to date fetches the tag from GitHub. Eight commands do that: `build`,
-`test`, `check`, `dev`, `setup`, `assets:check`, `assets:sync` and `assets:paths`. The one that fetches says so:
+`test`, `check`, `dev`, `setup`, `assets:check`, `assets:sync` and `assets:paths`. The one that fetches says so in
+a line that starts with `Fetched library wrappers:`. After that come the repository, the tag and, in parentheses,
+the first seven characters of the commit that the tag names.
 
-```text
-Fetched library wrappers: mdlsvensson/moonwell-wrappers v0.10.1 (bd5bce6).
-```
-
-The seven characters in parentheses start the commit that the tag names. The library's modules are then in
-`.moonwell/libraries/wrappers/`. The files that a library ships for the map go into `.moonwell/library-assets/`, in
-a folder of the library's name. moonwell-wrappers ships none, and [Assets](./assets#a-librarys-files) describes what
-a build does with such files. The template's `.gitignore` leaves `.moonwell/` out of git, so every clone of the
-project fetches its libraries itself.
+The library's modules are then in `.moonwell/libraries/wrappers/`. The files that a library ships for the map go
+into `.moonwell/library-assets/`, in a folder of the library's name. moonwell-wrappers ships none, and
+[Assets](./assets#a-librarys-files) describes what a build does with such files. The template's `.gitignore` leaves
+`.moonwell/` out of git, so every clone of the project fetches its libraries itself.
 
 A library that is there is not fetched at every run. Moonwell fetches it again when its folder is missing or is not
 the copy that `moonwell.lock` records, and when you change the entry's `github`, `tag` or `dir`. A run that fetches
@@ -173,8 +170,17 @@ path = "../my-library"
 
 `path` is the root of the library, relative to the project folder or absolute. Moonwell fetches nothing for such an
 entry, prints no line about it and records nothing of it in `moonwell.lock`. A record that the file has under the
-library's name, from a time when the entry named a repository, stays there. An entry in your `config.toml` does
-nothing to a library by `path`: that entry is matched by `github`, and this one has none.
+library's name, from a time when the entry named a repository, stays there. An entry in your `config.toml` is
+matched by `github`, so it does nothing to an entry that has a `path` and no `github`.
+
+The examples below use this library. It has one module, the file `src/mylib/hello.yue`:
+
+```yue
+export greet = (name) ->
+  print "Hello, #{name}."
+```
+
+[Write a library](#write-a-library) describes how such a folder is laid out.
 
 ## What happens to a local folder
 
@@ -189,7 +195,7 @@ A file or a folder whose name starts with a dot, such as `.git`, is left out. Mo
 folder.
 
 A build reads the copy. So an error in the library's code names the file of the copy, not the file you edit. Here
-`src/mylib/hello.yue` of the library above ends in a line that does not compile:
+`src/mylib/hello.yue` of the library above has a third line, `if`, which does not compile:
 
 ```text
 error: .moonwell/libraries/mylib/mylib/hello.yue:3 › expected valid expression
@@ -203,8 +209,8 @@ error: .moonwell/libraries/mylib/mylib/hello.yue:3 › expected valid expression
 Correct the file in your own folder. A change that you make in the copy is gone at the next run.
 
 `moonwell dev` watches a local folder: its modules, its files for the map and its `moonwell-library.json`. The line
-that `dev` prints when it starts lists the folders, here for a library with its modules in `src` and its files for
-the map in `assets`:
+that `dev` prints when it starts lists the folders, here for the library above, with its modules in `src` and with
+files for the map in a folder `assets`:
 
 ```text
 Watching src/, assets/, objects/, lua/, ../my-library/src/, ../my-library/assets/ and the project's settings. Press Ctrl+C to stop.
@@ -218,13 +224,9 @@ and start it again ([Commands](./reference/commands#dev)).
 
 A library is a folder with modules in it. To share it, make it a repository on GitHub and give it a tag: a
 project's entry names a tag. Below one folder of the library, every `.yue` and `.lua` file is a module, named by
-its path below that folder. This is `src/mylib/hello.yue` of a library whose module names start at `src`:
-
-```yue
-export greet = (name) -> print "Hello, #{name}."
-```
-
-A project that lists the library imports it as `mylib.hello`.
+its path below that folder. In the library of [A library by path](#a-library-by-path) that folder is `src`. So its
+file `src/mylib/hello.yue` is the module `mylib.hello`, and a project that lists the library imports it by that
+name.
 
 The library says how it is laid out in a file `moonwell-library.json` in its root:
 
@@ -265,8 +267,9 @@ Some rules for what the two folders hold:
 - **File names.** In both folders, Moonwell refuses two names that differ only in letter case, and a name that
   Windows cannot hold ([Assets](./assets#what-is-refused) lists those).
 - **Keep the files for the map under a folder of the library's own**, such as `assets/war3mapImported/mylib/`. Two
-  libraries with a file at the same path in the map fail the build, and a file of the project at that path takes
-  the library's place.
+  libraries with a file at the same path in the map are an error, unless a file of the project takes that path.
+  And a file of the project at a library's path is imported in the library's place
+  ([Assets](./assets#a-librarys-files)).
 
 The two libraries that are written for Moonwell each keep their modules in one folder below `src`: `src/wrappers/`
 and `src/systems/`. So every module name of theirs starts with `wrappers.` or `systems.`. Do the same in a library
