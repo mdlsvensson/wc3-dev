@@ -89,8 +89,8 @@ Give every `BTN<Name>` a matching `DISBTN<Name>`, and every `PASBTN<Name>` a mat
 shows a placeholder where a disabled icon is missing.
 
 An object names an asset by its path in the map. This is the object file of a new project, `objects/units.pkl`,
-with the model and the icon of this page in the Captain's two fields, where the template names files of the game
-([Objects](./objects#object-files)):
+without its comments, and with the model and the icon of this page in the Captain's two fields, where the template
+names files of the game ([Objects](./objects#object-files)):
 
 ```pkl
 amends "@moonwell/ObjectFile.pkl"
@@ -290,9 +290,9 @@ Models/Knight.mdx
 1 model, 5 paths: 2 in-game, 2 custom.
 ```
 
-A project without a model gets the line `No models under assets/.` A model that cannot be read is an error. Without
-a file, the report comes first: in the place of that model's lines it has one line that starts with `(unreadable:`
-and gives the reason.
+Without a file, a project that has no model among its assets gets the line `No models under assets/.` A model that
+cannot be read is an error. Without a file, the report comes first: in the place of that model's lines it has one
+line that starts with `(unreadable:` and gives the reason.
 
 ## What is refused
 
