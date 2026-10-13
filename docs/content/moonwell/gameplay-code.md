@@ -80,11 +80,14 @@ mw.on_main ->
 ```
 
 A file named `init.yue` answers to the name of its folder too: `src/players/init.yue` is `players.init` and
-`players`. Dots separate the parts of a module's name, so a module's file or folder with a dot in its own name, such
-as `src/my.helpers.yue`, is refused, with `Module file and folder names cannot contain dots.`
+`players`. Import it by one of the two names. Each name is a module of its own in the map, so a file that is
+imported under both goes into the map twice, and runs twice.
 
-In the map, a module runs once: the first time it is imported. Every later import gets the value that the module
-returned then.
+Dots separate the parts of a module's name, so a module's file or folder with a dot in its own name, such as
+`src/my.helpers.yue`, is refused, with `Module file and folder names cannot contain dots.`
+
+In the map, a module runs once: the first time it is imported. Every later import of that name gets the value that
+the module returned then.
 
 ### The entry
 
@@ -110,10 +113,11 @@ Moonwell finds the imports in the Lua that a file compiles to, where an `import`
 module's name. When you write a `require` yourself, give it one string literal without an escape in it. A name that
 is worked out while the map runs is refused, with `require must be called with a single string literal.` Two modules
 that import each other are refused too, and the error shows the chain: `Circular require: main → tools → main`.
+Each of the two errors names the file and, in a plain build, the line of the `require` or the `import`.
 
 ### A module that is missing or has no code
 
-An import of a module that no file gives is an error at the line of the import:
+An import of a module that no file gives is an error. In a plain build it names the line of the import:
 
 ```text
 error: src/main.yue:2 › Module 'players.gold' not found.
@@ -125,7 +129,7 @@ The hint lists where a module can come from: a file under `src/`, a file under `
 gives the same error, without a file and a line.
 
 YueScript writes no Lua for a file that holds nothing but comments and macros. An import of such a file is an error
-too. It names the import and the file:
+too. It names the import, as the error above does, and the file:
 
 ```text
 error: src/main.yue:2 › Module 'players.gold' has no code.
@@ -133,6 +137,8 @@ hint: YueScript writes no Lua for a file with nothing but comments and macros, a
 ```
 
 Give the file code, or take the import out. When the entry is such a file, the error names the entry itself.
+
+In a minified build these errors name another line: see [Minified builds](#minified-builds).
 
 ## Lua modules
 
@@ -202,8 +208,10 @@ while it runs. For the objects that your project makes, the ids module has these
 
 `$FourCC` takes one string literal of exactly four characters, between double or single quotes. Each of the four is
 a printable ASCII character, from the space to `~`, and none is a backslash. Everything else is refused: a variable,
-a text of three characters such as `"hfo"`, a text with an escape or with `#{` in it, and a second argument. The
-compile then fails at that line, with `$FourCC needs a string literal of exactly 4 characters, such as "hfoo".`
+a text of three characters such as `"hfo"`, a text with a backslash escape, and a second argument. Between double
+quotes, a text with `#{` in it is refused too, because YueScript puts a value into a text there; between single
+quotes `#{` is two characters like any other. A refusal fails the compile at that line, with
+`$FourCC needs a string literal of exactly 4 characters, such as "hfoo".`
 
 Among other arguments, write the macro with parentheses, as above. In
 `CreateUnit Player(0), $FourCC "hfoo", 0, 0, 270` the macro takes the three numbers after it as arguments of its
@@ -362,8 +370,8 @@ then at its 10th, its 100th and its 1000th time, and so on at every power of ten
 ```
 
 The runtime keeps the count of 100 different errors. A different one beyond those is printed every time it happens.
-The counting starts when the game's call of `main` has ended, with the `on_main` hooks: an error in a callback that
-runs before that, such as a `ForGroup` loop inside a hook, is printed every time.
+The counting starts after the last `on_main` hook has run: an error in a callback that runs before that, such as a
+`ForGroup` loop inside a hook, is printed every time.
 
 An error value that is a table, a function, a userdata or a thread, and has no `__tostring` of its own, is printed
 by its kind: `(error object is a table value)`.
@@ -383,11 +391,13 @@ game has them, and an error in a callback is not printed ([Settings](./reference
 
 ::: note
 On Warcraft III Reforged 3.0.0.24268, the game drops an error in the function of a timer or a trigger without a
-word. In a map built with the guard, such errors were printed on the screen. Four more things were measured
-there. A trigger's action that runs under `xpcall` still waits: `TriggerSleepAction` and `PolledWait`
-return inside it, and an error after the wait is caught. A BJ function calls what a script put in the place of a
-native: `ForGroupBJ` went through a replaced `ForGroup`. A condition that raises an error counts as false. With
-`xpcall` around each callback, as the guard has it, 100,000 `ForGroup` callbacks took 212 ms, and 203 ms without.
+word. In a map built with the guard, such errors were printed on the screen.
+
+Four more things were measured there, not in a map built with the guard but with a test script that put `xpcall`
+around each callback itself, as the guard does. A trigger's action that runs under `xpcall` still waits:
+`TriggerSleepAction` and `PolledWait` return inside it, and an error after the wait is caught. A BJ function calls
+what a script put in the place of a native: `ForGroupBJ` went through a replaced `ForGroup`. A condition that raises
+an error counts as false. And 100,000 `ForGroup` callbacks took 212 ms with the `xpcall`, and 203 ms without.
 :::
 
 ### An error you catch yourself
@@ -469,6 +479,12 @@ line in a plain build, it writes the file alone:
 
 That holds for an error in a hook, for an error in a callback and for `format_error`. When you look for an error in
 YueScript, build without minifying.
+
+Four errors of the build itself change too: a module that is not found, a module with no code, a `require` without
+a string literal and a circular require. Moonwell reads the line of an import from the Lua that the file compiles
+to, and the minified Lua of a module is one line. So in a minified build each of the four names line 1 of the
+YueScript file, whatever line the import is on. With `build.minify = true` that holds for `check` and `dev` as well.
+The error for an unknown global keeps its line and its column.
 
 Only the YueScript modules are minified. A Lua module goes into the map as it is written, and an error in it keeps
 the file and the line. World Editor's part of the script and the runtime stay as they are too.
