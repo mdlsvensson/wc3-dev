@@ -128,7 +128,7 @@ In a `.yue` file you get completion, hover and signature help for:
 - **Your objects.** After `import "generated.objects"`: every object under its key, such as `captain` among the
   `units`, with its rawcode.
 - **The map's own globals.** The `gg_` and `udg_` globals and the functions that the source map's script defines:
-  see [Using your own map](./own-map).
+  see [Using your own map](./own-map#the-maps-own-globals).
 
 You also get a warning for a value of the wrong type, such as a `unit` passed where a `player` is expected. And the
 editor resolves an import of one of your own modules or of a library's module: the sections below say how.
