@@ -75,7 +75,7 @@ Flags:
 | --- | --- |
 | 0 | The command did its work. The help and the version end with 0 too |
 | 1 | The command failed, or the line was refused |
-| 130 | Ctrl+C stopped the command before it was done. `dev` always ends this way: Ctrl+C is how you stop it |
+| 130 | Ctrl+C stopped the command before it was done. A `dev` that has started ends this way: Ctrl+C is how you stop it |
 
 Ctrl+C asks the command to stop. It ends its work as soon as it can and removes its
 [build lock](#one-build-at-a-time). A second Ctrl+C ends the program at once, also with 130, and removes the lock
@@ -144,8 +144,9 @@ order, and the first step that fails ends it:
    the entries.
 4. It opens the source map, checks the objects, and writes the declarations for your editor into `.moonwell/types/`
    and the macro module into `.moonwell/yue/`.
-5. It takes the [build lock](#one-build-at-a-time), brings the libraries up to date under `.moonwell/`, writes
-   `moonwell.lock`, and refreshes `.moonwell/lua/`, where your editor reads the libraries' modules.
+5. It takes the [build lock](#one-build-at-a-time), brings the libraries up to date under `.moonwell/`, keeps
+   `moonwell.lock` current as a build does, and refreshes `.moonwell/lua/`, where your editor reads the libraries'
+   modules.
 
 **Reads:** `moonwell.toml` and your `config.toml`; the object files, through Pkl; the source map,
 `maps/<map.folder>`; the libraries the project names. It reads your `config.toml` as every command in a project
@@ -159,6 +160,7 @@ module, `src/generated/objects.yue`. [Files and caches](./files) says where the 
 **Fails when:**
 
 - The folder is no project, or a settings file is refused.
+- The project has object files, and Pkl is not found and cannot be downloaded.
 - Pkl or Moonwell refuses an object, or the project's `moonwell` package does not go with the program (see
   [Installation](../installation#a-project-with-object-files)). Moonwell's own Pkl is copied by then.
 - The compiler cannot be downloaded, or `yue.path` names no program that runs.
@@ -183,15 +185,18 @@ written, in this order:
 5. Write what your code and your editor read beside the sources: the ids module `src/generated/objects.yue`, the
    declarations in `.moonwell/types/` and the macro module in `.moonwell/yue/`. `check` writes no ids module: it
    compares the one that is there.
-6. Bring the libraries up to date under `.moonwell/`, and write `moonwell.lock`.
+6. Bring the libraries up to date under `.moonwell/`, and keep `moonwell.lock` current. The file holds the libraries
+   fetched from GitHub; a project without libraries has none, and one that is left there is removed.
 7. Find the compiler, which is downloaded into the cache folder when it is not there, and compile the `.yue` files
    of `src/` and of the libraries into the compile's cache, `dist/stage/lua/`. Then follow the imports from the
    entry, and check the modules they reach for unknown globals.
 8. Plan the rest of the map on top of the objects' files, each part on the map as the one before leaves it: the map
    settings, then the assets with `war3map.imp`, and last the script, `war3map.lua`, with your code added to it.
 
-The first step that fails ends the plan, and the command prints its error. Steps 5 to 7 write beside the map, so a
-plan that fails after them leaves those files. None of the four commands changes the source map.
+The first step that fails ends the plan, and the command prints its error. Some steps write beside the map, so a
+plan that fails after them leaves those files: step 1 writes `.moonwell/objects.pkl`, the module that gathers the
+object files, where the project has object files, and steps 5 to 7 write what they name. None of the four commands
+changes the source map.
 
 ### build {#build}
 
@@ -202,8 +207,13 @@ of the source map and writes the planned files into the copy. Last it packs the 
 `<build.folder>/<map.folder>`, which is `dist/bin/map.w3x` in a new project.
 
 `build` writes the staged map only when the whole plan stands. A refused setting, an invalid object or a compile
-error leaves the staged map of the build before as it was. The archive of the build before is gone by then: `build`
-removes it after it has taken the lock, before it plans.
+error leaves the staged map of the build before as it was.
+
+The archive of the build before is another matter: `build` removes it once it has the lock, before step 3. So the
+old archive stays when step 1 fails (the folder is no project, a settings file is refused, Pkl is not found and
+cannot be downloaded, Pkl refuses an object file, the `moonwell` package does not go with the program) and when the
+lock is held. It is gone when a later step fails: an object Moonwell refuses, a map setting the map cannot take, a
+compile error.
 
 **Reads:** `moonwell.toml` and your `config.toml`; the object files under `objects/`, through Pkl, with
 `PklProject.deps.json`; the source map; `src/` and `lua/`; the libraries; `assets/`; the file under `.asset-state/`
@@ -219,11 +229,12 @@ that says which files of the source map `assets:sync` owns; the picture `setting
 - Another build is running in the project.
 - The archive cannot go where `build.folder` and `map.folder` put it, as when a folder is in its place or a link or
   a file is on the way to it, or the archive of the build before cannot be removed.
-- The plan fails: Pkl is not found, or the project's `moonwell` package does not go with the program; Pkl or
-  Moonwell refuses an object; the source map is missing or holds something Moonwell refuses; a library cannot be
-  fetched; the compiler cannot be downloaded; a source file does not compile; the entry file is not there; a global
-  is unknown (with `lint.unknownGlobals = "warning"` it is a warning); the map cannot take a map setting; an asset
-  cannot be imported; the map's `war3map.lua` is missing or defines no `main` or no `config` function.
+- The plan fails: Pkl is not found and cannot be downloaded, or the project's `moonwell` package does not go with
+  the program; Pkl or Moonwell refuses an object; the source map is missing or holds something Moonwell refuses; a
+  library cannot be fetched; the compiler cannot be downloaded; a source file does not compile; the entry file is
+  not there; a global is unknown (with `lint.unknownGlobals = "warning"` it is a warning); the map cannot take a map
+  setting; an asset cannot be imported; the map's `war3map.lua` is missing or defines no `main` or no `config`
+  function.
 - The staged map cannot be replaced, as when the game or World Editor has `dist/stage` open.
 - The map cannot be packed: it has no `war3map.w3i`, or it is too large for an archive. The staged map is written by
   then.
@@ -250,7 +261,7 @@ last, so a `test` without that setting has planned and staged the map before it 
 `test` packs no archive, and it leaves what `build` made in `build.folder` as it is. The setting `test.archive`
 changes the first of the two: with `test.archive = true`, `test` also packs the staged map into
 `dist/test/<map.folder>` and starts the game on that file in place of the folder. It removes the archive of the last
-test once it has the lock, before it plans. The setting may stand in `moonwell.toml` or in your `config.toml`, and
+test once it has the lock, before step 3. The setting may stand in `moonwell.toml` or in your `config.toml`, and
 yours wins. [Troubleshooting](./troubleshooting) says when a game needs it.
 
 **Reads:** what `build` reads, and `launch.gameExecutable` and `launch.args` of your `config.toml`.
@@ -299,8 +310,8 @@ give a library a folder or name a picture, stop `dev` and start it again. `dev` 
 
 **Reads:** what `check` reads, at every check.
 
-**Writes:** what `check` writes, and the ids module `src/generated/objects.yue`. It holds `dist/.lock` during a
-check and not between two checks.
+**Writes:** what `check` writes, `dist/moonwell.log` among it, and the ids module `src/generated/objects.yue`. It
+holds `dist/.lock` during a check and not between two checks.
 
 **Fails when:** the folder has no `src/` folder. `dev` then ends at once. Nothing else ends it but Ctrl+C, after
 which the check that is under way finishes and `dev` ends with the exit code 130.
@@ -323,8 +334,8 @@ objects, settings, assets and code that `build` plans without an error.
 
 **Reads:** what [`build`](#build) reads.
 
-**Writes:** `dist/.lock` while it runs, and what the plan writes beside the map but for one file: `.moonwell/`,
-`moonwell.lock` and the compile's cache `dist/stage/lua/`. It does not write the ids module,
+**Writes:** `dist/.lock` while it runs; what the plan writes beside the map but for one file: `.moonwell/`,
+`moonwell.lock` and the compile's cache `dist/stage/lua/`; `dist/moonwell.log`. It does not write the ids module,
 `src/generated/objects.yue`: it compares the file with the project's objects.
 
 **Fails when:**
@@ -332,8 +343,9 @@ objects, settings, assets and code that `build` plans without an error.
 - The folder is no project, or a settings file is refused.
 - Another build is running in the project.
 - The plan fails, as for [`build`](#build).
-- `src/generated/objects.yue` is missing or does not match the project's objects. `build`, `test` and `dev` write
-  the file; `check` leaves it and fails.
+- `src/generated/objects.yue` does not match the project's objects, or is missing where the project has objects.
+  `build`, `test` and `dev` write the file; `check` leaves it and fails. In a project without objects, a file that
+  is not there is no failure.
 
 `check` does not find what `build` finds only when it writes: an archive that cannot go to its place, a staged map
 that cannot be replaced, a map too large for an archive. It finds a source map without `war3map.w3i` only when a map
@@ -482,6 +494,8 @@ ids module is `current`, `stale` or `missing`, and ends with a count:
 Object data valid: 1 object(s), 2 internal file(s) would change during build.
 ```
 
+In a project without objects, an ids module that is not there counts as `current`.
+
 [Objects](../objects) describes the object files and the ids module.
 
 **Reads:** `moonwell.toml` and your `config.toml`; the object files under `objects/`, through Pkl, with
@@ -493,10 +507,12 @@ Object data valid: 1 object(s), 2 internal file(s) would change during build.
 **Fails when:**
 
 - The folder is no project, or a settings file is refused.
-- Pkl is not found, Pkl refuses an object file, or the project's `moonwell` package does not go with the program.
+- The project has object files, and Pkl is not found and cannot be downloaded, Pkl refuses an object file, or the
+  project's `moonwell` package does not go with the program.
 - The source map is missing, or holds something Moonwell refuses.
 - Moonwell refuses an object.
-- The ids module, `src/generated/objects.yue`, is missing or stale. `build`, `test` and `dev` write it.
+- The ids module, `src/generated/objects.yue`, is stale, or is missing where the project has objects. `build`,
+  `test` and `dev` write it.
 
 **Flags:** none.
 
