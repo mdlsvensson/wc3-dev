@@ -29,11 +29,11 @@ of the build before is another matter. `build` removes it before step 3, once it
 when the lock is held, and it is gone when a later step fails ([Commands](./reference/commands#build)).
 
 A build never changes the source map: it only reads it. It writes the built map in two forms. The folder
-`dist/stage/<map.folder>` is the staged copy, the built map as a folder. The archive is the built map as one file,
-which is `dist/bin/map.w3x` in a new project.
+`dist/stage/<map.folder>` is the staged map: a copy of the source map with the planned files written into it, the
+built map as a folder. The archive is the built map as one file, which is `dist/bin/map.w3x` in a new project.
 
 The other commands that build are parts of this. `moonwell check` works everything out and writes no map,
-`moonwell test` writes the staged copy and starts the game on it, and `moonwell dev` checks again after every save.
+`moonwell test` writes the staged map and starts the game on it, and `moonwell dev` checks again after every save.
 [Commands](./reference/commands#building) has the full account.
 
 ## What you need
@@ -56,7 +56,7 @@ own section of these pages.
 
 These pages describe Moonwell 0.12.4. The releases of the two libraries that go with it are moonwell-wrappers v0.10.1
 and moonwell-systems v0.6.1. Where a page says what the game does, that was measured on Warcraft III Reforged
-3.0.0.24268.
+3.0.0.24268, unless the page names another version.
 
 ## Where to start
 

@@ -17,7 +17,7 @@ Created my-map. Check launch.gameExecutable in C:\Users\<you>\.moonwell\config.t
 
 `init` makes the folder `my-map`, which must be new or empty, and writes the template project into it: a map that
 World Editor saved as a folder, gameplay code in `src/main.yue`, one custom unit in `objects/units.pkl`, the settings
-in `moonwell.toml`, and the files your editor reads. [Project layout](./project-layout) describes every file.
+in `moonwell.toml`, and the editor's files. [Project layout](./project-layout) describes every file.
 
 `init` also runs Pkl, which fetches the `moonwell` Pkl package that the project's object file is written against, so
 it needs a network connection. The block above is from a machine with Pkl 0.32 or newer on its PATH. When
@@ -45,12 +45,13 @@ Built dist/bin/map.w3x (2 module(s)).
 
 The first line is there once. Moonwell downloads the YueScript compiler into its cache folder when it is not there,
 and every later build finds it there. The custom object is the template's Captain, which
-[a section below](#the-templates-captain) comes to. The two modules are `src/main.yue` and the module of ids that it
+[a section below](#the-templates-captain) comes to. The two modules are `src/main.yue` and the ids module that it
 imports.
 
 The built map is the archive `dist/bin/map.w3x`, one file. The folder `dist/stage/map.w3x` holds the same map as a
-folder: the staged copy. The map that the project builds from, `maps/map.w3x`, is the source map. It is the one you
-open in World Editor, and no build changes it.
+folder. It is the staged map: a copy of the source map with what the build adds written into it. The map that the
+project builds from, `maps/map.w3x`, is the source map. It is the one you open in World Editor, and no build changes
+it.
 
 ## Tell Moonwell where the game is
 
@@ -79,7 +80,7 @@ and `dev` never start the game.
 moonwell test
 ```
 
-`test` writes the staged copy as `build` does. Then it starts Warcraft III with the staged copy as the map to load,
+`test` writes the staged map as `build` does. Then it starts Warcraft III with the staged map as the map to load,
 and ends: it does not wait for the game.
 
 In the game, the template's code runs. It prints `Moonwell is running.`, and it makes two units for the first player:
@@ -87,12 +88,12 @@ the Captain, which is the template's custom unit, and a Footman beside it. Once 
 of a player picked at random.
 
 ::: note
-On Warcraft III Reforged 3.0.0.24268, the text of `print` stays on screen for a few seconds. Ally colour mode
-(Alt+A), when it is on, paints every unit by alliance and hides the Captain's change of colour: turn it off to see
+On Warcraft III Reforged 3.0.0.24268, the text of `print` stayed on screen for a few seconds. Ally colour mode
+(Alt+A), when it was on, painted every unit by alliance and hid the Captain's change of colour: turn it off to see
 the change.
 :::
 
-When the game's path is missing or wrong, `test` fails with an error that names your `config.toml`. The staged copy
+When the game's path is missing or wrong, `test` fails with an error that names your `config.toml`. The staged map
 is written by then. When the game shows its main menu in place of the map, see
 [Troubleshooting](./reference/troubleshooting#the-game-shows-its-main-menu-in-place-of-the-map).
 
@@ -119,7 +120,7 @@ Packing archive...
 Built dist/bin/map.w3x (2 module(s)).
 ```
 
-The second line is new: the build wrote the name into two files of the map. It wrote them in the staged copy and the
+The second line is new: the build wrote the name into two files of the map. It wrote them in the staged map and the
 archive only. The source map keeps the name it has, so World Editor shows that one still.
 [Map settings](./map-settings) describes what else the `settings` tables hold.
 
@@ -155,7 +156,7 @@ mw.on_main ->
   print "Hello from my first map."
 ```
 
-Then run `moonwell test` again. It writes the staged copy anew, with your change, and starts the game on it. If it
+Then run `moonwell test` again. It writes the staged map anew, with your change, and starts the game on it. If it
 reports that staging the map failed, close the game and World Editor, in case one of them has `dist/stage` open, and
 run the command again ([Troubleshooting](./reference/troubleshooting#staging-the-map-fails)).
 
@@ -258,7 +259,7 @@ moonwell check
 Check passed: 2 module(s) reachable from main, 0 asset(s).
 ```
 
-It differs from a check of `dev` in one thing. `dev` writes the module of ids as a build does. `check` leaves the
+It differs from a check of `dev` in one thing. `dev` writes the ids module as a build does. `check` leaves the
 file alone, and fails when it does not match the objects, or is missing in a project with objects
 ([Commands](./reference/commands#check)).
 

@@ -93,8 +93,9 @@ files. It copies the Pkl that Moonwell downloaded into the `bin` folder of the c
 `yue` for your editor ([Editor setup](./editor-setup#run-moonwell-setup)). On Windows that is the folder the install
 script added to your PATH. On Linux it is `~/.cache/moonwell/bin`, unless a variable moved the cache. On either
 system, when no `pkl` is on your PATH, `setup` prints the line that adds the folder to it. With an older `pkl` on
-your PATH, `setup` makes the copy and prints no line, and a `pkl` command that you type still runs the one that
-comes first on your PATH: take the old `pkl` off your PATH, or put Pkl 0.32 or newer in its place.
+your PATH, `setup` makes the copy and does not print that line, and a `pkl` command that you type still runs the one
+that comes first on your PATH: take the old `pkl` off your PATH and run `moonwell setup` again, or put Pkl 0.32 or
+newer in its place.
 
 ## Installing one version
 

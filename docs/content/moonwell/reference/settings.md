@@ -131,7 +131,7 @@ a `?` in it. [Using your own map](../own-map#put-it-in-the-project) describes th
 
 | Setting | Default | Rule | Meaning |
 | --- | --- | --- | --- |
-| `test.archive` | `false` | `true` or `false` | `true` makes [`moonwell test`](./commands#test) pack the staged map into `dist/test/<map.folder>` and start the game on that file, in place of the staged folder |
+| `test.archive` | `false` | `true` or `false` | `true` makes [`moonwell test`](./commands#test) pack the staged map into `dist/test/<map.folder>` and start the game on that file, in place of the folder |
 
 Your `config.toml` may set `test.archive` too, and its value wins: see
 [A setting in the wrong file](#a-setting-in-the-wrong-file).

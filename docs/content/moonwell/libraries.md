@@ -116,7 +116,7 @@ git, a fresh clone of your project gets the code you built with, or none: when M
 file records, it compares what it got with the record. When the tag names another commit, the command fails and
 takes nothing of the other code. Its error says that the tag `moved from` one commit `to` another
 `since moonwell.lock recorded it`. When the commit is the same and the files are not, it says that the files of the
-tag `are not those moonwell.lock recorded`. To take the tag as it is, delete the library's entry from
+tag `are not those moonwell.lock recorded`. To take the tag as it is, delete the library's record from
 `moonwell.lock` and run the command again.
 
 Moonwell compares only when it fetches. A library whose folder is up to date is not fetched again, so a moved tag

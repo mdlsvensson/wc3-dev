@@ -29,7 +29,7 @@ entry = "src/main.yue"
 ```
 
 The source map is then `maps/arena.w3x`. `map.folder` is a path below `maps/` that ends in `.w3x`
-([Settings](./reference/settings#map)), so the folder's name ends that way too. The staged copy and the archive of a
+([Settings](./reference/settings#map)), so the folder's name ends that way too. The staged map and the archive of a
 build take the same name: `dist/stage/arena.w3x` and, with the `build.folder` of a new project, `dist/bin/arena.w3x`.
 
 The path may have folders in it: `folder = "campaign/arena.w3x"` is the map `maps/campaign/arena.w3x`. Other maps may
@@ -61,7 +61,7 @@ Editor 3.0.0.24268 saves version 39. A project without such a setting builds fro
 `assets:check` and `assets:sync` need both files to be in the map.
 
 **File names in any letter case.** Moonwell finds a file of the map by its name without regard to letter case, as the
-game does: a script named `WAR3MAP.LUA` is the map's script. The staged copy keeps each name as the source map has
+game does: a script named `WAR3MAP.LUA` is the map's script. The staged map keeps each name as the source map has
 it.
 
 **What is refused.** A command that opens the source map goes through the whole folder as it opens it. Those
@@ -79,8 +79,9 @@ commands are `build`, `test`, `check`, `dev`, `setup`, `assets:check`, `assets:s
   A link at `maps` or at the map's folder itself is refused too
   ([Project layout](./project-layout#real-folders-no-links)).
 - **Two names that differ only in letter case.** `Textures/` beside `textures/`, or `a.blp` beside `A.blp` in one
-  folder. The game takes the two for one path. On a file system that holds two such names in one folder, as on
-  Linux, the error says that the two paths `differ only in letter case`.
+  folder. The two would be one path in the map: the hint of the error says that Warcraft III ignores letter case in
+  map paths. On a file system that holds two such names in one folder, as on Linux, the error says that the two
+  paths `differ only in letter case`.
 - **A name Windows cannot hold.** The rules are those for a file under `assets/`, and
   [Assets](./assets#what-is-refused) lists them. On a system that holds such a name, the error says that it
   `cannot be used in a map that Windows tools read`.
@@ -134,7 +135,7 @@ A `gg_` global of another kind is of type `any`. A global without `gg_` gets its
 declares it with: `integer` for `udg_Score = 0`, and in the same way `number`, `string`, `boolean` or an array. One
 that is declared as `nil`, or with anything else, is of type `any`.
 
-## The staged copy
+## The staged map {#the-staged-copy}
 
 A build never changes the source map. `build` and `test` replace `dist/stage/<map.folder>` with a copy of the source
 map, and write into the copy what the project adds: your objects, your map settings, your assets, and the script
@@ -145,12 +146,12 @@ project has two maps, and you see different things in each:
   triggers, and the map's own name, players and forces. It shows nothing that a build adds: no object from your
   object files, and no value from the `settings` tables of `moonwell.toml`. It shows a file from `assets/` only
   after `assets:sync` wrote it there.
-- **In the game**, `moonwell test` starts the game on the staged copy, which has all of it.
+- **In the game**, `moonwell test` starts the game on the staged map, which has all of it.
 
 To look at what a build made in World Editor, open the built map there.
 
 ::: warning
-Do not work in the built map. The next build replaces the staged copy and the archive, and what you saved in them is
+Do not work in the built map. The next build replaces the staged map and the archive, and what you saved in them is
 gone.
 :::
 
@@ -216,10 +217,10 @@ hint: Save the source map from World Editor in folder format.
 **The map's object data.** A `war3map.w3u` of the source map, or a file like it, that Moonwell cannot read is an
 error that names the file ([Objects](./objects#objects-made-in-world-editor)).
 
-**Save the map again.** For a script, a map info or an object file that is refused, the way out is the same: open
-the source map in World Editor and save it again, as a folder and with Lua as its script language. That restores the
-functions and the calls that World Editor writes into the script, also after an edit by hand took one out. Then run
-the command again.
+**Save the map again.** For a script, a map info or a file of the map's object data that is refused, the way out is
+the same: open the source map in World Editor and save it again, as a folder and with Lua as its script language.
+That restores the functions and the calls that World Editor writes into the script, also after an edit by hand took
+one out. Then run the command again.
 
 ## See also
 

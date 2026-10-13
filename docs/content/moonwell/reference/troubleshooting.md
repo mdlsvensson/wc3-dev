@@ -43,9 +43,9 @@ run the command again.
 A `pkl` command that you type, such as `pkl project resolve`, runs the `pkl` on your PATH, and the one in the cache
 is not there. Run `moonwell setup` in a project with object files: it copies Moonwell's Pkl into the `bin` folder
 of the cache, and when no `pkl` is on your PATH it prints the line that adds that folder
-([Installation](../installation#pkl)). With an older `pkl` on your PATH, `setup` makes the copy and prints no
-line, and a `pkl` command that you type still runs the one that comes first on your PATH: take the old `pkl` off
-your PATH, or put Pkl 0.32 or newer in its place.
+([Installation](../installation#pkl)). With an older `pkl` on your PATH, `setup` makes the copy and does not print
+that line, and a `pkl` command that you type still runs the one that comes first on your PATH: take the old `pkl`
+off your PATH and run `moonwell setup` again, or put Pkl 0.32 or newer in its place.
 
 ## Building
 
@@ -119,7 +119,7 @@ or put the real files in its place ([Project layout](../project-layout#real-fold
 The error names `moonwell.lock` and a library. It says that the library's tag `moved from` one commit `to` another
 `since moonwell.lock recorded it`, or that the files of the tag `are not those moonwell.lock recorded`. Moonwell
 fetched the library and got other code than the file records, and it takes nothing of that code. When you mean to
-take the tag as it is, delete the library's entry from `moonwell.lock` and run the command again
+take the tag as it is, delete the library's record from `moonwell.lock` and run the command again
 ([Libraries](../libraries#moonwell.lock)).
 
 ### Staging the map fails
@@ -137,8 +137,8 @@ The error names the source map, `maps/<map.folder>`, or a file in it, and its hi
 is not there, the error names `moonwell.toml`, and its message names the folder.
 [Using your own map](../own-map#when-moonwell-refuses-the-map) goes through these errors: a map that is not there
 or is one file, a script without `main` or `config`, a map info that is missing, and object data that Moonwell
-cannot read. For a script, a map info or an object file that is refused, open the source map in World Editor and
-save it again, as a folder and with Lua as its script language.
+cannot read. For a script, a map info or a file of the map's object data that is refused, open the source map in
+World Editor and save it again, as a folder and with Lua as its script language.
 
 Two more kinds of error name a file of the map:
 
@@ -173,12 +173,11 @@ source map back as it was, and run `moonwell assets:sync` again
 
 ### The game shows its main menu in place of the map
 
-`moonwell test` starts the game on the staged map, which is a folder. Some versions of the game do not load a map
-that is a folder.
+`moonwell test` starts the game on the staged map, which is a folder. A game may not load a map that is a folder.
 
 ::: note
-Warcraft III Reforged 3.0.1 showed its main menu instead, with no error, and loaded a map that is packed into one
-file.
+Warcraft III Reforged 3.0.1 showed its main menu for a map that is a folder, with no error, and loaded a map that
+is packed into one file.
 :::
 
 For such a game, set `test.archive`:
@@ -222,10 +221,9 @@ action of a trigger. When you see none, one of these is the case:
   `ExecuteFunc`, or a coroutine that you resume yourself.
 - **The error repeats.** The runtime prints an error the first time, and then at its 10th, its 100th and its 1000th
   time, and so on.
-- **The callback ran while the script loaded.** For an error in a callback that the top-level code of a module
-  runs, `main` has not started: the runtime keeps the line, and prints it when `main` starts. For a callback that
-  a `config` hook runs, the runtime keeps the line too: see
-  [An error in a hook](../gameplay-code#an-error-in-a-hook).
+- **The callback ran before `main`.** For an error in a callback that the top-level code of a module runs, `main`
+  has not started: the runtime keeps the line, and prints it when `main` starts. For a callback that a `config`
+  hook runs, the runtime keeps the line too: see [An error in a hook](../gameplay-code#an-error-in-a-hook).
 
 [Gameplay code](../gameplay-code#an-error-in-a-callback) describes the guard and what it prints.
 

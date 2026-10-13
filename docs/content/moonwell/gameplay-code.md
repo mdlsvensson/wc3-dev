@@ -3,7 +3,7 @@
 After this page you can lay out your gameplay code in modules, run it at the right moment of the game, and read the
 errors it gives, at a build and in the game. Gameplay code is YueScript, in the `.yue` files under `src/`, and plain
 Lua, in the `.lua` files under `lua/`. A build compiles the YueScript to Lua 5.3 and adds your modules to the end of
-the map's script, `war3map.lua`, with a small piece of Lua of Moonwell's own before them. This page calls that piece
+the map's script, `war3map.lua`, with a small piece of Lua of Moonwell's own before them. These pages call that piece
 the runtime.
 
 ## Hooks
@@ -405,7 +405,7 @@ The guard does not cover everything:
 game has them, and an error in a callback is not printed ([Settings](./reference/settings#build)).
 
 ::: note
-On Warcraft III Reforged 3.0.0.24268, the game drops an error in the function of a timer or a trigger without a
+On Warcraft III Reforged 3.0.0.24268, the game dropped an error in the function of a timer or a trigger without a
 word. In a map built with the guard, such errors were printed on the screen.
 
 Four more things were measured there, not in a map built with the guard but with a test script that put `xpcall`
@@ -443,8 +443,8 @@ To find a line of `war3map.lua` by hand, open the script of the last build,
 Moonwell compiles YueScript to Lua 5.3, the Lua that the game runs. The game leaves parts of standard Lua out:
 
 ::: note
-Warcraft III Reforged 3.0.0.24268 has no `collectgarbage`, `dofile`, `loadfile`, `debug`, `io` or `package`, and its
-`os` has only `clock`, `date`, `difftime` and `time`. What `print` writes shows on the screen for a few seconds.
+Warcraft III Reforged 3.0.0.24268 had no `collectgarbage`, `dofile`, `loadfile`, `debug`, `io` or `package`, and its
+`os` had only `clock`, `date`, `difftime` and `time`. What `print` wrote showed on the screen for a few seconds.
 :::
 
 The check of [unknown globals](#unknown-globals) knows the six names that are missing. A use of one as a global is

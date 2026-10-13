@@ -48,8 +48,8 @@ the build makes that file where the source map has none:
 Each of these files has a second one beside it, `war3mapSkin.w3u` and so on, which holds some of an object's
 fields, such as its name, its model and its icon. Moonwell puts each field into the file it belongs in, so the
 Captain is in two files. Where the map's own file of a kind is in version 1 or 2 of its format, there is no second
-file for that kind, and every field goes into the one. A build writes these files in the staged copy of the map
-and in the archive. It does not change the source map.
+file for that kind, and every field goes into the one. A build writes these files in the staged map and in the
+archive. It does not change the source map.
 
 Every `.pkl` file under `objects/` is read as an object file, so a module that only holds values or functions for
 the others does not belong there: the evaluation fails on it. Put such a module in a folder outside `objects/`.
@@ -422,7 +422,7 @@ hint: Change the id in Pkl, or delete the object in World Editor.
 
 Every build starts from the source map. So an object that you take out of your object files is not in the next
 build, and no object is added a second time. The source map itself never gets your objects: they are in the
-staged copy and in the archive, and not in the source map, the one you open in World Editor.
+staged map and in the archive, and not in the source map, the one you open in World Editor.
 
 A `war3map.w3u` of the source map, or a file like it, that Moonwell cannot read is an error that names the file,
 and its hint is to open the map in World Editor and save it again

@@ -44,8 +44,8 @@ project, and [Files and caches](./reference/files#in-the-project) has every file
   editor and the compiler read, and the module that gathers the object files. The commands write it as they need
   it, and you never edit it ([Files and caches](./reference/files#project-moonwell)).
 - **`dist/`** holds what a build makes: the staged map in `dist/stage/`, the archive, which is `dist/bin/map.w3x`
-  in a new project, the Lua that your code compiles to, the log `dist/moonwell.log` and the build lock
-  ([Files and caches](./reference/files#dist)).
+  in a new project, the compile's cache, which holds the Lua that your code compiles to, the log
+  `dist/moonwell.log` and the build lock ([Files and caches](./reference/files#dist)).
 - **`src/generated/objects.yue`** is the ids module. `build`, `test` and `dev` write it when your objects change,
   and `check` compares it with them. Your code imports it, and you never edit it
   ([Files and caches](./reference/files#src-generated)).
@@ -55,10 +55,10 @@ project, and [Files and caches](./reference/files#in-the-project) has every file
 - **`.asset-state/`** is there when `moonwell assets:sync` has written assets into the source map. It records
   which files of the source map that command owns ([Files and caches](./reference/files#asset-state)).
 
-Two commands write into files that are yours. `moonwell setup` adds the editor's files that are missing, the
-entries that three lists of `.luarc.json` lack, and the lines `.moonwell/` and `src/**/*.lua` where `.gitignore`
-lacks them ([Editor setup](./editor-setup#what-else-setup-does)). `moonwell assets:sync` writes into the source
-map, and it is the one command that changes it ([Assets](./assets#seeing-assets-in-world-editor)).
+Besides `init`, two commands write into files that are yours. `moonwell setup` adds the editor's files that are
+missing, the entries that three lists of `.luarc.json` lack, and the lines `.moonwell/` and `src/**/*.lua` where
+`.gitignore` lacks them ([Editor setup](./editor-setup#what-else-setup-does)). `moonwell assets:sync` writes into
+the source map, and it is the one command that changes it ([Assets](./assets#seeing-assets-in-world-editor)).
 
 ## What to commit
 
