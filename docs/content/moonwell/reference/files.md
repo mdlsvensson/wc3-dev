@@ -2,8 +2,8 @@
 
 This page lists what Moonwell writes and where: in a project, in the cache folder and in the Moonwell folder. It
 says which command writes which file, and it lists the environment variables Moonwell reads.
-[Project layout](../project-layout) describes the files of a project that you write yourself, and says which files
-you commit.
+[Project layout](../project-layout) describes the files of a project that you write yourself, and says
+[which files you commit](../project-layout#what-to-commit).
 
 ## In the project
 
@@ -21,7 +21,7 @@ Three commands also write files that are yours: `init` writes the whole project,
 that are missing, and `assets:sync` writes into the source map.
 
 Each of these places is a real file or folder. Moonwell refuses a link on the way to what it writes:
-[Project layout](../project-layout) lists what is refused.
+[Project layout](../project-layout#real-folders-no-links) lists what is refused.
 
 ### `.moonwell/` {#project-moonwell}
 
@@ -38,7 +38,7 @@ them. It is not the Moonwell folder of your machine, which has the same name and
 | `library-assets/<name>/` | The files the library `<name>` ships for the map | The same eight |
 | `lua/` | The libraries' modules as Lua, for your editor | `build`, `test`, `check`, `dev`, and in part `setup` |
 
-`objects.pkl` is there only in a project with a `.pkl` file under `objects/`. It imports every object file, and
+`objects.pkl` is written only in a project with a `.pkl` file under `objects/`. It imports every object file, and
 Moonwell runs Pkl on it to evaluate them together.
 
 `types/` holds four files of declarations for lua-language-server:
@@ -90,8 +90,8 @@ another. A Lua file whose source is gone is removed.
 **The archive.** `build` writes the archive beside its place first, as `<map.folder>.tmp`, and moves it there when
 it is whole. So the place holds a whole archive or none. A build that is ended midway can leave the `.tmp` file,
 and the next build replaces it. `build` removes the archive of the build before as soon as it has the build lock
-([Commands](./commands#build)). `test` treats `dist/test/<map.folder>` in the same way, and writes it only with
-`test.archive`.
+([Commands](./commands#build)). With `test.archive`, `test` treats `dist/test/<map.folder>` in the same way.
+Without it, `test` neither writes that file nor removes it.
 
 **The log.** A command adds each line it writes for you to `dist/moonwell.log`, with the time in UTC and `info`,
 `warn` or `error` before it:
@@ -157,7 +157,7 @@ The table shows what a command writes when it runs to its end. `<dir>` is the fo
 
 | Command | `.moonwell/` | `src/generated/` | `moonwell.lock` | `dist/stage/lua/` | Staged map | Archive | `dist/.lock` | Cache folder | Also |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| [`init`](./commands#init) | No | No | No | No | No | No | No | Pkl | The project, in `<dir>` |
+| [`init`](./commands#init) | No | The template's file | No | No | No | No | No | Pkl | The project, in `<dir>` |
 | [`setup`](./commands#setup) | All of it | No | Yes | No | No | No | Yes | The compiler, Pkl, `bin/` | The editor's files and `.gitignore` |
 | [`build`](./commands#build) | All of it | Yes | Yes | Yes | Yes | `<build.folder>/<map.folder>` | Yes | The compiler, Pkl | |
 | [`test`](./commands#test) | All of it | Yes | Yes | Yes | Yes | With `test.archive`: `dist/test/<map.folder>` | Yes | The compiler, Pkl | |
@@ -177,6 +177,9 @@ Read the table with these in mind:
 - "The libraries" are `libraries/` and `library-assets/` below `.moonwell/`. Of `.moonwell/lua/`, `setup` writes
   the Lua modules only.
 - `objects.pkl` is written only in a project with object files.
+- For `src/generated/`, "Yes" means that the command writes `objects.yue` when the file does not match the
+  objects. In a project without objects it does not make the file. `init` writes the file as the template has it,
+  with the rest of the project.
 - For `moonwell.lock`, "Yes" means that the command keeps the file current: it writes it when its content changes,
   and removes it when the project has no library from GitHub.
 - In the cache folder, the compiler and Pkl are written when they are downloaded: the compiler when its version is

@@ -124,16 +124,18 @@ link on the way to them. A link here is a symbolic link or, on Windows, a juncti
 
 A command refuses a link at any of these places:
 
-- `dist`, and what a build writes below it: `dist/stage`, the staged map, the Lua your code compiles to, the
-  archive under `dist/test` and the build lock.
+- `dist`, and what a build writes below it: `dist/stage`, the staged map, the folder of the Lua your code compiles
+  to, `dist/stage/lua`, with its two JSON files, the archive under `dist/test` and the build lock.
 - The archive, `<build.folder>/<map.folder>`, and every folder on the way to it.
-- `.moonwell`, and every folder and file Moonwell writes below it.
+- `.moonwell`, and below it `objects.pkl`, `types/` and its files, the macro module, and `libraries/` and
+  `library-assets/` with the folder of each library. `.moonwell/lua` is refused too, but a link below it is not:
+  Moonwell removes that link, and writes the real file where one belongs.
 - `moonwell.lock`, and `.asset-state` with the file in it.
 - The folders the project is read from: `maps`, `objects`, `src`, `lua` and `assets`. Inside the source map and
   inside `assets`, a link is refused wherever it is.
 
 The command that comes to the link stops there, and its error names the link. Where the link is on the way to the
-staged map, to an archive or to the build lock, the error reads:
+staged map, to an archive or to the build lock, the error reads as this one does, for a link at `dist`:
 
 ```text
 error: dist › dist is a link: Moonwell writes what it builds into real files and folders.
@@ -148,8 +150,8 @@ hint: Replace the link (or Windows junction) with the real files.
 ```
 
 Only a command that comes to the link refuses it: `moonwell settings:check` writes nothing below `.moonwell`, and
-runs with a link there. `moonwell setup` also refuses one of the editor's files that is a link to a file that does
-not exist.
+runs with a link there. `moonwell setup` also refuses one of the editor's files, or a `.gitignore`, that is a link
+to a file that does not exist.
 
 ## Build only a project you trust
 
