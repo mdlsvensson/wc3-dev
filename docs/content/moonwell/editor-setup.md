@@ -66,14 +66,16 @@ and you run it, once. Then open a new terminal and restart VS Code.
 that folder on your user PATH ([Installation](./installation#install-moonwell)), so one entry serves `moonwell` and
 `yue`.
 
-**On Linux** `bin` is `~/.cache/moonwell/bin`, and the install script put nothing on your PATH. There the command is a
-line for your shell:
+**On Linux** `bin` is `~/.cache/moonwell/bin`, unless a variable moved the cache, and the install script put nothing
+on your PATH. There the command is a line for your shell:
 
 ```sh
 echo 'export PATH="/home/<you>/.cache/moonwell/bin:$PATH"' >> ~/.profile
 ```
 
-The variable `MOONWELL_CACHE` moves the cache folder, and `bin` with it.
+Two variables move the cache folder, and `bin` with it: `MOONWELL_CACHE` on both systems and, on Linux,
+`XDG_CACHE_HOME` ([Files and caches](./reference/files#the-cache-folder)). The command names the folder as it is on
+your machine.
 
 Three more things about the copy:
 
@@ -147,8 +149,8 @@ is declared with the type of each parameter and of what it returns. This is `Cre
 function CreateUnit(id, unitid, x, y, face) end
 ```
 
-The game's types are declared there too, each as a class below the type it extends: a `unit` is a `widget`, and no
-`player`.
+The game's types are declared there too, each as a class below the type it extends: a `unit` is a `widget`, and not
+a `player`.
 
 `build`, `test`, `check`, `dev` and `setup` bring the declarations up to date. Two of the four files follow your
 project: the one of the map's globals, and the one of your objects.
@@ -156,20 +158,19 @@ project: the one of the map's globals, and the one of your objects.
 - **After you save the map in World Editor,** run `moonwell check`. `moonwell dev` does not watch the map: while it
   runs, save a `.yue` file to start a check.
 - **After you change an object file,** run `moonwell build`, or have `moonwell dev` running, which watches the
-  object files. Both write the ids module and then the declarations. `moonwell check` writes no ids module: when a
-  key or an id of your objects changed, it stops on the module that matches no more, before it comes to the
-  declarations ([Objects](./objects#the-generated-ids)).
+  object files. Both write the ids module and then the declarations. `moonwell check` writes no ids module: when
+  you added or removed an object, or changed a key or an id, it stops on the module that matches no more, before it
+  comes to the declarations ([Objects](./objects#the-generated-ids)).
 
 The commands that compile your code write the declarations first. So one that stops on a compile error has still
 brought them up to date.
 
 ### Modules of a library
 
-Your editor finds the modules of the libraries in `.moonwell/lua/`. The folder holds every module of every library
-as a Lua file, a YueScript module as the Lua it compiles to, and `.luarc.json` names it as a library too. `build`,
-`test`, `check` and `dev` write the folder. `setup` writes only the modules that are Lua already, because it compiles
-nothing. So after you add a library, and in a fresh clone of a project that has one, run `moonwell check`.
-[Libraries](./libraries#libraries-and-the-checks) has more on what the folder holds.
+Your editor finds the modules of the project's libraries in `.moonwell/lua/`, which `.luarc.json` names as a library
+too. `setup` compiles nothing, and so writes only the modules there that are Lua already: after you add a library,
+and in a fresh clone of a project that has one, run `moonwell check`
+([Libraries](./libraries#libraries-and-the-checks)).
 
 ## The `.lua` files beside your `.yue` files
 
@@ -209,22 +210,15 @@ These files are the editor's, and no part of what you write:
 - `runtime.builtin` turns three libraries of standard Lua off in the editor: `io`, `debug` and `package`.
 - `runtime.path` and `workspace.library` are where the editor finds modules and declarations, as the sections above
   describe.
-- `workspace.useGitIgnore` is `false`, so that the language server reads the `.lua` files under `src/`, which git
-  leaves out.
+- `workspace.useGitIgnore` is `false`, so that the language server reads the compiled `.lua` files, which git leaves
+  out.
 - `completion.maxSuggestCount` is above the number of the game's functions and globals, so that the editor can
   suggest every one of them.
 
-The three libraries are ones that the game's Lua does not have:
-
-::: note
-Warcraft III Reforged 3.0.0.24268 has no `collectgarbage`, `dofile`, `loadfile`, `debug`, `io` or `package`, and its
-`os` has only `clock`, `date`, `difftime` and `time`.
-:::
-
+The game's Lua lacks more than these three libraries, and [Gameplay code](./gameplay-code#the-games-lua) says what.
 lua-language-server cannot turn single functions off. So the editor does not flag a use of `collectgarbage`, `dofile`
 or `loadfile`, nor of a function that `os` lacks. `moonwell check` reports the first three, as unknown globals. It
-does not see a function that `os` lacks, such as `os.exit`: that is a field
-([Gameplay code](./gameplay-code#the-games-lua)).
+does not see a function that `os` lacks, such as `os.exit`: that is a field.
 
 With `package` off, the language server's own `require` is off as well. The declarations of the `moonwell` module
 declare `require` in its place: in a built map, `require` is the runtime's own function.

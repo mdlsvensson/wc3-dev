@@ -68,7 +68,8 @@ it.
 commands are `build`, `test`, `check`, `dev`, `setup`, `assets:check`, `assets:sync`, `settings:check`,
 `objects:check` and `objects:eval`. Each refuses three things, wherever in the map they are:
 
-- **A link.** A symbolic link or a Windows junction, whatever it leads to:
+- **A link.** A symbolic link or a Windows junction, whatever it leads to. In the map of a new project,
+  `maps/map.w3x`:
 
   ```text
   error: maps/map.w3x/Textures › Symlinks are not supported: maps/map.w3x/Textures
@@ -146,8 +147,12 @@ project has two maps, and you see different things in each:
   after `assets:sync` wrote it there.
 - **In the game**, `moonwell test` starts the game on the staged copy, which has all of it.
 
-To look at what a build made in World Editor, open the built map there. Look, and do not work in it: the next build
-replaces the staged copy and the archive, and what you saved in them is gone.
+To look at what a build made in World Editor, open the built map there.
+
+::: warning
+Do not work in the built map. The next build replaces the staged copy and the archive, and what you saved in them is
+gone.
+:::
 
 Every build starts from the source map as it is at that moment. After you save the map in World Editor, build
 again. And what you take out of the project is not in the next build.
@@ -168,7 +173,8 @@ error: moonwell.toml › Source map folder maps/arena.w3x not found.
 hint: Set map.folder to a folder under maps/ saved by World Editor in folder format.
 ```
 
-A map that World Editor saved as one file, in the folder's place:
+A map that World Editor saved as one file, in the folder's place. This error and the ones after it are from a new
+project, whose map is `maps/map.w3x`:
 
 ```text
 error: maps/map.w3x › Source map maps/map.w3x is not a folder.
