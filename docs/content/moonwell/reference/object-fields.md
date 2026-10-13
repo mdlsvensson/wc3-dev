@@ -27,8 +27,10 @@ A field of the game has a rawcode, such as `uhpm`, and a label that World Editor
 | `Occlusion Type (HD)` | `occlusionTypeHD` |
 
 Five names are written by hand and do not follow the label. The `Class` of an upgrade is `upgradeClass`, because
-`class` is a keyword of Pkl. The other four are fields of the abilities Wind Walk and Taunt, with the rawcodes
-`Owk4`, `Tau1`, `Tau2` and `Tau3`: there the game gives two fields of one ability the same label.
+`class` is a keyword of Pkl. The other four are fields of the abilities Wind Walk and Taunt, where the game gives
+two fields of one ability the same label. Wind Walk has two fields labelled `Backstab Damage`, and the second,
+`Owk4`, is `backstabDamageEnabled`. Taunt has two labelled `Prefer Hostiles`, and its fields `Tau1`, `Tau2` and
+`Tau3` are `preferHostiles`, `preferFriendlies` and `maxUnits`.
 
 Among the fields of abilities, one name can stand for more than one field: `chanceToMiss` is a field of Curse and
 another field of Bash. No object can have both, so for an object of a given base a name is one field.
@@ -76,7 +78,9 @@ three notes follow it:
   [Per-level fields](#per-level-fields).
 - ``A comma-separated list: a `List<String>` is joined with commas.`` marks a list field: see
   [Value types](#value-types).
-- `Skin field.` marks a field that a build writes into the `war3mapSkin` file of the kind.
+- `Skin field.` marks a skin field. A build writes it into the `war3mapSkin` file of the kind, or, where the map's
+  own file of the kind is in version 1 or 2 of its format, into that file: see
+  [Objects](../objects#object-files).
 
 The last line is the name and the type that Pkl checks. The `?` at its end says that the field may be left out.
 
@@ -99,8 +103,8 @@ field with levels one entry for each level that is set. This one is the name of 
 `rawcode` and `name` are the two ways to name the field. `level` and `column` are the two numbers that the map's
 file stores with a field of an ability or an upgrade: the level, which is 0 for a field without levels, and the
 data column that the game's data gives the field. For an object of another kind both are 0. `skin` says whether
-the field goes into the `war3mapSkin` file. `type` is how the value is stored: `int`, `real`, `unreal` or
-`string`.
+the field is a skin field, whichever file a build writes it into. `type` is how the value is stored: `int`,
+`real`, `unreal` or `string`.
 
 A name that is not right gets an answer too. For a typed name that the kind does not have, Pkl offers names that
 come near it. For a key of `properties` that fits no field, Moonwell offers up to three names, when any comes
@@ -134,9 +138,13 @@ abilities {
 }
 ```
 
-**A key of `properties`** is read as a rawcode first, and then as a friendly name among the fields that apply to
-the base of the object. A key that fits neither is an error. This is the one for the key `hitPointsMaximum` on a
-copy of the Footman:
+**A key of `properties`** is read in three steps: as a rawcode of a field of the kind, then as a friendly name
+among the fields that apply to the base of the object, and last as a name that exactly one field of the kind has.
+A field that the first or the last step finds may not apply to the base, and the error is then the one for such a
+field, below: `["startingStrength"]` on a copy of the Footman finds the hero's field. A key that fits none of the
+three is an error of its own. A name that several fields of the kind have, none of which applies to the base, is
+such a key. This is that error for the key `hitPointsMaximum`, on a unit `scout` that copies the Footman, in a
+file `objects/a.pkl`:
 
 ```text
 error: objects/a.pkl › units["scout"].properties["hitPointsMaximum"]: no field that applies to 'hfoo' (Footman) has this rawcode or name.

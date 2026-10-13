@@ -34,8 +34,8 @@ object: its key between the square brackets, then its `id`, its `base` and the f
 the Footman and sets three fields: its name, its model and its icon. The two paths stand between `#"` and `"#`,
 where Pkl takes a backslash as it is written.
 
-A build adds your objects to the object data of the map it builds. Each kind goes into the file that the map has
-for it:
+A build adds your objects to the object data of the map it builds. Each kind goes into one file of the map, and
+the build makes that file where the source map has none:
 
 | Kind | File |
 | --- | --- |
@@ -307,13 +307,16 @@ mw.on_main ->
 ```
 
 `build`, `test` and `dev` write the module again whenever it does not match the objects, so you never edit it.
-`check` and `objects:check` write nothing. They compare the module with the objects, and fail when it does not
-match, or when it is missing in a project with objects:
+`check` and `objects:check` do not write the module. They compare it with the objects, and fail when it does not
+match, or when it is missing in a project with objects. This is the error for a module that does not match:
 
 ```text
 error: src/generated/objects.yue › The file does not match the project's objects.
 hint: Run moonwell build, test or dev to regenerate it.
 ```
+
+For a module that is missing, the error says `The file is missing, but the project has objects.`, with the same
+hint.
 
 Commit the module with the object files. [Project layout](./project-layout#what-to-commit) lists it among the
 files to commit, and [Files and caches](./reference/files#src-generated) says which command does what with it.
@@ -407,8 +410,8 @@ field.
 ## Objects made in World Editor
 
 The source map can have object data of its own: standard objects that were changed in World Editor, and custom
-objects that were made there. Moonwell keeps all of it as it is. A build copies the objects that the map's object
-files hold, byte for byte, and adds yours after them.
+objects that were made there. Moonwell keeps all of it as it is. A build copies the objects that the map's own
+`war3map.w3u` and the files like it hold, byte for byte, and adds yours after them.
 
 An id of yours that a custom object of the source map has already is an error:
 
@@ -419,10 +422,10 @@ hint: Change the id in Pkl, or delete the object in World Editor.
 
 Every build starts from the source map. So an object that you take out of your object files is not in the next
 build, and no object is added a second time. The source map itself never gets your objects: they are in the
-staged copy and in the archive, and not in the map that World Editor opens.
+staged copy and in the archive, and not in the source map, the one you open in World Editor.
 
-An object file of the map that Moonwell cannot read is an error that names the file, and its hint is to open the
-map in World Editor and save it again.
+A `war3map.w3u` of the source map, or a file like it, that Moonwell cannot read is an error that names the file,
+and its hint is to open the map in World Editor and save it again.
 
 ## What is not supported
 
