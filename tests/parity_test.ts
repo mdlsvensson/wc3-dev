@@ -1,6 +1,16 @@
 import { assertEquals } from "@std/assert";
 import { fileURLToPath } from "node:url";
 
+// Files of the baseline that were replaced on purpose since: the code font changed from Pixel Code to JetBrains
+// Mono, and the fonts' provenance file with it.
+const replaced = new Set([
+  "fonts/PixelCode.woff2",
+  "fonts/PixelCode-Italic.woff2",
+  "fonts/PixelCode-Bold.woff2",
+  "fonts/PixelCode-LICENSE.txt",
+  "fonts/README.md",
+]);
+
 Deno.test("shared static assets preserve every baseline byte and licence", async () => {
   const repo = new URL("../", import.meta.url);
   const listing = await new Deno.Command("git", {
@@ -16,6 +26,7 @@ Deno.test("shared static assets preserve every baseline byte and licence", async
   assertEquals(listing.code, 0);
   const paths = new TextDecoder().decode(listing.stdout).trim().split("\n");
   for (const path of paths) {
+    if (replaced.has(path)) continue;
     const blob = await new Deno.Command("git", {
       args: [
         "-C",

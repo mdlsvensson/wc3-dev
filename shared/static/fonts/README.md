@@ -12,8 +12,9 @@ licence file beside the fonts it covers.
   `jersey25`). Licence: `Jersey-OFL.txt`, the same text for all four.
 - **Jacquard 12**, declared in the stylesheet and not used yet: `Jacquard12-Regular.woff2`, converted the same way
   from `jacquard12` in the same repository. Licence: `Jacquard12-OFL.txt`.
-- **Pixel Code**, the code font: `PixelCode.woff2`, `PixelCode-Italic.woff2` and `PixelCode-Bold.woff2`, unchanged
-  from `dist/woff2/` of [its repository](https://github.com/qwerasd205/PixelCode) at commit `eefe418`. Licence:
-  `PixelCode-LICENSE.txt`.
+- **JetBrains Mono**, the code font: `JetBrainsMono-Regular.woff2`, `JetBrainsMono-Italic.woff2` and
+  `JetBrainsMono-Bold.woff2`, unchanged from `fonts/webfonts/` of `JetBrainsMono-2.304.zip`, the release 2.304 of
+  [its repository](https://github.com/JetBrains/JetBrainsMono). Licence: `JetBrainsMono-OFL.txt`, the release's
+  `OFL.txt`.
 
-Downloaded October 9, 2026.
+Downloaded October 9, 2026; JetBrains Mono on October 13, 2026.

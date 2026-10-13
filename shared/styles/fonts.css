@@ -65,26 +65,27 @@
   font-display: swap;
 }
 
+/* Code. */
 @font-face {
-  font-family: 'Pixel Code';
+  font-family: 'JetBrains Mono';
   font-style: normal;
   font-weight: 400;
-  src: url('/fonts/PixelCode.woff2') format('woff2');
+  src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Pixel Code';
+  font-family: 'JetBrains Mono';
   font-style: italic;
   font-weight: 400;
-  src: url('/fonts/PixelCode-Italic.woff2') format('woff2');
+  src: url('/fonts/JetBrainsMono-Italic.woff2') format('woff2');
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Pixel Code';
+  font-family: 'JetBrains Mono';
   font-style: normal;
   font-weight: 700;
-  src: url('/fonts/PixelCode-Bold.woff2') format('woff2');
+  src: url('/fonts/JetBrainsMono-Bold.woff2') format('woff2');
   font-display: swap;
 }

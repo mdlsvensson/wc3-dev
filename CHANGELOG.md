@@ -20,3 +20,4 @@
 - Keep a dot in a made heading id where it stands between two letters or digits.
 - Add `docs/versions.json` and a test that holds every version a page names to it.
 - Write the Moonwell section of the documentation: eleven guide pages and five reference pages.
+- Set code in JetBrains Mono in place of Pixel Code.

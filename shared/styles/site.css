@@ -2,7 +2,7 @@
 
 :root {
   --font-base: "IBM Plex Sans", system-ui, sans-serif;
-  --font-mono: "Pixel Code", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --jersey-10: 400 calc(128px / 7) / 24px "Jersey 10", var(--font-base);
   --jersey-15: 400 calc(80px / 3) / 32px "Jersey 15", var(--font-base);
   --jersey-20: 400 calc(640px / 19) / 40px "Jersey 20", var(--font-base);
