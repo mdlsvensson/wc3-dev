@@ -295,6 +295,9 @@ The scan does not see a global that is assigned inside a function or a block, or
 A map that Moonwell builds prints the errors of your code that the runtime can catch. It prints with `print`, and
 each of its lines starts with `[moonwell]` in red.
 
+Once the game has called `main`, the runtime prints a line at once. A line from before that is kept: the runtime
+prints the kept lines, in their order, when the game calls `main`, before the first `before_main` hook.
+
 ### An error in a hook
 
 The runtime calls each function of a hook under `xpcall`. When one fails, the runtime prints `[moonwell]`, the
@@ -302,6 +305,9 @@ hook's name, `failed:` and the error's message, and calls the next function.
 
 World Editor's own `config` and `main` run under the same protection. An error in one of them is printed as
 `[moonwell] config failed:` or `[moonwell] main failed:`, and the hooks after it still run.
+
+The two `config` hooks and World Editor's `config` run before `main`. So the line for an error in one of them is
+kept, and the runtime prints it when `main` starts.
 
 Lua writes the place of an error in front of its message, as a line of `war3map.lua`. The runtime knows which lines
 of the script each module has, and writes the module's file and its line in the place's stead: `src/main.yue:4:` for
@@ -314,8 +320,9 @@ is the message alone.
 The entry runs while the map's script loads, and so does the top-level code of every module that it imports there.
 An error in that code ends the entry at once. The lines after it do not run, so the hooks that they would have added
 are missing, while a hook that was added before the error stays. A hook that is given something that is no function
-fails in this way. The runtime prints the error under the name of the entry's module. For an entry `src/main.yue`
-that raises `no gold` at its top level, on line 3, it prints this:
+fails in this way. The runtime catches the error and reports it under the name of the entry's module. `main` has not
+started then, so the runtime keeps the line, and prints it when the game calls `main`, before the first
+`before_main` hook. For an entry `src/main.yue` that raises `no gold` at its top level, on line 3, it prints this:
 
 ```text
 [moonwell] load main failed: src/main.yue:3: no gold
@@ -324,11 +331,13 @@ that raises `no gold` at its top level, on line 3, it prints this:
 The map goes on: the game calls `config` and `main` as it does in every map.
 
 ::: note
-In a test on Warcraft III Reforged 3.0.0.24268, a line that was printed while the script loaded was not on the
-screen. Lines printed in a `before_main` hook, in an `on_main` hook and from a timer of zero seconds were there, and
-so was the runtime's line for a failing `on_main` hook. The two `config` hooks were not part of the test. So a
-`load … failed` line is one you do not see: when hooks of yours do not run at all, look for an error at the top
-level of a module.
+In a test on Warcraft III Reforged 3.0.0.24268, a line that a module printed at its top level, while the script
+loaded, was not on the screen. Lines printed in a `before_main` hook, in an `on_main` hook and from a timer of zero
+seconds were there, and so was the runtime's line for a failing `on_main` hook. The two `config` hooks were not part
+of the test. In a second test, the entry of a map raised an error at its top level, after it had added a
+`before_main` hook: the red `load … failed` line was on the screen when the map started, with the hook's line below
+it. So text of your own that a module prints at its top level is text you do not see: print from a `before_main` or
+an `on_main` hook.
 :::
 
 ### An error in a callback
@@ -370,8 +379,9 @@ then at its 10th, its 100th and its 1000th time, and so on at every power of ten
 ```
 
 The runtime keeps the count of 100 different errors. A different one beyond those is printed every time it happens.
-The counting starts after the last `on_main` hook has run: an error in a callback that runs before that, such as a
-`ForGroup` loop inside a hook, is printed every time.
+An error is counted from its first time, whenever its callback runs. A callback can fail before the game calls
+`main`, in a `config` hook or at the top level of a module: its lines are kept, and the runtime prints them when
+`main` starts.
 
 An error value that is a table, a function, a userdata or a thread, and has no `__tostring` of its own, is printed
 by its kind: `(error object is a table value)`.
@@ -415,7 +425,7 @@ mw.on_main ->
 ```
 
 This prints `src/main.yue:4: no gold`, where the message itself has a line of the script, such as
-`war3map.lua:436: no gold`. `format_error` takes any value and returns text. It replaces every place in the text
+`war3map.lua:450: no gold`. `format_error` takes any value and returns text. It replaces every place in the text
 whose line is inside a module. A place outside the modules stays as it is: a line of World Editor's part of the
 script, or of the runtime.
 

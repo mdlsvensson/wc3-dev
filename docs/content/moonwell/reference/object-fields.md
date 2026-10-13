@@ -42,18 +42,18 @@ the label, the rawcode and the notes that are described below. [Editor setup](..
 Pkl.
 
 **In the package.** The typed fields of each kind are one module of the `moonwell` Pkl package, in the folder
-[`schema/generated`](https://github.com/mdlsvensson/moonwell/tree/moonwell@0.12.3/schema/generated) of Moonwell's
+[`schema/generated`](https://github.com/mdlsvensson/moonwell/tree/moonwell@0.12.4/schema/generated) of Moonwell's
 repository:
 
 | Kind | Module |
 | --- | --- |
-| Heroes | [`HeroProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.3/schema/generated/HeroProps.pkl) |
-| Units | [`UnitProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.3/schema/generated/UnitProps.pkl) |
-| Buildings | [`BuildingProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.3/schema/generated/BuildingProps.pkl) |
-| Items | [`ItemProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.3/schema/generated/ItemProps.pkl) |
-| Abilities | [`AbilityProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.3/schema/generated/AbilityProps.pkl) |
-| Buffs | [`BuffProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.3/schema/generated/BuffProps.pkl) |
-| Upgrades | [`UpgradeProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.3/schema/generated/UpgradeProps.pkl) |
+| Heroes | [`HeroProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.4/schema/generated/HeroProps.pkl) |
+| Units | [`UnitProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.4/schema/generated/UnitProps.pkl) |
+| Buildings | [`BuildingProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.4/schema/generated/BuildingProps.pkl) |
+| Items | [`ItemProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.4/schema/generated/ItemProps.pkl) |
+| Abilities | [`AbilityProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.4/schema/generated/AbilityProps.pkl) |
+| Buffs | [`BuffProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.4/schema/generated/BuffProps.pkl) |
+| Upgrades | [`UpgradeProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.4/schema/generated/UpgradeProps.pkl) |
 
 A module holds its fields in the order of their names. These are two entries, one of `UnitProps.pkl` and one of
 `AbilityProps.pkl`:
