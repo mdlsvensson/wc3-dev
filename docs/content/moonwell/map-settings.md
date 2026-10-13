@@ -39,7 +39,7 @@ The settings go into these files of the map:
 | --- | --- |
 | [`settings.info`](./reference/settings#settings.info): `name`, `author`, `description`, `recommendedPlayers` | `war3map.w3i`, the map info. For `name` and `description`, `war3map.lua` too |
 | [`settings.loadingScreen`](./reference/settings#settings.loadingscreen) | `war3map.w3i` |
-| [`[[settings.players]]`](./reference/settings#settings.players), [`[[settings.forces]]`](./reference/settings#settings.forces), [`settings.environment`](./reference/settings#settings.environment) | `war3map.w3i` and `war3map.lua` |
+| [`[[settings.players]]`](./reference/settings#settings.players), [`[[settings.forces]]`](./reference/settings#settings.forces), [`settings.environment`](./reference/settings#settings.environment) | `war3map.w3i` and `war3map.lua`. For the `name` of a player or a force, `war3map.w3i` alone |
 | [`settings.gameplay`](./reference/settings#settings.gameplay), [`[[settings.gameplayConstants]]`](./reference/settings#settings.gameplayconstants-and-settings.gameinterface) | `war3mapMisc.txt` |
 | [`[[settings.gameInterface]]`](./reference/settings#settings.gameplayconstants-and-settings.gameinterface) | `war3mapSkin.txt` |
 | `settings.info.preview` | The map's minimap and `war3map.lua`: see [A picture in the map list](#a-picture-in-the-map-list) |
@@ -82,8 +82,8 @@ A colour is `[red, green, blue, alpha]`, each a whole number from 0 to 255. It r
 
 `fog.start` must not be above `fog.end`. A rule of the file cannot say that, because either value may be the map's
 own. So Moonwell compares the two when it reads the map info, and takes the map's value for the one that is not
-written. The map of a new project has a fog that starts at 3000 and ends at 5000. There, this setting alone is
-refused:
+written. The map of a new project has its fog off, and its map info holds a fog start of 3000 and a fog end of 5000.
+There, this setting alone is refused:
 
 ```toml
 [settings.environment.fog]
@@ -136,9 +136,10 @@ of a force that the map has is refused with `force overrides require custom forc
 as Selectable. A race by its name, such as `"orc"`, takes that mark away.
 
 ::: note
-On Warcraft III Reforged 3.0.0.24268, with a map whose settings gave a player the race `"selectable"`, the lobby let
-a race be chosen for that slot. The lobby showed the account name of the person playing in their slot, not the name
-the map gives that player.
+Seen on Warcraft III Reforged 3.0.0.24268, on one machine. The lobby showed the account name of the person playing
+in their slot, not the name the map gives that player. That name was seen in World Editor's Player Properties, on
+the built map. With the map's fixed player settings on, the lobby let a race be chosen for a slot whose race the
+settings made `"selectable"`. A hosted game was not checked.
 :::
 
 ## What the map must be
@@ -193,7 +194,7 @@ blue of the fog's colour: its alpha is in the map info alone.
 Five kinds of settings are in the map info alone, and no call is edited for them: `author`, `recommendedPlayers`,
 the loading screen, a player's `name` and a force's `name`.
 
-Moonwell needs each call exactly where World Editor writes it:
+Moonwell needs the script to be as World Editor writes it:
 
 - Each function that the table names for your settings is defined once.
 - A call that Moonwell replaces is there once: once in `config()`, or once for the slot.
@@ -233,7 +234,8 @@ is a picture under `assets/`, because a build imports every file there into the 
 ### The file
 
 The picture is a `.png`, a `.tga` or a `.blp` file of 256×256 or 512×512 pixels. The ending of the name decides how
-the file is read, in any letter case.
+the file is read, in any letter case. For the choice between the two sizes, read the note under
+[What a build does](#what-a-build-does): it says what was seen of the game's start location markers on each.
 
 - **A PNG** of any kind is read: 8 or 16 bits, colour, grey or palette, interlaced or not.
 - **A TGA** must be true colour with 24 or 32 bits a pixel, with or without run-length compression. One with a
@@ -252,10 +254,10 @@ hint: Resize the picture. 256x256 is where the game's start location markers sit
 ```
 
 ::: warning
-A picture that the game cannot read closes the game the moment the map is selected in the map list, for everyone who
-has the map. On Warcraft III Reforged 3.0.0.24268, a `war3mapMap.blp` that held the bytes of a TGA or a DDS file did
-so. That is why Moonwell takes only the files above, and why another file fails `build`, `test`, `check`, `dev` and
-`settings:check`.
+On Warcraft III Reforged 3.0.0.24268, a `war3mapMap.blp` that held the bytes of a TGA or a DDS file closed the game
+the moment the map was selected in the single-player map list. The picture is part of the map that every player
+gets; a hosted game was not checked. That is why Moonwell takes only the files above, and why another file fails
+`build`, `test`, `check`, `dev` and `settings:check`.
 :::
 
 ### What a build does
@@ -274,7 +276,7 @@ As with every setting, the source map stays as it is.
 Measured on Warcraft III Reforged 3.0.0.24268, in the single-player map list. The list showed the map's
 `war3mapMap.blp`, and ignored a `war3mapPreview.tga`. It showed `war3mapMap.tga` when the map had no
 `war3mapMap.blp`. The game drew its start location markers over the picture, placed for a picture of 256×256
-pixels: on one of 512×512 they sit smaller and toward the top left. With the build's call, the game itself showed
+pixels: on one of 512×512 they sat smaller and toward the top left. With the build's call, the game itself showed
 World Editor's minimap.
 :::
 
