@@ -30,13 +30,16 @@ error: moonwell.toml › 'build.minify' expected type 'bool', got unconvertible 
 hint: Every setting and its rule is listed under "Settings" in Moonwell's README.
 ```
 
-One error lists every unknown name and every value of the wrong kind in the file. When the names and the kinds are
-right, Moonwell holds each value to its rule, the rules this page lists. A value outside its rule is an error that
-names the setting and the rule, such as `settings.gameplay.heroMaxLevel must be 1 to 10000.` When a file breaks
-several rules, the error names one of them.
+One error lists every unknown name and every value of the wrong kind in the file. One refusal comes before it, and
+alone: a setting of your machine in `moonwell.toml` (see [A setting in the wrong file](#a-setting-in-the-wrong-file)).
+When the names and the kinds are right, Moonwell holds each value to its rule, the rules this page lists. A value
+outside its rule is an error that names the setting and the rule, such as
+`settings.gameplay.heroMaxLevel must be 1 to 10000.` When a file breaks several rules, the error names one of them.
 
 A file that is not valid TOML is refused whole, with the line and the column of the mistake where the TOML reader
-gives them. A name that is written twice in one table is such a mistake.
+gives them. A name that is written twice in one table, in the same letter case, is such a mistake. Two spellings of
+one name are not refused: with `minify` and `Minify` in one table, Moonwell uses one of the two values. A file with
+`[build]` and `[Build]` is read without an error too. So write each name once.
 
 A name between two pairs of brackets, such as `[[settings.players]]`, is a list. Write the header once for each
 entry:
@@ -96,8 +99,8 @@ checks against the map itself, such as that a player's slot is there.
 
 Two words of the rules below:
 
-- A **relative path** is not empty, does not start with `/`, `\` or a drive letter such as `C:`, and has no `..`
-  part.
+- A **relative path** does not start with `/`, `\` or a drive letter such as `C:`, has no `..` part, and names a
+  folder or a file: a path that is empty, or that holds `.` parts alone, such as `"."`, is refused.
 - A **colour** is a list of four whole numbers, each from 0 to 255: red, green, blue and alpha.
 
 ### map
@@ -136,9 +139,10 @@ Your `config.toml` may set `test.archive` too, and its value wins: see
 | --- | --- | --- | --- |
 | `yue.version` | `"0.34.3"` | Three numbers with dots | The version of the YueScript compiler that Moonwell downloads and compiles with |
 
-Moonwell can download two versions of the compiler, 0.34.3 and 0.34.2. Another version passes the rule of the file
-and fails when a command looks for the compiler, with an error that lists the two. The way to another compiler is
-`yue.path` in your `config.toml`: see [yue](#config-yue) below.
+Moonwell can download two versions of the compiler, 0.34.3 and 0.34.2. Another version passes the rule of the file.
+It fails when a command looks for the compiler, with an error that lists the two, unless your `config.toml` has a
+`yue.path`. Moonwell then runs that program, and only compares the version it reports with this setting, for a
+warning: see [yue](#config-yue) below.
 
 ### assets
 
@@ -252,8 +256,8 @@ how a library is fetched and what it holds.
 | `allied` | The map's value | `true` or `false` | Whether the players of the force are allied |
 | `alliedVictory` | The map's value | `true` or `false` | Whether they have allied victory |
 | `sharedVision` | The map's value | `true` or `false` | Whether they share vision |
-| `sharedControl` | The map's value | `true` or `false` | Whether they share control of their units |
-| `sharedAdvancedControl` | The map's value | `true` or `false` | Whether they share full control of their units |
+| `sharedControl` | The map's value | `true` or `false` | Whether they share control |
+| `sharedAdvancedControl` | The map's value | `true` or `false` | Whether they share full control |
 
 ### settings.environment
 
@@ -279,6 +283,9 @@ waterColor = [20, 40, 80, 255]
 enabled = true
 density = 0.5
 ```
+
+A `fog.start` above `fog.end` passes the rules of the file. It is refused when a command checks the settings against
+the map, where a value that is not written is the map's own: see [Map settings](../map-settings).
 
 ### settings.gameplayConstants and settings.gameInterface
 
