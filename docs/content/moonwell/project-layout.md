@@ -172,5 +172,6 @@ means harm. Build only a project whose code you trust, and add only a library yo
 - [Files and caches](./reference/files): every file Moonwell writes and which command writes it, the cache folder,
   the Moonwell folder and the environment variables.
 - [Settings](./reference/settings): every setting of `moonwell.toml` and of your `config.toml`.
+- [Troubleshooting](./reference/troubleshooting#a-link-is-refused): a link that Moonwell refuses.
 - [Gameplay code](./gameplay-code): the next page. It describes the code under `src/` and `lua/`: hooks, modules,
   macros and errors.

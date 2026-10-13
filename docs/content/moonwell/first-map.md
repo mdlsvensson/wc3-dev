@@ -267,4 +267,6 @@ file alone, and fails when it does not match the objects, or is missing in a pro
 - [Commands](./reference/commands): `init`, `build`, `test`, `dev` and `check`, with what each reads and writes and
   when it fails.
 - [Settings](./reference/settings): every setting of `moonwell.toml` and of your `config.toml`.
+- [Troubleshooting](./reference/troubleshooting#in-the-game): a game that does not start, and a game that shows
+  its main menu in place of the map.
 - [Project layout](./project-layout): the next page. It goes through every file and folder of the project you made.

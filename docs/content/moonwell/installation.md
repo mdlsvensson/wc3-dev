@@ -92,7 +92,9 @@ the cache is not there. For that, run [`moonwell setup`](./reference/commands#se
 files. It copies the Pkl that Moonwell downloaded into the `bin` folder of the cache, the folder where `setup` keeps
 `yue` for your editor ([Editor setup](./editor-setup#run-moonwell-setup)). On Windows that is the folder the install
 script added to your PATH. On Linux it is `~/.cache/moonwell/bin`, unless a variable moved the cache. On either
-system, when no `pkl` is on your PATH, `setup` prints the line that adds the folder to it.
+system, when no `pkl` is on your PATH, `setup` prints the line that adds the folder to it. With an older `pkl` on
+your PATH, `setup` makes the copy and prints no line, and a `pkl` command that you type still runs the one that
+comes first on your PATH: take the old `pkl` off your PATH, or put Pkl 0.32 or newer in its place.
 
 ## Installing one version
 
@@ -154,4 +156,6 @@ The other way works too: keep the project as it is and install the Moonwell it n
 - [Commands](./reference/commands): [`moonwell setup`](./reference/commands#setup) and every other command.
 - [Settings](./reference/settings#your-machine-config.toml): every setting of `config.toml`.
 - [Files and caches](./reference/files): the cache folder, the Moonwell folder and the variables that move them.
+- [Troubleshooting](./reference/troubleshooting#installing): a `moonwell` that is not found after the install, and
+  a Pkl that is missing or too old.
 - [Your first map](./first-map): the next page. It makes a project, builds it and starts the game on it.

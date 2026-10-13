@@ -96,8 +96,8 @@ The tables from `map` to `libraries` are the settings of the project itself. The
 has no default of its own. One that is not written leaves the map's value as it is, and an empty text is a value:
 `author = ""` clears the author ([Inheritance and clearing](../map-settings#inheritance-and-clearing)).
 [Map settings](../map-settings#what-a-setting-changes) describes what each one changes, and
-[what a build checks against the map itself](../map-settings#what-the-map-must-be), such as that a player's slot is
-there.
+[what a build checks against the map itself](../map-settings#what-the-map-must-be), such as
+[that a player's slot is there](../map-settings#players-and-forces).
 
 Two words of the rules below:
 
@@ -252,6 +252,8 @@ of the file. They are refused when a command brings the libraries up to date.
 | `x` | The map's value | A number from -10000000 to 10000000 | The x coordinate of the player's start location |
 | `y` | The map's value | A number from -10000000 to 10000000 | The y coordinate of the player's start location |
 
+[Players and forces](../map-settings#players-and-forces) describes what an entry of this list needs of the map.
+
 ### settings.forces
 
 `[[settings.forces]]` is a list, with no entries by default. Each entry changes one force of the map:
@@ -266,8 +268,7 @@ of the file. They are refused when a command brings the libraries up to date.
 | `sharedControl` | The map's value | `true` or `false` | Whether they share control |
 | `sharedAdvancedControl` | The map's value | `true` or `false` | Whether they share full control |
 
-[Players and forces](../map-settings#players-and-forces) describes what the entries of `[[settings.players]]` and
-of `[[settings.forces]]` need of the map.
+[Players and forces](../map-settings#players-and-forces) describes what an entry of this list needs of the map.
 
 ### settings.environment
 

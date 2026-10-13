@@ -301,8 +301,8 @@ prints the kept lines, in their order, when `main` starts, before the first `bef
 
 ### An error in a hook
 
-The runtime calls each function of a hook under `xpcall`. When one fails, the runtime prints `[moonwell]`, the
-hook's name, `failed:` and the error's message, and calls the next function.
+The runtime calls each function of a hook under `xpcall`. When one fails, the runtime reports it as `[moonwell]`,
+the hook's name, `failed:` and the error's message, and calls the next function.
 
 World Editor's own `config` and `main` run under the same protection. An error in one of them is reported as
 `[moonwell] config failed:` or `[moonwell] main failed:`, and the hooks after it still run.
@@ -340,10 +340,10 @@ The map goes on: the game calls `config` and `main` as it does in every map.
 In a test on Warcraft III Reforged 3.0.0.24268, a line that a module printed at its top level, while the script
 loaded, was not on the screen. Lines printed in a `before_main` hook, in an `on_main` hook and from a timer of zero
 seconds were there, and so was the runtime's line for a failing `on_main` hook. The two `config` hooks were not part
-of the test. In a second test, the entry of a map added a `before_main` hook that put a line of its own on the
-screen, and then raised an error at its top level. When the map started, the red `load … failed` line was on the
-screen, with the hook's line below it. So text of your own that a module prints at its top level is text you do not
-see: print from a `before_main` or an `on_main` hook.
+of the test. In a second test, the entry of a map added a `before_main` hook with a line of its own, and then
+raised an error at its top level. When the map started, the red `load … failed` line was on the screen, with the
+hook's line below it. So text of your own that a module prints at its top level is text you do not see: print from
+a `before_main` or an `on_main` hook.
 :::
 
 ### An error in a callback
@@ -511,4 +511,6 @@ the file and the line. World Editor's part of the script and the runtime stay as
 - [Settings](./reference/settings): the tables [`map`](./reference/settings#map),
   [`build`](./reference/settings#build) and [`lint`](./reference/settings#lint) of `moonwell.toml`.
 - [Files and caches](./reference/files): the macro module, the Lua that your code compiles to and the staged map.
+- [Troubleshooting](./reference/troubleshooting#building): a global that is unknown, a bitwise operator and a
+  module that is not found, and [errors in the game](./reference/troubleshooting#in-the-game).
 - [Objects](./objects): the next page. It describes the object files and the ids module that your code imports.

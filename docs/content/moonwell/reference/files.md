@@ -127,8 +127,9 @@ that gave it Windows line ends matches all the same. `dev` does not watch `src/g
 ### `moonwell.lock` {#moonwell.lock}
 
 `moonwell.lock` is a JSON file in the project folder. It holds a record of each library that is fetched from
-GitHub: the entry's `github`, `tag` and `dir`, the `commit` that the tag named when the library was fetched, a hash
-of the library's modules as `files` and, where the library ships files for the map, a hash of those as `assets`.
+GitHub. A record has the `github`, the `tag` and the `dir` of the library's entry in `moonwell.toml`, the `commit`
+that the tag named when the library was fetched, a hash of the library's modules as `files` and, where the library
+ships files for the map, a hash of those as `assets`.
 
 The commands that bring the libraries up to date keep the file current: `build`, `test`, `check`, `dev`, `setup`
 and the three `assets:` commands. They write it when its content changes, and remove it when no record is left in
@@ -137,7 +138,7 @@ a time when the library was fetched, stays there.
 
 When Moonwell fetches a library again at the tag the file records, and the tag names another commit or gives other
 files than the file records, the command fails and names the library. To take the tag as it is, delete the
-library's entry from `moonwell.lock` and run the command again ([Libraries](../libraries#moonwell.lock)). A
+library's record from `moonwell.lock` and run the command again ([Libraries](../libraries#moonwell.lock)). A
 `moonwell.lock` that is not valid JSON, or is no lock file, is an error too: put it right, or delete it, and the
 next command fetches every library again and writes a new one. [Libraries](../libraries#add-a-library) describes how
 a library is added and fetched.

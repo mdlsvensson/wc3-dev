@@ -301,9 +301,8 @@ writes the Lua modules, and leaves the compiled ones as the last of the four wro
 
 ## See also
 
-The two libraries that are written for Moonwell have sections of their own:
-[moonwell-wrappers](../wrappers/) and [moonwell-systems](../systems/).
-
+- [moonwell-wrappers](../wrappers/) and [moonwell-systems](../systems/): the two libraries that are written for
+  Moonwell. Each has a section of its own.
 - [Settings](./reference/settings#libraries): the `[[libraries]]` list of `moonwell.toml`, and
   [the one of your `config.toml`](./reference/settings#config-libraries).
 - [Assets](./assets#a-librarys-files): what a build does with the files a library ships for the map.

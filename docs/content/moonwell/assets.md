@@ -338,5 +338,7 @@ library.
 - [Settings](./reference/settings#assets): the rules of `assets.exclude` and `[[assets.paths]]`.
 - [Files and caches](./reference/files#asset-state): the state file under `.asset-state/`, and
   `.moonwell/library-assets/`.
+- [Troubleshooting](./reference/troubleshooting#the-map-and-world-editor): an asset that does not show in World
+  Editor, and a file that `assets:sync` refuses.
 - [Map settings](./map-settings): the next page. It describes the settings of the map itself that `moonwell.toml`
   holds.

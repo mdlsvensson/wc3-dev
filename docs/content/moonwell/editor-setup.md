@@ -215,10 +215,11 @@ These files are the editor's, and no part of what you write:
 - `completion.maxSuggestCount` is above the number of the game's functions and globals, so that the editor can
   suggest every one of them.
 
-The game's Lua lacks more than these three libraries, and [Gameplay code](./gameplay-code#the-games-lua) says what.
-lua-language-server cannot turn single functions off. So the editor does not flag a use of `collectgarbage`, `dofile`
-or `loadfile`, nor of a function that `os` lacks. `moonwell check` reports the first three, as unknown globals. It
-does not see a function that `os` lacks, such as `os.exit`: that is a field.
+The game's Lua lacks more than the three libraries that `runtime.builtin` turns off, and
+[Gameplay code](./gameplay-code#the-games-lua) says what. lua-language-server cannot turn single functions off. So
+the editor does not flag a use of `collectgarbage`, `dofile` or `loadfile`, nor of a function that `os` lacks.
+`moonwell check` reports the first three, as unknown globals. It does not see a function that `os` lacks, such as
+`os.exit`: that is a field.
 
 With `package` off, the language server's own `require` is off as well. The declarations of the `moonwell` module
 declare `require` in its place: in a built map, `require` is the runtime's own function.
