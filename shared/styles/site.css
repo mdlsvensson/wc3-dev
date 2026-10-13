@@ -304,6 +304,8 @@ pre,
 code {
   font-family: var(--font-mono);
   font-size: 13.5px;
+  /* The font would draw `->` and `!=` as one glyph each; code shows the characters a reader types. */
+  font-variant-ligatures: none;
 }
 
 .documentation .site-header {

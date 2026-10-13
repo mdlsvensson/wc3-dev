@@ -30,3 +30,9 @@ Deno.test("the code font is JetBrains Mono, declared upright, italic and bold", 
     .map((face) => `${face.style} ${face.weight}`).sort();
   assertEquals(cuts, ["italic 400", "normal 400", "normal 700"]);
 });
+
+Deno.test("code is drawn without ligatures, so that a reader sees the characters to type", () => {
+  const rule = /pre,\s*code\s*\{([^}]*)\}/.exec(siteCss)?.[1] ?? "";
+  assertEquals(/font-family:\s*var\(--font-mono\)/.test(rule), true);
+  assertEquals(/font-variant-ligatures:\s*none/.test(rule), true);
+});
