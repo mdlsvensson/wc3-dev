@@ -1,7 +1,8 @@
 # Assets
 
 After this page you can import models, textures and icons into the map, give a file an exact path there, and see
-what you imported in World Editor. An asset is a file under `assets/` in the project folder.
+what you imported in World Editor. An asset is a file under `assets/` in the project folder, or a file that a
+library ships for the map.
 
 ## Files under assets/
 
@@ -121,7 +122,8 @@ not. That is how you put an icon or a model of your own in the place of a librar
 assets/Textures/Golem.blp replaces library golems's Textures/Golem.blp
 ```
 
-Two libraries with a file at the same path in the map are an error, unless a file of yours takes that path:
+Two libraries with a file at the same path in the map are an error, unless a file of yours takes that path. Here
+the project names a second library, `ogres`, and both libraries ship `Textures/Golem.blp`:
 
 ```text
 error: moonwell.toml › Libraries golems and ogres both import Textures\Golem.blp.
@@ -178,6 +180,11 @@ It prints the same list, writes the files, and ends with:
 Synced 5 asset(s) into maps/map.w3x (6 file change(s)). Reopen the map in World Editor.
 ```
 
+::: note
+With World Editor 3.0.0.24268, the Import Manager listed a synced file beside a file that was imported in World
+Editor itself, and after the map was saved there, `assets:check` reported no change.
+:::
+
 When a file that `assets:sync` is about to write or delete was changed after the command read the map, it stops,
 takes back the writes it made, and its hint tells you to close World Editor and anything else that writes to the
 map.
@@ -214,7 +221,8 @@ What `assets:sync` never does:
   hint: assets:sync owns this file in the source map (a build stages a copy of it). Move your edited copy into assets/, or restore the file in the source map, then run assets:sync.
   ```
 
-The two errors stop a build as well, and `assets:check`: a build plans the same imports, over the staged map.
+The two errors stop a build as well, and `assets:check`: a build plans the same imports, for the copy of the source
+map that it stages.
 
 When a write fails, or when you stop `assets:sync` with Ctrl+C, it takes back the writes it made. Where it cannot
 put a file back, the error names that file, and its hint is to restore the map folder from version control.
@@ -222,11 +230,6 @@ put a file back, the error names that file, and its hint is to restore the map f
 A build does not wait for a sync. It reads the state file too, and so knows which files of the source map are
 synced assets. The staged map gets the assets as they are under `assets/`: an asset that you removed after the last
 sync is not in the build, though the source map has it until the next `assets:sync`.
-
-::: note
-With World Editor 3.0.0.24268, the Import Manager listed a synced file beside a file that was imported in World
-Editor itself, and after the map was saved there, `assets:check` reported no change.
-:::
 
 ## Checking a model's files
 
@@ -249,7 +252,7 @@ assets/Models/Knight.mdx
 1 model, 5 paths: 2 in-game, 1 custom imported, 1 custom not imported.
 ```
 
-A line has the kind of the reference, the path as the model holds it, and a label. The kinds are `texture`,
+A line has the kind of the reference, the path the model names, and a label. The kinds are `texture`,
 `particle model`, `particle texture`, `attachment`, `popcorn` and `face effect`. The labels:
 
 | Label | What it means |
@@ -260,15 +263,18 @@ A line has the kind of the reference, the path as the model holds it, and a labe
 | `custom path, not imported` | The game has no file at this path, and no asset has it: the model will be missing this file |
 
 A texture that the model takes from a replaceable slot has no path and no label. Its line reads
-`team colour (slot 1)`, `team glow (slot 2)` or `replaceable texture (slot <n>)`. The last line counts the models,
-the lines, and the lines of each label, with the two in-game labels as one number.
+`team colour (slot 1)`, `team glow (slot 2)` or `replaceable texture (slot <n>)`. A model that names no file has
+the one line `(no referenced files)`. The last line counts the models, the lines of the references, and the lines
+of each label, with the two in-game labels as one number.
 
 Moonwell knows the game's paths from a list that is part of the program: the paths of the files of Warcraft III
 Reforged 3.0.0.24268. It compares a path with that list without regard to letter case, and takes the texture
 formats `.blp`, `.dds`, `.tga`, `.tif`, `.tiff`, `.png` and `.jpg` for one: above, `Textures\Knight.blp` is an
 in-game path because the game has that texture as a `.dds` file. An asset counts for a reference only when its path
 in the map is the path the model names, with the same ending, in any letter case. In both comparisons a reference
-that ends in `.mdl` is looked up as `.mdx`.
+that ends in `.mdl` is looked up as `.mdx`. So an asset whose path in the map ends in `.mdl` counts for no
+reference: a model that names `Models\Sword.mdl` is met by an asset at `Models\Sword.mdx`, and not by one at
+`Models\Sword.mdl`.
 
 With a file, `assets:paths` reports on that one model. The path starts at the folder the command runs in:
 
@@ -317,7 +323,7 @@ each check of `dev`.
   `PRN`, `AUX`, `NUL`, `COM1` to `COM9` and `LPT1` to `LPT9`, in any letter case, alone or before a dot, as in
   `aux.blp`. On a system that holds such a name, as Linux does, the error says that it
   `cannot be used in a map that Windows tools read`. Each name in a `path` of `[[assets.paths]]` follows the same
-  rules, and there the error starts with `Invalid asset path:`.
+  rules, and is neither empty nor `.` or `..`. There the error says `Invalid asset path:` and the path.
 
 Among the files that a library ships, Moonwell refuses the same two kinds of names, and the error names the
 library.
