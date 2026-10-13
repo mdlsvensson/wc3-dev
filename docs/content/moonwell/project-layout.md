@@ -29,9 +29,11 @@ Git keeps no empty folder, so `lua/` and the three icon folders each hold one em
 it over: under `lua/` it reads the `.lua` files, and under `assets/` it leaves out a file whose name starts with a
 dot.
 
-The pages after this one take the folders one by one: [Gameplay code](./gameplay-code) for `src/` and `lua/`,
-[Objects](./objects) for `objects/` and `PklProject`, [Assets](./assets) for `assets/`,
-[Editor setup](./editor-setup) for the three files of the editor, and [Using your own map](./own-map) for `maps/`.
+The pages after this one take the folders one by one: [Gameplay code](./gameplay-code#modules-and-imports) for `src/`
+and `lua/`, [Objects](./objects#object-files) for `objects/` and [`PklProject`](./objects#pklproject),
+[Assets](./assets#files-under-assets) for `assets/` and [its icon folders](./assets#icons),
+[Editor setup](./editor-setup#install-vs-code-and-the-two-extensions) for the three files of the editor, and
+[Using your own map](./own-map) for `maps/`.
 
 ## What Moonwell writes
 
@@ -47,28 +49,29 @@ project, and [Files and caches](./reference/files#in-the-project) has every file
 - **`src/generated/objects.yue`** is the ids module. `build`, `test` and `dev` write it when your objects change,
   and `check` compares it with them. Your code imports it, and you never edit it
   ([Files and caches](./reference/files#src-generated)).
-- **`moonwell.lock`** is there when the project has a library that is fetched from GitHub. It records the commit
-  of each such library's tag, so that everyone who builds the project gets the same code
+- **`moonwell.lock`** holds a record of each library that is fetched from GitHub, with the commit of its tag, so
+  that everyone who builds the project gets the same code. When no record is left in it, the file is removed
   ([Files and caches](./reference/files#moonwell.lock)).
 - **`.asset-state/`** is there when `moonwell assets:sync` has written assets into the source map. It records
   which files of the source map that command owns ([Files and caches](./reference/files#asset-state)).
 
 Two commands write into files that are yours. `moonwell setup` adds the editor's files that are missing, the
-entries that `.luarc.json` lacks, and the lines `.moonwell/` and `src/**/*.lua` where `.gitignore` lacks them.
-`moonwell assets:sync` writes into the source map, and it is the one command that changes it.
+entries that three lists of `.luarc.json` lack, and the lines `.moonwell/` and `src/**/*.lua` where `.gitignore`
+lacks them ([Editor setup](./editor-setup#what-else-setup-does)). `moonwell assets:sync` writes into the source
+map, and it is the one command that changes it ([Assets](./assets#seeing-assets-in-world-editor)).
 
 ## What to commit
 
 Commit everything that `init` made, and three of the things Moonwell writes:
 
 - `src/generated/objects.yue`. In a project with objects, `moonwell check` fails when the file is missing or does
-  not match the objects, and it does not write the file itself.
+  not match the objects, and it does not write the file itself ([Objects](./objects#the-generated-ids)).
 - `moonwell.lock`. A fresh clone then gets the same code of each library. When a tag is moved on GitHub, the
   command that fetches the library fails, and does not take the other code.
 - `.asset-state/`. It goes with the source map: it says which of the map's files `assets:sync` wrote.
 
 `PklProject.deps.json` is among what `init` made, and it is committed too: without it, a project with object
-files is not read, and the error tells you to run `pkl project resolve`.
+files is not read, and the error tells you to run `pkl project resolve` ([Objects](./objects#pklproject)).
 
 The template's `.gitignore` leaves four things out:
 
@@ -162,7 +165,7 @@ that the project brings.
 
 Refusing links keeps Moonwell's own writes inside the project folder. It is no barrier against a project that
 means harm. Build only a project whose code you trust, and add only a library you trust.
-[Gameplay code](./gameplay-code) describes macros.
+[Gameplay code](./gameplay-code#macros) describes macros.
 
 ## See also
 

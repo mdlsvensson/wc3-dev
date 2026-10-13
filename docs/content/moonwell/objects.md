@@ -425,7 +425,8 @@ build, and no object is added a second time. The source map itself never gets yo
 staged copy and in the archive, and not in the source map, the one you open in World Editor.
 
 A `war3map.w3u` of the source map, or a file like it, that Moonwell cannot read is an error that names the file,
-and its hint is to open the map in World Editor and save it again.
+and its hint is to open the map in World Editor and save it again
+([Using your own map](./own-map#when-moonwell-refuses-the-map)).
 
 ## What is not supported
 
@@ -451,4 +452,8 @@ and its hint is to open the map in World Editor and save it again.
   [`objects:eval`](./reference/commands#objects-eval), and what each reads, writes and fails on.
 - [Files and caches](./reference/files): [the ids module](./reference/files#src-generated), and
   `.moonwell/objects.pkl`, the module that gathers the object files.
+- [Troubleshooting](./reference/troubleshooting):
+  [an ids module that is stale](./reference/troubleshooting#the-generated-ids-are-stale), and [a Pkl package of
+  another version](./reference/troubleshooting#the-program-and-the-projects-pkl-package-differ-in-version) than the
+  program.
 - [Assets](./assets): the next page. It describes the files under `assets/` that a build imports into the map.

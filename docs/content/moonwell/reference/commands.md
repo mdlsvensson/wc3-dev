@@ -87,10 +87,10 @@ A command writes its lines for you to standard error. What another program may w
 the JSON of `objects:eval`, a completion script, the help and the version. So `moonwell objects:eval > objects.json`
 writes the JSON alone into the file.
 
-Run in a project, every command but `init` also adds each line it writes for you to `dist/moonwell.log` in the
-project folder. A line there starts with the time, in UTC, and with `info`, `warn` or `error`. Moonwell only ever
-adds to the file. A line that is refused, the help, the version and `completion` write nothing there.
-[Files and caches](./files) lists the other files Moonwell writes.
+Run in a project, every command but `init` also adds each line it writes for you to
+[`dist/moonwell.log`](./files#dist) in the project folder. A line there starts with the time, in UTC, and with
+`info`, `warn` or `error`. Moonwell only ever adds to the file. A line that is refused, the help, the version and
+`completion` write nothing there. [Files and caches](./files) lists the other files Moonwell writes.
 
 ## Projects
 
@@ -101,8 +101,8 @@ adds to the file. A line that is refused, the help, the version and `completion`
 Makes a new project in the folder `<dir>`, which is new or empty. `init` writes the files of a project there, with a
 `PklProject` that names the `moonwell` Pkl package of the program's own version. Then it runs `pkl project resolve`
 in the new folder, which writes `PklProject.deps.json`. Its last line names your `config.toml`, for you to check the
-game's path in it, and the next step: `cd <dir> && moonwell build`. [Project layout](../project-layout) describes the
-files of a project.
+game's path in it, and the next step: `cd <dir> && moonwell build`.
+[Project layout](../project-layout#what-init-makes) describes the files of a project.
 
 **Reads:** no project and no settings file. It runs Pkl, which it finds as [Installation](../installation#pkl)
 describes: when the `pkl` on your PATH is not Pkl 0.32 or newer, Moonwell runs its own, which it downloads into the
@@ -128,20 +128,21 @@ package.
 `moonwell setup`
 
 Prepares a project on your machine: it gets the compiler and the libraries, and writes the files your editor reads.
-It compiles nothing and builds no map. [Editor setup](../editor-setup) shows where it fits. `setup` works in this
-order, and the first step that fails ends it:
+It compiles nothing and builds no map. [Editor setup](../editor-setup#run-moonwell-setup) shows where it fits.
+`setup` works in this order, and the first step that fails ends it:
 
 1. It reads the settings. Where the project has a `.pkl` file under `objects/`, it finds Pkl and evaluates the
    object files. When Moonwell runs its own Pkl, `setup` copies that program into the `bin` folder of the cache
    first, and when no `pkl` is on your PATH it prints the line that adds the folder to it.
-2. It finds the YueScript compiler of the version `yue.version` names, downloads it into the cache folder when it is
-   not there, and prints where it is. It copies the compiler into the cache's `bin` folder, for your editor. When
-   the `yue` on your PATH is missing or is another version, it prints the line that adds the folder to your PATH.
-   With `yue.path` set, it uses that program and copies nothing.
+2. It finds the YueScript compiler of the version [`yue.version`](./settings#yue) names, downloads it into the cache
+   folder when it is not there, and prints where it is. It copies the compiler into the cache's `bin` folder, for
+   your editor. When the `yue` on your PATH is missing or is another version, it prints the line that adds the
+   folder to your PATH. With [`yue.path`](./settings#config-yue) set, it uses that program and copies nothing.
 3. It adds the editor's files that are missing: `yueconfig.yue`, `.luarc.json` and `.vscode/extensions.json`. It adds
    the lines `.moonwell/` and `src/**/*.lua` to `.gitignore` where they are missing. To a `.luarc.json` that is
-   there, it adds the entries the file lacks; one that is not plain JSON it leaves alone, with a warning that lists
-   the entries.
+   there, it adds the entries that three of its lists lack, `runtime.path`, `workspace.library` and
+   `workspace.ignoreDir`, and changes no other setting. One that is not plain JSON it leaves alone, with a warning
+   that lists the entries.
 4. It opens the source map, checks the objects, and writes the declarations for your editor into `.moonwell/types/`
    and the macro module into `.moonwell/yue/`.
 5. It takes the [build lock](#one-build-at-a-time), brings the libraries up to date under `.moonwell/`, keeps
@@ -155,7 +156,7 @@ does, and never writes it: the install script makes that file (see
 
 **Writes:** the `bin` folder of the cache; the editor's files and `.gitignore` in the project; `.moonwell/`;
 `moonwell.lock`; `dist/.lock` while it works on the libraries; `dist/moonwell.log`. It does not write the ids
-module, `src/generated/objects.yue`. [Files and caches](./files) says where the cache folder is.
+module, `src/generated/objects.yue`. [Files and caches](./files#the-cache-folder) says where the cache folder is.
 
 **Fails when:**
 
@@ -185,18 +186,19 @@ written, in this order:
 5. Write what your code and your editor read beside the sources: the ids module `src/generated/objects.yue`, the
    declarations in `.moonwell/types/` and the macro module in `.moonwell/yue/`. `check` writes no ids module: it
    compares the one that is there.
-6. Bring the libraries up to date under `.moonwell/`, and keep `moonwell.lock` current. The file holds the libraries
-   fetched from GitHub; a project without libraries has none, and one that is left there is removed.
+6. Bring the libraries up to date under `.moonwell/`, and keep [`moonwell.lock`](../libraries#moonwell.lock)
+   current. The file holds a record of each library that is fetched from GitHub. When no record is left in it, the
+   file is removed.
 7. Find the compiler, which is downloaded into the cache folder when it is not there, and compile the `.yue` files
    of `src/` and of the libraries into the compile's cache, `dist/stage/lua/`. Then follow the imports from the
-   entry, and check the modules they reach for unknown globals.
+   entry, and check the modules they reach for [unknown globals](../gameplay-code#unknown-globals).
 8. Plan the rest of the map on top of the objects' files, each part on the map as the one before leaves it: the map
    settings, then the assets with `war3map.imp`, and last the script, `war3map.lua`, with your code added to it.
 
 The first step that fails ends the plan, and the command prints its error. Some steps write beside the map, so a
 plan that fails after them leaves those files: step 1 writes `.moonwell/objects.pkl`, the module that gathers the
 object files, where the project has object files, and steps 5 to 7 write what they name. None of the four commands
-changes the source map.
+changes the source map. [Files and caches](./files#in-the-project) describes each of these files.
 
 ### build {#build}
 
@@ -217,7 +219,8 @@ compile error.
 
 **Reads:** `moonwell.toml` and your `config.toml`; the object files under `objects/`, through Pkl, with
 `PklProject.deps.json`; the source map; `src/` and `lua/`; the libraries; `assets/`; the file under `.asset-state/`
-that says which files of the source map `assets:sync` owns; the picture `settings.info.preview` names.
+that says which files of the source map `assets:sync` owns; the picture
+[`settings.info.preview`](./settings#settings.info) names.
 
 **Writes:** `dist/.lock` while it runs; what the plan writes beside the map (`src/generated/objects.yue`,
 `.moonwell/`, `moonwell.lock`, `dist/stage/lua/`); the staged map; the archive, which is written beside its place as
@@ -227,42 +230,45 @@ that says which files of the source map `assets:sync` owns; the picture `setting
 
 - The folder is no project, or a settings file is refused.
 - Another build is running in the project.
-- The archive cannot go where `build.folder` and `map.folder` put it, as when a folder is in its place or a link or
-  a file is on the way to it, or the archive of the build before cannot be removed.
+- The archive cannot go where [`build.folder`](./settings#build) and [`map.folder`](./settings#map) put it, as when
+  a folder is in its place or a link or a file is on the way to it, or the archive of the build before cannot be
+  removed.
 - The plan fails: Pkl is not found and cannot be downloaded, or the project's `moonwell` package does not go with
   the program; Pkl or Moonwell refuses an object; the source map is missing or holds something Moonwell refuses; a
   library cannot be fetched; the compiler cannot be downloaded; a source file does not compile; the entry file is
-  not there; a global is unknown (with `lint.unknownGlobals = "warning"` it is a warning); the map cannot take a map
-  setting; an asset cannot be imported; the map's `war3map.lua` is missing or defines no `main` or no `config`
-  function.
+  not there; a global is unknown (with [`lint.unknownGlobals = "warning"`](./settings#lint) it is a warning); the
+  map cannot take a map setting; an asset cannot be imported; the map's `war3map.lua` is missing or defines no
+  `main` or no `config` function.
 - The staged map cannot be replaced, as when the game or World Editor has `dist/stage` open.
 - The map cannot be packed: it has no `war3map.w3i`, or it is too large for an archive. The staged map is written by
   then.
 
 **Flags:**
 
-- `--entry <file>` compiles from this `.yue` file under `src/` in place of `map.entry`. Write the path from the
-  project folder: `src/arena.yue`.
-- `--minify` shrinks the script; runtime errors lose their line numbers. `build.minify = true` in `moonwell.toml`
-  does the same without the flag, and the flag cannot turn that off. See [Gameplay code](../gameplay-code).
+- `--entry <file>` compiles from this `.yue` file under `src/` in place of [`map.entry`](./settings#map). Write the
+  path from the project folder: `src/arena.yue`.
+- `--minify` shrinks the script; runtime errors lose their line numbers. [`build.minify = true`](./settings#build)
+  in `moonwell.toml` does the same without the flag, and the flag cannot turn that off. See
+  [Gameplay code](../gameplay-code#minified-builds).
 
 ### test {#test}
 
 `moonwell test [--entry f] [--minify]`
 
 Stages the map as `build` does, then starts Warcraft III on the staged map. `test` starts the game with the
-arguments of `launch.args`, then `-loadfile` and the full path of the staged map. It does not wait for the game: it
-ends when the game is started.
+arguments of [`launch.args`](./settings#config-launch), then `-loadfile` and the full path of the staged map. It
+does not wait for the game: it ends when the game is started.
 
-`test` needs `launch.gameExecutable` in your `config.toml`, the path of the game's program. It looks for the game
-last, so a `test` without that setting has planned and staged the map before it fails. Its error then says
-`launch.gameExecutable is not set.` and names your `config.toml`.
+`test` needs [`launch.gameExecutable`](./settings#config-launch) in your `config.toml`, the path of the game's
+program. It looks for the game last, so a `test` without that setting has planned and staged the map before it
+fails. Its error then says `launch.gameExecutable is not set.` and names your `config.toml`.
 
-`test` packs no archive, and it leaves what `build` made in `build.folder` as it is. The setting `test.archive`
-changes the first of the two: with `test.archive = true`, `test` also packs the staged map into
-`dist/test/<map.folder>` and starts the game on that file in place of the folder. It removes the archive of the last
-test once it has the lock, before step 3. The setting may stand in `moonwell.toml` or in your `config.toml`, and
-yours wins. [Troubleshooting](./troubleshooting) says when a game needs it.
+`test` packs no archive, and it leaves what `build` made in `build.folder` as it is. The setting
+[`test.archive`](./settings#test) changes the first of the two: with `test.archive = true`, `test` also packs the
+staged map into `dist/test/<map.folder>` and starts the game on that file in place of the folder. It removes the
+archive of the last test once it has the lock, before step 3. The setting may stand in `moonwell.toml` or in your
+`config.toml`, and yours wins.
+[Troubleshooting](./troubleshooting#the-game-shows-its-main-menu-in-place-of-the-map) says when a game needs it.
 
 **Reads:** what `build` reads, and `launch.gameExecutable` and `launch.args` of your `config.toml`.
 
@@ -301,8 +307,9 @@ have stayed unchanged for 150 milliseconds. Stop it with Ctrl+C.
 - The `.yue` files under `src/`, but for `src/generated/`.
 - Every file under `assets/`, the `.pkl` files under `objects/` and the `.lua` files under `lua/`, each only when
   its folder is there as `dev` starts.
-- For each library that is read from a folder, by its `path` in `moonwell.toml` or by your `config.toml`: its
-  modules, the files it ships and its `moonwell-library.json`.
+- For each library that is read from a folder, by [its `path` in `moonwell.toml`](../libraries#a-library-by-path)
+  or by [your `config.toml`](../libraries#work-on-a-library-from-a-checkout): its modules, the files it ships and
+  its `moonwell-library.json`.
 - The picture `settings.info.preview` names.
 
 A change to `moonwell.toml` is checked, and the list stays as it is. So after you make one of the three folders,
@@ -413,7 +420,8 @@ date; `dist/moonwell.log`.
 Writes the assets into the source map, `maps/<map.folder>`, so that World Editor shows them. A build imports assets
 into the staged map only; `assets:sync` is the one command that changes the source map. It prints the list
 `assets:check` prints, then writes the files and `war3map.imp` into the map and deletes the files it wrote before
-that are assets no more. It records which files of the map it owns in `.asset-state/<map.folder>.json`.
+that are assets no more. It records which files of the map it owns in `.asset-state/<map.folder>.json`
+([Assets](../assets#seeing-assets-in-world-editor)).
 
 ::: warning
 Close the map in World Editor before you run `assets:sync`, and open it again afterwards.
@@ -436,7 +444,8 @@ written.
 Lists the files a model references, and says of each whether it is an in-game path or a custom path. In a project it
 also says whether a custom path is among the assets the build imports. With a file it reports on that model, whose
 path starts at the folder the command runs in. Without a file it reports on every `.mdx` and `.mdl` file among the
-assets of the project and of its libraries, and says `No models under assets/.` when there is none.
+assets of the project and of its libraries, and says `No models under assets/.` when there is none
+([Assets](../assets#checking-a-models-files)).
 
 **Reads:** the model file. In a project also `moonwell.toml`, your `config.toml`, `assets/` and the libraries. It
 does not open the source map.
@@ -467,7 +476,8 @@ file, and ends with a count:
 Map settings valid: 4 internal file(s) would change during build.
 ```
 
-[Map settings](../map-settings) describes the settings.
+[Map settings](../map-settings) describes the settings, and has
+[a run of the command](../map-settings#checking-settings).
 
 **Reads:** `moonwell.toml` and your `config.toml`; the source map; the picture `settings.info.preview` names. It
 runs no Pkl and takes no build lock.
@@ -496,7 +506,7 @@ Object data valid: 1 object(s), 2 internal file(s) would change during build.
 
 In a project without objects, an ids module that is not there counts as `current`.
 
-[Objects](../objects) describes the object files and the ids module.
+[Objects](../objects) describes the object files and [the ids module](../objects#the-generated-ids).
 
 **Reads:** `moonwell.toml` and your `config.toml`; the object files under `objects/`, through Pkl, with
 `PklProject.deps.json`; the source map. It takes no build lock.

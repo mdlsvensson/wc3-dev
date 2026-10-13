@@ -180,7 +180,8 @@ export greet = (name) ->
   print "Hello, #{name}."
 ```
 
-[Write a library](#write-a-library) describes how such a folder is laid out.
+[Write a library](#write-a-library) describes how such a folder is laid out, and shows the
+`moonwell-library.json` of this one.
 
 ## What happens to a local folder
 
@@ -228,7 +229,8 @@ its path below that folder. In the library of [A library by path](#a-library-by-
 file `src/mylib/hello.yue` is the module `mylib.hello`, and a project that lists the library imports it by that
 name.
 
-The library says how it is laid out in a file `moonwell-library.json` in its root:
+A library says how it is laid out in a file `moonwell-library.json` in its root. This is the file of that library,
+which also ships files for the map:
 
 ```json
 { "dir": "src", "assets": "assets" }
@@ -260,7 +262,8 @@ Some rules for what the two folders hold:
 - **Every `.yue` file below `dir` is compiled** whenever a project that uses the library is built or checked. A
   file that does not compile fails that command, also when nothing imports it.
 - **A `.lua` file beside a `.yue` file of the same name is skipped.** Moonwell takes it for the Lua that the `.yue`
-  file compiles to, which VS Code's YueScript extension writes beside a file you save.
+  file compiles to, which VS Code's YueScript extension writes beside a file you save
+  ([Editor setup](./editor-setup#the-lua-files-beside-your-yue-files)).
 - **No dot in a module's name.** A file such as `hello.test.lua` below `dir` fails the build, with
   `Module file and folder names cannot contain dots.` A module cannot take the name `moonwell` either. Keep the
   `.yue` and `.lua` files that are no modules outside `dir`.
@@ -287,7 +290,8 @@ library's code is not checked. What a library's modules declare counts as known 
 reaches the module: a name that a YueScript module declares with `global`, and a name that a Lua module defines at
 its top level ([What counts as known](./gameplay-code#what-counts-as-known)).
 
-Your editor finds the libraries' modules in `.moonwell/lua/`. The folder holds every module of every library as a
+Your editor finds the libraries' modules in `.moonwell/lua/`
+([Editor setup](./editor-setup#modules-of-a-library)). The folder holds every module of every library as a
 Lua file, at the path of its name: `wrappers.unit` is `.moonwell/lua/wrappers/unit.lua`. The `.luarc.json` of a new
 project lists the folder under `workspace.library`, for lua-language-server. `build`, `test`, `check` and `dev`
 write a Lua module there as it is, and a YueScript module as the Lua it compiles to. `setup` compiles nothing: it
@@ -297,12 +301,14 @@ writes the Lua modules, and leaves the compiled ones as the last of the four wro
 
 ## See also
 
+The two libraries that are written for Moonwell have sections of their own:
+[moonwell-wrappers](../wrappers/) and [moonwell-systems](../systems/).
+
 - [Settings](./reference/settings#libraries): the `[[libraries]]` list of `moonwell.toml`, and
   [the one of your `config.toml`](./reference/settings#config-libraries).
 - [Assets](./assets#a-librarys-files): what a build does with the files a library ships for the map.
 - [Files and caches](./reference/files#project-moonwell): the folders of a library under `.moonwell/`, and
   [`moonwell.lock`](./reference/files#moonwell.lock).
+- [Troubleshooting](./reference/troubleshooting#a-librarys-tag-moved): a tag that moved, and
+  [a module that is not found](./reference/troubleshooting#a-module-is-not-found).
 - [Editor setup](./editor-setup): the next page. It sets up VS Code for a project.
-
-The two libraries that are written for Moonwell have sections of their own:
-[moonwell-wrappers](../wrappers/) and [moonwell-systems](../systems/).

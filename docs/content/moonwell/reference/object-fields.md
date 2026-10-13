@@ -38,8 +38,8 @@ another field of Bash. No object can have both, so for an object of a given base
 ## Finding a field
 
 **In your editor.** In an editor with Pkl support, hover over a field of an object file to see its documentation:
-the label, the rawcode and the notes that are described below. [Editor setup](../editor-setup) covers editors for
-Pkl.
+the label, the rawcode and the notes that are described below. [Editor setup](../editor-setup#pkl-in-an-editor)
+covers editors for Pkl.
 
 **In the package.** The typed fields of each kind are one module of the `moonwell` Pkl package, in the folder
 [`schema/generated`](https://github.com/mdlsvensson/moonwell/tree/moonwell@0.12.4/schema/generated) of Moonwell's

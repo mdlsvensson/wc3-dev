@@ -126,8 +126,8 @@ hint: Expected src/players/gold.yue, lua/players/gold.lua, lua/players/gold/init
 ```
 
 The hint lists where a module can come from: a file under `src/`, a file under `lua/` (see
-[Lua modules](#lua-modules)) or a library of the project (see [Libraries](./libraries)). An entry that names no file
-gives the same error, without a file and a line.
+[Lua modules](#lua-modules)) or a library of the project (see [Libraries](./libraries#import-its-modules)). An entry
+that names no file gives the same error, without a file and a line.
 
 YueScript writes no Lua for a file that holds nothing but comments and macros. An import of such a file is an error
 too. It names the import, as the error above does, and the file:
@@ -186,8 +186,8 @@ The name `moonwell` belongs to the built-in module. A file that would take the n
 
 Under `src/` a build reads the `.yue` files and nothing else, and under `lua/` it reads the `.lua` files. The `.lua`
 files under `src/` are not yours: VS Code's YueScript extension writes one beside each `.yue` file that you save,
-and the template's `.gitignore` leaves `src/**/*.lua` out (see [Editor setup](./editor-setup)). Keep Lua of your own
-in `lua/`.
+and the template's `.gitignore` leaves `src/**/*.lua` out (see
+[Editor setup](./editor-setup#the-lua-files-beside-your-yue-files)). Keep Lua of your own in `lua/`.
 
 ## Macros
 
@@ -205,7 +205,7 @@ mw.on_main ->
 `$FourCC("hfoo")` is the rawcode `hfoo` as the integer that the game's functions take, 1751543663: the bytes of its
 four characters, the first one highest. The compiler writes the number into the Lua, so the map converts nothing
 while it runs. For the objects that your project makes, the ids module has these numbers under names of your own
-(see [Objects](./objects)).
+(see [Objects](./objects#the-generated-ids)).
 
 `$FourCC` takes one string literal of exactly four characters, between double or single quotes. Each of the four is
 a printable ASCII character, from the space to `~`, and none is a backslash. Everything else is refused: a variable,
@@ -455,7 +455,7 @@ The game has no `package`, and the `require` of a built map is the runtime's own
 build put into the map, and it looks for no file while the map runs.
 
 In your editor, the template's `.luarc.json` sets Lua 5.3 and turns `io`, `debug` and `package` off (see
-[Editor setup](./editor-setup)).
+[Editor setup](./editor-setup#the-games-lua-in-the-editor)).
 
 ## Bitwise operators and floor division
 

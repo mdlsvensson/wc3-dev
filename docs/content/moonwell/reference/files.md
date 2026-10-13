@@ -114,31 +114,33 @@ behind.
 `src/generated/objects.yue` is the ids module: the ids of your objects, for your code to import as
 `generated.objects`. Its first line says that Moonwell wrote it and that it is not to be edited.
 
+- `init` writes the file as the template has it, with the id of the template's one object.
 - `build`, `test` and `dev` write the file when it does not match the objects.
 - `check` and `objects:check` compare it with the objects and write nothing. They fail when it does not match, or
   when it is missing in a project with objects.
 - `setup` and `objects:eval` do not look at it.
 
-In a project without objects no command makes the file, and a missing file is no failure. Moonwell writes the file
-with LF line ends, and compares it without regard to the line ends: a checkout that gave it Windows line ends
-matches all the same. `dev` does not watch `src/generated/`.
+In a project without objects, `build`, `test` and `dev` do not make a file that is missing, and a missing file is
+no failure. Moonwell writes the file with LF line ends, and compares it without regard to the line ends: a checkout
+that gave it Windows line ends matches all the same. `dev` does not watch `src/generated/`.
 
 ### `moonwell.lock` {#moonwell.lock}
 
-`moonwell.lock` is a JSON file in the project folder. For each library that is fetched from GitHub it holds the
-entry's `github`, `tag` and `dir`, the `commit` that the tag named when the library was fetched, a hash of the
-library's modules as `files` and, where the library ships files for the map, a hash of those as `assets`.
+`moonwell.lock` is a JSON file in the project folder. It holds a record of each library that is fetched from
+GitHub: the entry's `github`, `tag` and `dir`, the `commit` that the tag named when the library was fetched, a hash
+of the library's modules as `files` and, where the library ships files for the map, a hash of those as `assets`.
 
 The commands that bring the libraries up to date keep the file current: `build`, `test`, `check`, `dev`, `setup`
-and the three `assets:` commands. They write it when its content changes. A project with no library from GitHub
-has no `moonwell.lock`, and one that is left there is removed. A library that is read from a folder gets no entry.
-When it has one, from the time it was fetched, the entry stays.
+and the three `assets:` commands. They write it when its content changes, and remove it when no record is left in
+it. A library that is read from a folder gets no record. A record that the file has under the library's name, from
+a time when the library was fetched, stays there.
 
 When Moonwell fetches a library again at the tag the file records, and the tag names another commit or gives other
 files than the file records, the command fails and names the library. To take the tag as it is, delete the
-library's entry from `moonwell.lock` and run the command again. A `moonwell.lock` that is not valid JSON, or is no
-lock file, is an error too: put it right, or delete it, and the next command fetches every library again and writes
-a new one. [Libraries](../libraries) describes how a library is added and fetched.
+library's entry from `moonwell.lock` and run the command again ([Libraries](../libraries#moonwell.lock)). A
+`moonwell.lock` that is not valid JSON, or is no lock file, is an error too: put it right, or delete it, and the
+next command fetches every library again and writes a new one. [Libraries](../libraries#add-a-library) describes how
+a library is added and fetched.
 
 ### `.asset-state/` {#asset-state}
 
@@ -149,7 +151,7 @@ yours.
 
 When `assets:sync` owns no file of the map, it writes no state file, and removes one that is there. A state file
 that Moonwell cannot read as one is an error, whose hint tells you to restore the file from version control.
-[Assets](../assets) describes `assets:sync`.
+[Assets](../assets#seeing-assets-in-world-editor) describes `assets:sync`.
 
 ## Which command writes what
 
@@ -181,13 +183,14 @@ Read the table with these in mind:
   objects. In a project without objects it does not make the file. `init` writes the file as the template has it,
   with the rest of the project.
 - For `moonwell.lock`, "Yes" means that the command keeps the file current: it writes it when its content changes,
-  and removes it when the project has no library from GitHub.
+  and removes it when no record is left in it.
 - In the cache folder, the compiler and Pkl are written when they are downloaded: the compiler when its version is
   not in the cache and `yue.path` is not set, Pkl when Moonwell needs its own and has not got it. But for `init`,
   which always runs Pkl, a command needs Pkl only in a project with object files.
 - `assets:paths` writes these only in a project. Outside one it writes nothing.
-- `setup` adds an editor's file only where it is missing, and adds to `.gitignore` and `.luarc.json` only the
-  lines and entries they lack.
+- `setup` adds an editor's file only where it is missing. To `.gitignore` it adds only the lines the file lacks,
+  and to `.luarc.json` only the entries that three of its lists lack: `runtime.path`, `workspace.library` and
+  `workspace.ignoreDir` ([Editor setup](../editor-setup#what-else-setup-does)).
 
 A command that fails has written less. [Commands](./commands) gives each command's steps in their order, and says
 which commands take back what they wrote.

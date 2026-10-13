@@ -23,9 +23,10 @@ written in Pkl, and files to import into the map.
 9. It replaces `dist/stage/<map.folder>` with a copy of the source map and writes the planned files into the copy.
 10. It packs that map into one archive, `<build.folder>/<map.folder>`.
 
-Nothing of the map is written before step 9: the first step that fails ends the build with its error. `build`
-removes the archive of the build before after step 2, so a build that fails later leaves no archive
-([Commands](./reference/commands#build)).
+Nothing of the map is written before step 9: the first step that fails ends the build with its error. The archive
+of the build before is another matter. `build` removes it before step 3, once it has the
+[build lock](./reference/commands#one-build-at-a-time). So the old archive stays when step 1 or step 2 fails and
+when the lock is held, and it is gone when a later step fails ([Commands](./reference/commands#build)).
 
 A build never changes the source map: it only reads it. It writes the built map in two forms. The folder
 `dist/stage/<map.folder>` is the staged copy, the built map as a folder. The archive is the built map as one file,

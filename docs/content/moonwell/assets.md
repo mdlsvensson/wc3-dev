@@ -32,7 +32,8 @@ hint: Assets cannot replace map internals such as war3map.lua or war3map.imp.
 
 One folder is free: a path below `war3mapImported/` is an asset's to take. A path that starts with
 `war3mapPreview.` or `war3mapMap.` is refused in the same way, and the hint of that error names the setting for a
-picture of your own in the game's map list, `settings.info.preview`: see [Map settings](./map-settings).
+picture of your own in the game's map list, `settings.info.preview`: see
+[Map settings](./map-settings#a-picture-in-the-map-list).
 
 The rule is about the path in the map, not about the file's name. A file under `assets/` with such a name is no
 error when the settings of the next section give it another path or leave it out.
@@ -112,7 +113,8 @@ units {
 A library can ship files for the map beside its modules. Moonwell keeps a copy of them in
 `.moonwell/library-assets/<name>/` ([Files and caches](./reference/files#project-moonwell)) and imports them with
 yours, each at the path it has in the library's folder of such files. `assets.exclude` and `[[assets.paths]]` are
-about your own files, and change nothing of a library's. [Libraries](./libraries) describes how a library is added.
+about your own files, and change nothing of a library's. [Libraries](./libraries#add-a-library) describes how a
+library is added, and [how a library names that folder](./libraries#write-a-library).
 
 When a file of yours and a file of a library have the same path in the map, yours is imported and the library's is
 not. That is how you put an icon or a model of your own in the place of a library's. `build`, `test`, `check`,

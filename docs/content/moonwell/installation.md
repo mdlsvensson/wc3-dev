@@ -32,7 +32,7 @@ nothing.
 **On Windows** the program is `%LOCALAPPDATA%\moonwell\bin\moonwell.exe`. The script adds that folder to your user
 PATH, and to the PATH of the PowerShell window you ran it in. A terminal that was already open does not see the
 change: open a new one. The `bin` folder is part of Moonwell's cache folder, which the variable `MOONWELL_CACHE`
-moves: see [Files and caches](./reference/files).
+moves: see [Files and caches](./reference/files#the-cache-folder).
 
 **On Linux** the program is `~/.local/bin/moonwell`. The script does not change your PATH. When that folder is not on
 it, the script says so and prints the line that adds it:
@@ -49,14 +49,14 @@ To check the install, ask for the version:
 moonwell --version
 ```
 
-It prints the version that is installed.
+It prints the version that is installed ([Commands](./reference/commands#help-and-version)).
 
 ## Your settings file
 
 The script also makes `config.toml`, the settings of your machine, when that file is missing. It is in the folder
 `.moonwell` in your user folder: `C:\Users\<you>\.moonwell\config.toml` on Windows, `~/.moonwell/config.toml` on
-Linux. When the variable `MOONWELL_HOME` is set, the file is in the folder it names. Both scripts write the same two
-lines:
+Linux. When the variable `MOONWELL_HOME` is set, the file is in the folder it names
+([Files and caches](./reference/files#the-moonwell-folder)). Both scripts write the same two lines:
 
 ```toml
 [launch]
@@ -67,18 +67,20 @@ That is where Battle.net installs the game on Windows by default. The Linux scri
 Windows path. The script says where the file is and asks you to check the path. It never changes a `config.toml` that
 is already there.
 
-`moonwell test` reads the game's path from this file, and [Settings](./reference/settings) lists everything else it
-can hold.
+`moonwell test` reads the game's path from this file ([Your first map](./first-map#tell-moonwell-where-the-game-is)),
+and [Settings](./reference/settings#your-machine-config.toml) lists everything else it can hold.
 
 ## Pkl
 
 A project's object files, the `.pkl` files under `objects/`, are written in [Pkl](https://pkl-lang.org), and Moonwell
-runs the `pkl` program to read them (see [Objects](./objects)). You do not have to install Pkl yourself:
+runs the `pkl` program to read them (see [Objects](./objects#object-files)). You do not have to install Pkl
+yourself:
 
 - When the `pkl` on your PATH is Pkl 0.32 or newer, Moonwell runs that one.
-- Otherwise Moonwell downloads Pkl 0.32.1 into its cache folder and runs that. The download is about 100 MB. It is
-  checked against a SHA-256 checksum that is part of Moonwell, and it happens once. When the `pkl` on your PATH is
-  older than 0.32, Moonwell also warns you, and says that a `pkl` command you type yourself still runs the old one.
+- Otherwise Moonwell downloads Pkl 0.32.1 into its [cache folder](./reference/files#the-cache-folder) and runs
+  that. The download is about 100 MB. It is checked against a SHA-256 checksum that is part of Moonwell, and it
+  happens once. When the `pkl` on your PATH is older than 0.32, Moonwell also warns you, and says that a `pkl`
+  command you type yourself still runs the old one.
 
 In a project, Pkl runs only where there are object files: a project without a `.pkl` file under `objects/` needs no
 Pkl. `moonwell init` runs Pkl too: it runs `pkl project resolve` in the project it makes, which has an object file.
@@ -86,10 +88,11 @@ So the download, when Moonwell needs it, comes with the first command that runs 
 `moonwell init`.
 
 A `pkl` command that you type yourself, such as `pkl project resolve`, runs the `pkl` on your PATH, and the one in
-the cache is not there. For that, run `moonwell setup` in a project with object files. It copies the Pkl that
-Moonwell downloaded into the `bin` folder of the cache, the folder where `setup` keeps `yue` for your editor. On
-Windows that is the folder the install script added to your PATH. On Linux it is `~/.cache/moonwell/bin`, unless a
-variable moved the cache, and when no `pkl` is on your PATH, `setup` prints the line that adds the folder.
+the cache is not there. For that, run [`moonwell setup`](./reference/commands#setup) in a project with object
+files. It copies the Pkl that Moonwell downloaded into the `bin` folder of the cache, the folder where `setup` keeps
+`yue` for your editor ([Editor setup](./editor-setup#run-moonwell-setup)). On Windows that is the folder the install
+script added to your PATH. On Linux it is `~/.cache/moonwell/bin`, unless a variable moved the cache. On either
+system, when no `pkl` is on your PATH, `setup` prints the line that adds the folder to it.
 
 ## Installing one version
 
@@ -120,9 +123,9 @@ terminal that runs `moonwell dev`, and to run the line again.
 ### A project with object files
 
 A project with object files names the Moonwell it is written for: the version of the `moonwell` Pkl package in its
-`PklProject`. The program and the package must have the same major and minor version, the first two of the three
-numbers. Where they differ, a command that reads the object files stops with an error that names both versions and
-says what to change.
+[`PklProject`](./objects#pklproject). The program and the package must have the same major and minor version, the
+first two of the three numbers. Where they differ, a command that reads the object files stops with an error that
+names both versions and says what to change.
 
 To move such a project to the Moonwell you installed, change the version at the end of the package's address in
 `PklProject`. For Moonwell 0.12.4 the file is this, as `moonwell init` writes it:
@@ -148,7 +151,7 @@ The other way works too: keep the project as it is and install the Moonwell it n
 
 ## See also
 
-- [Commands](./reference/commands): `moonwell setup` and every other command.
-- [Settings](./reference/settings): every setting of `config.toml`.
+- [Commands](./reference/commands): [`moonwell setup`](./reference/commands#setup) and every other command.
+- [Settings](./reference/settings#your-machine-config.toml): every setting of `config.toml`.
 - [Files and caches](./reference/files): the cache folder, the Moonwell folder and the variables that move them.
 - [Your first map](./first-map): the next page. It makes a project, builds it and starts the game on it.

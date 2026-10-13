@@ -246,4 +246,6 @@ Pkl plugin for IntelliJ another.
 - [Commands](./reference/commands#setup): `moonwell setup`, step by step, with what it reads, writes and fails on.
 - [Files and caches](./reference/files): [`.moonwell/`](./reference/files#project-moonwell), with the declarations
   and the libraries' modules, and [the cache folder](./reference/files#the-cache-folder) with its `bin`.
+- [Troubleshooting](./reference/troubleshooting#the-editor): an editor that completes nothing, a `yue` that is not
+  found, and a new global of the map that is unknown.
 - [Using your own map](./own-map): the next page. It makes a map of yours the source map of a project.

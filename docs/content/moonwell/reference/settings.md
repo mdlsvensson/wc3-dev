@@ -94,8 +94,10 @@ An empty `moonwell.toml` means the same.
 The tables from `map` to `libraries` are the settings of the project itself. The tables whose names start with
 `settings` are the map settings: each one replaces a value of the source map in the map a build makes. A map setting
 has no default of its own. One that is not written leaves the map's value as it is, and an empty text is a value:
-`author = ""` clears the author. [Map settings](../map-settings) describes what each one changes, and what a build
-checks against the map itself, such as that a player's slot is there.
+`author = ""` clears the author ([Inheritance and clearing](../map-settings#inheritance-and-clearing)).
+[Map settings](../map-settings#what-a-setting-changes) describes what each one changes, and
+[what a build checks against the map itself](../map-settings#what-the-map-must-be), such as that a player's slot is
+there.
 
 Two words of the rules below:
 
@@ -111,7 +113,7 @@ Two words of the rules below:
 | `map.entry` | `"src/main.yue"` | Starts with `src/` and ends in `.yue` | The file a build compiles from. The flag `--entry` of [`build`](./commands#build) names another for one run |
 
 A command that opens the source map also refuses a `map.folder` with a name Windows cannot hold, such as a name with
-a `?` in it. [Using your own map](../own-map) describes the source map.
+a `?` in it. [Using your own map](../own-map#put-it-in-the-project) describes the source map.
 
 ### build
 
@@ -121,8 +123,9 @@ a `?` in it. [Using your own map](../own-map) describes the source map.
 | `build.minify` | `false` | `true` or `false` | `true` shrinks the map's script, and runtime errors lose their line numbers. The flag `--minify` does the same for one run |
 | `build.protectCallbacks` | `true` | `true` or `false` | With `true`, the map prints an error that is raised in a callback, such as a timer's. `false` leaves the natives that take a callback as they are, and such an error is lost |
 
-`moonwell build` also refuses a `build.folder` with a name Windows cannot hold. [Gameplay code](../gameplay-code)
-describes errors in callbacks and what `minify` does to the script.
+`moonwell build` also refuses a `build.folder` with a name Windows cannot hold.
+[Gameplay code](../gameplay-code#an-error-in-a-callback) describes errors in callbacks and
+[what `minify` does to the script](../gameplay-code#minified-builds).
 
 ### test
 
@@ -167,8 +170,9 @@ file = "icons/BTNSword.blp"
 path = 'ReplaceableTextures\CommandButtons\BTNSword.blp'
 ```
 
-A file without an entry keeps its path under `assets/` as its path in the map. [Assets](../assets) describes which
-files a build imports and what it refuses among them.
+A file without an entry keeps its path under `assets/` as its path in the map. [Assets](../assets#files-under-assets)
+describes which files a build imports, [how the two settings change that](../assets#exact-paths-and-exclusions) and
+[what a build refuses among the files](../assets#what-is-refused).
 
 ### lint
 
@@ -177,7 +181,7 @@ files a build imports and what it refuses among them.
 | `lint.unknownGlobals` | `"error"` | `"error"` or `"warning"` | What a global name that Moonwell does not know is in your code: an error that fails the build, or a warning |
 | `lint.globals` | `[]` | A list of Lua names: letters, digits and `_`, not starting with a digit, and no reserved word of Lua such as `end` | Global names that count as known |
 
-[Gameplay code](../gameplay-code) describes which globals Moonwell knows.
+[Gameplay code](../gameplay-code#what-counts-as-known) describes which globals Moonwell knows.
 
 ### libraries
 
@@ -201,8 +205,9 @@ tag = "v0.10.1"
 An entry needs a `path`, or both `github` and `tag`.
 
 Two names that differ only in letter case, and a name that Windows keeps for a device, such as `CON`, pass the rules
-of the file. They are refused when a command brings the libraries up to date. [Libraries](../libraries) describes
-how a library is fetched and what it holds.
+of the file. They are refused when a command brings the libraries up to date.
+[Libraries](../libraries#add-a-library) describes how a library is fetched and what it holds, and
+[`moonwell.lock`](../libraries#moonwell.lock), which records what was fetched.
 
 ### settings.info
 
@@ -213,6 +218,8 @@ how a library is fetched and what it holds.
 | `settings.info.description` | The map's value | Text without a NUL character | The map's description |
 | `settings.info.recommendedPlayers` | The map's value | Text without a NUL character | The map's recommended players, as text |
 | `settings.info.preview` | None | Text without a NUL character, and not empty | A picture that the game's map list shows for the map: the path of the file, from the project folder |
+
+[A picture in the map list](../map-settings#a-picture-in-the-map-list) describes the picture that `preview` names.
 
 ### settings.loadingScreen
 
@@ -259,6 +266,9 @@ how a library is fetched and what it holds.
 | `sharedControl` | The map's value | `true` or `false` | Whether they share control |
 | `sharedAdvancedControl` | The map's value | `true` or `false` | Whether they share full control |
 
+[Players and forces](../map-settings#players-and-forces) describes what the entries of `[[settings.players]]` and
+of `[[settings.forces]]` need of the map.
+
 ### settings.environment
 
 | Setting | Default | Rule | Meaning |
@@ -285,7 +295,8 @@ density = 0.5
 ```
 
 A `fog.start` above `fog.end` passes the rules of the file. It is refused when a command checks the settings against
-the map, where a value that is not written is the map's own: see [Map settings](../map-settings).
+the map, where a value that is not written is the map's own: see
+[Map settings](../map-settings#fog-start-and-end).
 
 ### settings.gameplayConstants and settings.gameInterface
 
@@ -300,13 +311,14 @@ interface. Both have the same three settings:
 | `value` | None | Required: text on one line, without a line break or a NUL character. An empty text is a value | The value of the key, written as text: `"25"`, not `25` |
 
 A list sets a section and key once. Two entries with the same section and key are refused, also when they differ
-only in letter case. [Map settings](../map-settings) describes how the two lists are written into the map.
+only in letter case. [Map settings](../map-settings#raw-gameplay-constants-and-game-interface) describes how the
+two lists are written into the map.
 
 ## Your machine: `config.toml`
 
 `config.toml` is in the folder `.moonwell` in your user folder: `C:\Users\<you>\.moonwell\config.toml` on Windows,
 `~/.moonwell/config.toml` on Linux. When the variable `MOONWELL_HOME` is set, the file is in the folder it names.
-[Files and caches](./files) describes that folder.
+[Files and caches](./files#the-moonwell-folder) describes that folder.
 
 The install script makes the file when it is missing, with the game's path at the place where Battle.net installs
 the game by default, and never changes one that is there (see [Installation](../installation#your-settings-file)).
@@ -366,7 +378,8 @@ on your machine:
 
 Every project on your machine that lists the repository then reads the library from the folder, whatever tag the
 project names. The repository is matched with the project's without regard to letter case. An entry adds no library
-to a project that does not list its repository. [Libraries](../libraries) describes working on a library this way.
+to a project that does not list its repository.
+[Libraries](../libraries#work-on-a-library-from-a-checkout) describes working on a library this way.
 
 ## A setting in the wrong file
 
@@ -388,4 +401,4 @@ A setting of the project in your `config.toml` is refused as a name Moonwell doe
 writes one. Then yours decides, either way: `true` there tests on an archive on your machine alone, and `false`
 there turns the archive off even when the project asks for it. Write the setting in `moonwell.toml` when everyone on
 the project is to test on an archive, and in `config.toml` when only your machine is.
-[Troubleshooting](./troubleshooting) says when a game needs it.
+[Troubleshooting](./troubleshooting#the-game-shows-its-main-menu-in-place-of-the-map) says when a game needs it.

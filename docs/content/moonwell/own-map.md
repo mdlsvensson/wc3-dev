@@ -226,5 +226,7 @@ the command again.
 - [Map settings](./map-settings): what a map setting needs of the map, and the calls of the script that it edits.
 - [Assets](./assets): `assets:sync`, which writes your assets into the source map for World Editor.
 - [Settings](./reference/settings#map): the rule of `map.folder`.
+- [Troubleshooting](./reference/troubleshooting#the-map-and-world-editor): a map that Moonwell refuses, and what
+  does not show in World Editor.
 - [Commands](./reference/commands): the first of the reference pages. It lists every command, with what it reads,
   what it writes and when it fails.

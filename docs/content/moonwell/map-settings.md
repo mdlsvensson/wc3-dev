@@ -139,7 +139,7 @@ as Selectable. A race by its name, such as `"orc"`, takes that mark away.
 Seen on Warcraft III Reforged 3.0.0.24268, on one machine. The lobby showed the account name of the person playing
 in their slot, not the name the map gives that player. That name was seen in World Editor's Player Properties, on
 the built map. With the map's fixed player settings on, the lobby let a race be chosen for a slot whose race the
-settings made `"selectable"`. A hosted game was not checked.
+settings made `"selectable"`. A game that players on other machines join was not checked.
 :::
 
 ## What the map must be
@@ -166,8 +166,9 @@ error: maps/map.w3x/war3map.w3i › Cannot read map settings: unsupported war3ma
 hint: Open and re-save this map in World Editor; extended settings require Lua script mode.
 ```
 
-When a map is refused, open it in World Editor and save it again, as a folder and with Lua as its script language.
-[Using your own map](./own-map) describes what a source map must be.
+When a map is refused, open it in World Editor and save it again, as a folder and with Lua as its script language
+([Using your own map](./own-map#save-the-map-as-a-folder-with-lua)). That page also describes
+[what a source map must be](./own-map#what-moonwell-needs-of-the-map).
 
 ## World Editor's calls in `war3map.lua`
 
@@ -256,8 +257,8 @@ hint: Resize the picture. 256x256 is where the game's start location markers sit
 ::: warning
 On Warcraft III Reforged 3.0.0.24268, a `war3mapMap.blp` that held the bytes of a TGA or a DDS file closed the game
 the moment the map was selected in the single-player map list. The picture is part of the map that every player
-gets; a hosted game was not checked. That is why Moonwell takes only the files above, and why another file fails
-`build`, `test`, `check`, `dev` and `settings:check`.
+gets; a game that players on other machines join was not checked. That is why Moonwell takes only the files above,
+and why another file fails `build`, `test`, `check`, `dev` and `settings:check`.
 :::
 
 ### What a build does
@@ -381,4 +382,6 @@ When several settings are refused, the error names one of them.
 - [Settings](./reference/settings#settings.info): every `settings` table, with the rule of each setting.
 - [Commands](./reference/commands#settings-check): `settings:check`, and what it reads, writes and fails on.
 - [Files and caches](./reference/files#dist): the staged map and the archive.
+- [Troubleshooting](./reference/troubleshooting#the-map-and-world-editor): a map that Moonwell refuses, and a
+  setting that does not show in World Editor.
 - [Libraries](./libraries): the next page. It adds a library of gameplay code to the project.
