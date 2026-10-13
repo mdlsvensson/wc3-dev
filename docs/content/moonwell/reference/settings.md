@@ -188,7 +188,7 @@ tag = "v0.10.1"
 
 | Setting | Default | Rule | Meaning |
 | --- | --- | --- | --- |
-| `name` | None | Required: letters, digits, `_` and `-`. Written once | The library's name in the project. Its files are kept in `.moonwell/libraries/<name>/` |
+| `name` | None | Required: letters, digits, `_` and `-`. Written once | The library's name in the project. Its modules are kept in `.moonwell/libraries/<name>/` |
 | `github` | None | A repository as `owner/repo` | The repository on GitHub that the library is fetched from |
 | `tag` | None | Not empty | The tag of that repository to fetch |
 | `path` | None | Not empty | A folder to read the library from, relative to the project folder or absolute. With a `path`, the library is read from the folder, and nothing is fetched |
