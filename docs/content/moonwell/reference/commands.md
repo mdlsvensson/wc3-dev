@@ -15,6 +15,7 @@ where the log file is.
 | [`assets:check`](#assets-check) | Shows what `assets:sync` would change in the source map |
 | [`assets:sync`](#assets-sync) | Writes the assets into the source map, for World Editor |
 | [`assets:paths`](#assets-paths) | Lists the files a model references, as in-game or custom paths |
+| [`assets:gltf`](#assets-gltf) | Converts a `.mdx` or `.mdl` model to `.glb` or `.gltf` |
 | [`settings:check`](#settings-check) | Shows which files of the map the map settings would change |
 | [`objects:check`](#objects-check) | Shows which files of the map the objects would change |
 | [`objects:eval`](#objects-eval) | Prints the objects as JSON |
@@ -22,8 +23,8 @@ where the log file is.
 
 Run a command in the project folder, the folder that holds `moonwell.toml`. Moonwell does not look for a project in
 the folders above it: a command that reads the settings and finds no `moonwell.toml` in the folder it runs in
-reports `No moonwell.toml found in this directory.` Three commands need no project: `init`, `completion` and, with
-a model file, `assets:paths`.
+reports `No moonwell.toml found in this directory.` Four commands need no project: `init`, `completion`,
+`assets:gltf` and, with a model file, `assets:paths`.
 
 ## Writing a command line
 
@@ -365,8 +366,8 @@ setting is written into that file.
 A command that plans a build or brings the libraries up to date takes the build lock for that work: the file
 `dist/.lock`, which holds the process id of the command. The command removes the file when it is done, also when it
 fails or when you stop it with Ctrl+C. `build`, `test`, `check`, every check of `dev`, `setup`, `assets:check`,
-`assets:sync` and, in a project, `assets:paths` take the lock. `settings:check`, `objects:check` and `objects:eval`
-do not.
+`assets:sync` and, in a project, `assets:paths` and `assets:gltf` take the lock. `settings:check`, `objects:check`
+and `objects:eval` do not.
 
 When the file is there already, the command stops:
 
@@ -382,7 +383,7 @@ number the hint names: delete `dist/.lock`.
 
 ## Assets
 
-None of the three commands runs Pkl: of a project they read the settings and not the object files.
+None of the four commands runs Pkl: of a project they read the settings and not the object files.
 [Assets](../assets) describes how assets are written and mapped to paths in the map.
 
 ### assets:check {#assets-check}
@@ -462,6 +463,37 @@ does not open the source map.
   cannot be collected.
 
 **Flags:** none. The one argument is the model file.
+
+### assets:gltf {#assets-gltf}
+
+`moonwell assets:gltf <model> [output]`
+
+Converts a `.mdx` or `.mdl` model to glTF 2.0 (`.glb` or `.gltf`), with its meshes, skeleton, vertex weights,
+sequence animations and materials ([Assets](../assets#converting-a-model-to-gltf)). Without `[output]`, it writes
+`<stem>.glb` beside `<model>`. With `[output]` ending in `.glb`, it writes that file; with `[output]` ending in
+`.gltf`, it writes `<stem>.gltf`, `<stem>.bin` (when the model has binary buffer data) and each texture as
+`<name>.png` in the output file's folder, and prints `Wrote <output>.`
+
+**Reads:** the model file and the texture files it references (in a project, from the assets of the project and of
+its libraries first, then beside the model, below the folder the command runs in and below `assets/`; outside a
+project, from those folders on disk). In a project also `moonwell.toml`, your `config.toml`, `assets/` and the
+libraries. It does not open the source map.
+
+**Writes:** the `.glb` file, or the `.gltf`, `.bin` and `.png` files. In a project also `dist/.lock` while it
+collects the assets, the libraries under `.moonwell/` and `moonwell.lock`, and `dist/moonwell.log`.
+
+**Fails when:**
+
+- `<model>` does not end in `.mdx` or `.mdl`, is not there, is a folder, or cannot be read as a model.
+- `[output]` is a folder, does not end in `.glb` or `.gltf`, has a link on the way to it inside the folder the
+  command runs in, or cannot be written.
+- A texture that the model references by path is not found or cannot be decoded as a `.blp`, `.dds`, `.tga` or
+  `.png` texture, or the model uses a replaceable slot other than `ReplaceableId 1` (team colour) or
+  `ReplaceableId 2` (team glow).
+- In a project: a settings file is refused, another build is running, a library cannot be fetched, or the assets
+  cannot be collected.
+
+**Flags:** none. The arguments are `<model>` and, optionally, `[output]`.
 
 ## Settings and objects
 

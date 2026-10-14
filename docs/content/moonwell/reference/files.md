@@ -17,8 +17,9 @@ A project is the folder that holds `moonwell.toml`. Moonwell writes into five pl
 | [`moonwell.lock`](#moonwell.lock) | The commit of each library that is fetched from GitHub | Commit it |
 | [`.asset-state/`](#asset-state) | Which files of the source map `assets:sync` owns | Commit it |
 
-Three commands also write files that are yours: `init` writes the whole project, `setup` adds the editor's files
-that are missing, and `assets:sync` writes into the source map.
+Four commands also write files that are yours: `init` writes the whole project, `setup` adds the editor's files
+that are missing, `assets:sync` writes into the source map, and `assets:gltf` writes the `.glb` or `.gltf` files
+you ask for.
 
 Each of these places is a real file or folder. Moonwell refuses a link on the way to what it writes:
 [Project layout](../project-layout#real-folders-no-links) lists what is refused.
@@ -34,8 +35,8 @@ them. It is not the Moonwell folder of your machine, which has the same name and
 | `objects.pkl` | The module that gathers the object files | `build`, `test`, `check`, `dev`, `setup`, `objects:check`, `objects:eval` |
 | `types/` | The declarations your editor reads | `build`, `test`, `check`, `dev`, `setup` |
 | `yue/moonwell/macros.yue` | The macro module, `moonwell.macros` | `build`, `test`, `check`, `dev`, `setup` |
-| `libraries/<name>/` | The modules of the library `<name>` | `build`, `test`, `check`, `dev`, `setup`, `assets:check`, `assets:sync`, `assets:paths` |
-| `library-assets/<name>/` | The files the library `<name>` ships for the map | The same eight |
+| `libraries/<name>/` | The modules of the library `<name>` | `build`, `test`, `check`, `dev`, `setup`, `assets:check`, `assets:sync`, `assets:paths`, `assets:gltf` |
+| `library-assets/<name>/` | The files the library `<name>` ships for the map | The same nine |
 | `lua/` | The libraries' modules as Lua, for your editor | `build`, `test`, `check`, `dev`, and in part `setup` |
 
 `objects.pkl` is written only in a project with a `.pkl` file under `objects/`. It imports every object file, and
@@ -72,7 +73,7 @@ of the other four wrote them. A file whose module no library has is removed.
 | `<build.folder>/<map.folder>` | The archive: the built map as one file. `dist/bin/map.w3x` in a new project | `build` |
 | `dist/test/<map.folder>` | The archive that `test` starts the game on, with `test.archive` | `test` |
 | `dist/moonwell.log` | The log | Every command in a project but `init` and `completion` |
-| `dist/.lock` | The build lock | `build`, `test`, `check`, `dev`, `setup`, `assets:check`, `assets:sync`, `assets:paths` |
+| `dist/.lock` | The build lock | `build`, `test`, `check`, `dev`, `setup`, `assets:check`, `assets:sync`, `assets:paths`, `assets:gltf` |
 
 **The staged map.** `build` and `test` replace `dist/stage/<map.folder>` with a copy of the source map, and write
 the planned files of the build into the copy. They do so only when the whole plan of the build stands, so a build
@@ -132,7 +133,7 @@ that the tag named when the library was fetched, a hash of the library's modules
 ships files for the map, a hash of those as `assets`.
 
 The commands that bring the libraries up to date keep the file current: `build`, `test`, `check`, `dev`, `setup`
-and the three `assets:` commands. They write it when its content changes, and remove it when no record is left in
+and the four `assets:` commands. They write it when its content changes, and remove it when no record is left in
 it. A library that is read from a folder gets no record. A record that the file has under the library's name, from
 a time when the library was fetched, stays there.
 
@@ -169,6 +170,7 @@ The table shows what a command writes when it runs to its end. `<dir>` is the fo
 | [`assets:check`](./commands#assets-check) | The libraries | No | Yes | No | No | No | Yes | No | |
 | [`assets:sync`](./commands#assets-sync) | The libraries | No | Yes | No | No | No | Yes | No | The source map and `.asset-state/` |
 | [`assets:paths`](./commands#assets-paths) | The libraries | No | Yes | No | No | No | Yes | No | |
+| [`assets:gltf`](./commands#assets-gltf) | The libraries | No | Yes | No | No | No | Yes | No | The `.glb` file, or the `.gltf`, `.bin` and `.png` files |
 | [`settings:check`](./commands#settings-check) | No | No | No | No | No | No | No | No | |
 | [`objects:check`](./commands#objects-check) | `objects.pkl` | No | No | No | No | No | No | Pkl | |
 | [`objects:eval`](./commands#objects-eval) | `objects.pkl` | No | No | No | No | No | No | Pkl | |
@@ -188,7 +190,8 @@ Read the table with these in mind:
 - In the cache folder, the compiler and Pkl are written when they are downloaded: the compiler when its version is
   not in the cache and `yue.path` is not set, Pkl when Moonwell needs its own and has not got it. But for `init`,
   which always runs Pkl, a command needs Pkl only in a project with object files.
-- `assets:paths` writes these only in a project. Outside one it writes nothing.
+- `assets:paths` and `assets:gltf` write what the first eight columns name only in a project. Outside one,
+  `assets:paths` writes nothing and `assets:gltf` writes only the converted model.
 - `setup` adds an editor's file only where it is missing. To `.gitignore` it adds only the lines the file lacks,
   and to `.luarc.json` only the entries that three of its lists lack: `runtime.path`, `workspace.library` and
   `workspace.ignoreDir` ([Editor setup](../editor-setup#what-else-setup-does)).

@@ -90,7 +90,7 @@ package that the object files are written for, and its version. This is the file
 amends "pkl:Project"
 
 dependencies {
-  ["moonwell"] { uri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.4" }
+  ["moonwell"] { uri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.5" }
 }
 ```
 
@@ -340,7 +340,7 @@ Value: "600"
 
 556 | hitPointsMaximumBase: Int?
                             ^^^
-at moonwell.generated.UnitProps#hitPointsMaximumBase (projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.4#/generated/UnitProps.pkl)
+at moonwell.generated.UnitProps#hitPointsMaximumBase (projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.5#/generated/UnitProps.pkl)
 
 8 | hitPointsMaximumBase = "600"
                            ^^^^^

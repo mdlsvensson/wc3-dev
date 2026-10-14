@@ -20,10 +20,10 @@ tag = "v0.10.1"
 `.moonwell/`, and its messages call the library by it. `github` is the repository, and `tag` is a tag of it.
 [Settings](./reference/settings#libraries) has the rule of each setting.
 
-The next command that brings the libraries up to date fetches the tag from GitHub. Eight commands do that: `build`,
-`test`, `check`, `dev`, `setup`, `assets:check`, `assets:sync` and `assets:paths`. The one that fetches says so in
-a line that starts with `Fetched library wrappers:`. After that come the repository, the tag and, in parentheses,
-the first seven characters of the commit that the tag names.
+The next command that brings the libraries up to date fetches the tag from GitHub. Nine commands do that: `build`,
+`test`, `check`, `dev`, `setup`, `assets:check`, `assets:sync` and, in a project, `assets:paths` and `assets:gltf`.
+The one that fetches says so in a line that starts with `Fetched library wrappers:`. After that come the repository,
+the tag and, in parentheses, the first seven characters of the commit that the tag names.
 
 The library's modules are then in `.moonwell/libraries/wrappers/`. The files that a library ships for the map go
 into `.moonwell/library-assets/`, in a folder of the library's name. moonwell-wrappers ships none, and
@@ -122,7 +122,7 @@ tag `are not those moonwell.lock recorded`. To take the tag as it is, delete the
 Moonwell compares only when it fetches. A library whose folder is up to date is not fetched again, so a moved tag
 shows on the machine that fetches next, such as a fresh clone.
 
-To upgrade a library, change `tag` in `moonwell.toml` and run one of the eight commands. It fetches the other tag
+To upgrade a library, change `tag` in `moonwell.toml` and run one of the nine commands. It fetches the other tag
 and records its commit in `moonwell.lock`. Commit both files.
 
 When you take an entry out of `moonwell.toml`, the next of those commands removes the library's folders under
@@ -144,7 +144,7 @@ the repository, not the folder of its modules. [Settings](./reference/settings#c
 
 Every project on your machine that lists the repository then reads the library from that folder, whatever tag the
 project names. The two repositories are compared without regard to letter case. The entry adds no library to a
-project that does not list the repository. Each of the eight commands says at every run that it reads the folder:
+project that does not list the repository. Each of the nine commands says at every run that it reads the folder:
 
 ```text
 Library wrappers: the local folder C:\Users\me\Repo\moonwell-wrappers (C:\Users\me\.moonwell\config.toml).
@@ -186,7 +186,7 @@ export greet = (name) ->
 ## What happens to a local folder
 
 A checkout that your `config.toml` names and a folder that the project names by `path` are treated alike. Moonwell
-does not build from the folder itself. At every run, each of the eight commands compares the folder with its copy
+does not build from the folder itself. At every run, each of the nine commands compares the folder with its copy
 under `.moonwell/`, writes the files that differ and removes the ones that are gone from the folder:
 
 - Into `.moonwell/libraries/<name>/` go the `.yue` and `.lua` files below the folder that module names start from.

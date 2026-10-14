@@ -1,8 +1,8 @@
 # Assets
 
-After this page you can import models, textures and icons into the map, give a file an exact path there, and see
-what you imported in World Editor. An asset is a file under `assets/` in the project folder, or a file that a
-library ships for the map.
+After this page you can import models, textures and icons into the map, give a file an exact path there, see what
+you imported in World Editor, and check or convert a model to glTF. An asset is a file under `assets/` in the
+project folder, or a file that a library ships for the map.
 
 ## Files under assets/
 
@@ -302,11 +302,62 @@ Without a file, a project that has no model among its assets gets the line `No m
 cannot be read is an error. Without a file, the report comes first: in the place of that model's lines it has one
 line that starts with `(unreadable:` and gives the reason.
 
+## Converting a model to glTF
+
+`moonwell assets:gltf <model> [output]` converts a `.mdx` or `.mdl` model to glTF 2.0, for viewing or editing in
+tools such as Blender. Without `[output]`, it writes a single `.glb` file beside the model:
+
+```sh
+moonwell assets:gltf assets/Models/Knight.mdx
+```
+
+```text
+Wrote assets/Models/Knight.glb.
+```
+
+Give a second path ending in `.glb` or `.gltf` to write there instead. When the output path ends in `.gltf`,
+Moonwell writes `<stem>.gltf`, `<stem>.bin` and each decoded texture as `<name>.png` in the output file's folder:
+
+```sh
+moonwell assets:gltf assets/Models/Knight.mdx out/Knight.gltf
+```
+
+```text
+Wrote out/Knight.gltf.
+```
+
+Both Classic SD (version 800) and Reforged HD (versions 900 to 1200) models are converted:
+
+- **Meshes and coordinates.** Geosets are converted from Warcraft III's right-handed Z-up coordinates to glTF's
+  right-handed Y-up coordinates via `(x, y, z) -> (y, z, x)`. In a Reforged HD model with level-of-detail
+  geosets, only the base level (`LOD` 0, or the lowest `LOD` present) is exported.
+- **Skeletons, weights and animations.** Bones, helpers and other scene nodes keep their hierarchy and pivot
+  offsets, with up to four joint weights per vertex (from Classic matrix groups or Reforged HD skin data). Sequence
+  animations and global sequences export translation, rotation and scaling tracks, sampling Hermite, Bezier and
+  Squad curves and step-animating geoset visibility.
+- **Textures and materials.** Every texture the model names must be found or the command stops with an error:
+  - A replaceable slot with no path is synthesized in memory for Player 1 Red (`#FF0303`): `ReplaceableId 1` (team
+    colour) as a solid 8×8 PNG and `ReplaceableId 2` (team glow) as a 64×64 radial PNG. Any other replaceable
+    slot is refused.
+  - A texture with a path is searched first in the assets of the project and of its libraries (when the command
+    runs in a project), then at that path below the model's folder, then by its file name in the model's folder,
+    then below the folder the command runs in, and last below `assets/` there. At each place Moonwell matches
+    without regard to letter case, tries the file's own ending first and then the same stem with `.blp`, `.dds`,
+    `.tga` and `.png`, and decodes `BLP1` (JPEG and paletted), `DDS` (`DXT1`/BC1, `DXT3`/BC2, `DXT5`/BC3,
+    `ATI2`/BC5 normal maps and uncompressed 24-bit and 32-bit), `TGA` (24-bit and 32-bit, plain and RLE) and `PNG`
+    to PNG.
+  - Classic SD materials map their diffuse layer and filter mode (`None` to `OPAQUE`, `Transparent` to `MASK` with
+    cutoff `0.5`, `Blend` to `BLEND`), composite a `ReplaceableId 1` team-colour layer under a `Blend` diffuse
+    layer onto one PNG, and map additive or `ReplaceableId 2` team-glow layers to `emissiveTexture`. Reforged HD
+    materials map diffuse, normal (with reconstructed `+Z` for two-channel BC5 normal maps), ORM (occlusion,
+    roughness and metallic, after compositing the team-colour alpha mask into the diffuse texture) and emissive
+    slots to glTF's metallic-roughness PBR textures.
+
 ## What is refused
 
 Moonwell refuses three things under `assets/`, and names the file or folder in the error. Every command that reads
-the assets fails on them: `build`, `test`, `check`, `assets:check`, `assets:sync`, in a project `assets:paths`, and
-each check of `dev`.
+the assets fails on them: `build`, `test`, `check`, `assets:check`, `assets:sync`, in a project `assets:paths` and
+`assets:gltf`, and each check of `dev`.
 
 - **A link.** A symbolic link or a Windows junction is refused at `assets` itself and anywhere below it, whatever
   it leads to ([Project layout](./project-layout#real-folders-no-links)):
@@ -333,8 +384,8 @@ library.
 ## See also
 
 - [Commands](./reference/commands): [`assets:check`](./reference/commands#assets-check),
-  [`assets:sync`](./reference/commands#assets-sync) and [`assets:paths`](./reference/commands#assets-paths), and
-  what each reads, writes and fails on.
+  [`assets:sync`](./reference/commands#assets-sync), [`assets:paths`](./reference/commands#assets-paths) and
+  [`assets:gltf`](./reference/commands#assets-gltf), and what each reads, writes and fails on.
 - [Settings](./reference/settings#assets): the rules of `assets.exclude` and `[[assets.paths]]`.
 - [Files and caches](./reference/files#asset-state): the state file under `.asset-state/`, and
   `.moonwell/library-assets/`.

@@ -133,7 +133,8 @@ A command refuses a link at any of these places:
 - `.moonwell`, and below it `objects.pkl`, `types/` and its files, the macro module, and `libraries/` and
   `library-assets/` with the folder of each library. `.moonwell/lua` is refused too, but a link below it is not:
   Moonwell removes that link, and writes the real file where one belongs.
-- `moonwell.lock`, and `.asset-state` with the file in it.
+- `moonwell.lock`, `.asset-state` with the file in it, and an output path inside the project that `assets:gltf`
+  writes to.
 - The folders the project is read from: `maps`, `objects`, `src`, `lua` and `assets`. Inside the source map and
   inside `assets`, a link is refused wherever it is.
 
