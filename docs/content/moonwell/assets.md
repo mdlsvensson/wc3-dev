@@ -326,7 +326,7 @@ moonwell assets:gltf assets/Models/Knight.mdx out/Knight.gltf
 Wrote out/Knight.gltf.
 ```
 
-Both Classic SD (version 800) and Reforged HD (versions 900 to 1200) models are converted:
+Both Classic SD (version 800) and Reforged HD (versions 900 to 1800) models are converted:
 
 - **Meshes and coordinates.** Geosets are converted from Warcraft III's right-handed Z-up coordinates to glTF's
   right-handed Y-up coordinates via `(x, y, z) -> (y, z, x)`. In a Reforged HD model with level-of-detail
@@ -335,7 +335,9 @@ Both Classic SD (version 800) and Reforged HD (versions 900 to 1200) models are 
   offsets, with up to four joint weights per vertex (from Classic matrix groups or Reforged HD skin data). Sequence
   animations and global sequences export translation, rotation and scaling tracks, sampling Hermite, Bezier and
   Squad curves and step-animating geoset visibility.
-- **Textures and materials.** Every texture the model names must be found or the command stops with an error:
+- **Textures and materials.** Every texture that a material of an exported geoset uses must be found or the command
+  stops with an error (textures only referenced by particle or ribbon emitters, environment slots or unexported
+  materials, and the placeholder emissive texture `Textures/Black32.blp`, are skipped):
   - A replaceable slot with no path is synthesized in memory for Player 1 Red (`#FF0303`): `ReplaceableId 1` (team
     colour) as a solid 8×8 PNG and `ReplaceableId 2` (team glow) as a 64×64 radial PNG. Any other replaceable
     slot is refused.

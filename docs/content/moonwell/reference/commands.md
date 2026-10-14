@@ -474,10 +474,10 @@ sequence animations and materials ([Assets](../assets#converting-a-model-to-gltf
 `.gltf`, it writes `<stem>.gltf`, `<stem>.bin` (when the model has binary buffer data) and each texture as
 `<name>.png` in the output file's folder, and prints `Wrote <output>.`
 
-**Reads:** the model file and the texture files it references (in a project, from the assets of the project and of
-its libraries first, then beside the model, below the folder the command runs in and below `assets/`; outside a
-project, from those folders on disk). In a project also `moonwell.toml`, your `config.toml`, `assets/` and the
-libraries. It does not open the source map.
+**Reads:** the model file and the texture files that its exported materials use (in a project, from the assets of
+the project and of its libraries first, then beside the model, below the folder the command runs in and below
+`assets/`; outside a project, from those folders on disk). In a project also `moonwell.toml`, your `config.toml`,
+`assets/` and the libraries. It does not open the source map.
 
 **Writes:** the `.glb` file, or the `.gltf`, `.bin` and `.png` files. In a project also `dist/.lock` while it
 collects the assets, the libraries under `.moonwell/` and `moonwell.lock`, and `dist/moonwell.log`.
@@ -487,8 +487,8 @@ collects the assets, the libraries under `.moonwell/` and `moonwell.lock`, and `
 - `<model>` does not end in `.mdx` or `.mdl`, is not there, is a folder, or cannot be read as a model.
 - `[output]` is a folder, does not end in `.glb` or `.gltf`, has a link on the way to it inside the folder the
   command runs in, or cannot be written.
-- A texture that the model references by path is not found or cannot be decoded as a `.blp`, `.dds`, `.tga` or
-  `.png` texture, or the model uses a replaceable slot other than `ReplaceableId 1` (team colour) or
+- A texture that an exported material uses by path is not found or cannot be decoded as a `.blp`, `.dds`, `.tga`
+  or `.png` texture, or an exported material uses a replaceable slot other than `ReplaceableId 1` (team colour) or
   `ReplaceableId 2` (team glow).
 - In a project: a settings file is refused, another build is running, a library cannot be fetched, or the assets
   cannot be collected.
