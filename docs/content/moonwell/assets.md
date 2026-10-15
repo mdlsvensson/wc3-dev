@@ -342,12 +342,13 @@ Both Classic SD (version 800) and Reforged HD (versions 900 to 1800) models are 
   scaling tracks sampled from the keys inside that sequence alone, Hermite, Bezier and Squad curves included. The
   first and last of those keys hold to the animation's start and end, and a track with no key in the sequence
   holds its rest value: no offset, no rotation, a scale of 1. A track of a global sequence is sampled over the
-  global sequence's length.
+  global sequence's length and repeated at that length for as long as the animation runs, which is as long as its
+  own sequence.
 - **Geoset visibility.** A geoset that a sequence shows and hides is written with the glTF extension
   `KHR_node_visibility` and animated, step by step, through `KHR_animation_pointer`. A geoset with no key in a
   sequence keeps its geoset animation's own alpha. A viewer without those extensions shows every geoset at once.
-- **Textures and materials.** Every texture that a material of an exported geoset uses must be found or the command
-  stops with an error (textures only referenced by particle or ribbon emitters, environment slots or unexported
+- **Textures and materials.** Every texture that a material of an exported geoset uses must be found, or be one of
+  the game's own files, or the command stops with an error (textures only referenced by particle or ribbon emitters, environment slots or unexported
   materials, and the placeholder emissive texture `Textures/Black32.blp`, are skipped):
   - A replaceable slot with no path is synthesized in memory for Player 1 Red (`#FF0303`): `ReplaceableId 1` (team
     colour) as a solid 8×8 PNG and `ReplaceableId 2` (team glow) as a 64×64 radial PNG. Any other replaceable
@@ -365,6 +366,15 @@ Both Classic SD (version 800) and Reforged HD (versions 900 to 1800) models are 
     `.tga` and `.png`, and decodes `BLP1` (JPEG and paletted), `DDS` (`DXT1`/BC1, `DXT3`/BC2, `DXT5`/BC3,
     `ATI2`/BC5 normal maps and uncompressed 24-bit and 32-bit), `TGA` (24-bit and 32-bit, plain and RLE) and `PNG`
     to PNG.
+  - A texture with a path that is found nowhere, but is one of the game's files (the list that
+    [Checking a model's files](#checking-a-models-files) compares with), becomes a grey 8×8 PNG under the texture's own name, as
+    Moonwell cannot read the game's files. The command prints a warning for it before the line `Wrote`:
+
+    ```text
+    warning: assets/Models/Knight.mdx: Texture Textures\Footman.blp ships with the game, which Moonwell cannot read, so a grey placeholder stands in for it.
+    ```
+
+    Put the texture in `assets/` or beside the model to convert it with its real look.
   - Classic SD materials map their diffuse layer and filter mode (`None` to `OPAQUE`, `Transparent` to `MASK` with
     cutoff `0.75`, `Blend` to `BLEND`), composite a `ReplaceableId 1` team-colour layer under a `Blend` diffuse
     layer onto one PNG, and map additive or `ReplaceableId 2` team-glow layers to `emissiveTexture`. Reforged HD
