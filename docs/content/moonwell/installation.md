@@ -1,7 +1,7 @@
 # Installation
 
 After this page, `moonwell` is on your PATH, you know which files the install made, and you know how to update it.
-These pages describe Moonwell 0.12.6.
+These pages describe Moonwell 0.12.7.
 
 ## What you need
 
@@ -100,16 +100,16 @@ newer in its place.
 ## Installing one version
 
 The install line above installs the newest release. A release also has an install script of its own, which installs
-that release. For Moonwell 0.12.6, on Windows:
+that release. For Moonwell 0.12.7, on Windows:
 
 ```powershell
-irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.12.6/install.ps1 | iex
+irm https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.12.7/install.ps1 | iex
 ```
 
 On Linux:
 
 ```sh
-curl -fsSL https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.12.6/install.sh | sh
+curl -fsSL https://github.com/mdlsvensson/moonwell/releases/download/moonwell@0.12.7/install.sh | sh
 ```
 
 When a project's object files do not go with the Moonwell you have (see [Updating](#updating)), Moonwell's error
@@ -131,13 +131,13 @@ first two of the three numbers. Where they differ, a command that reads the obje
 names both versions and says what to change.
 
 To move such a project to the Moonwell you installed, change the version at the end of the package's address in
-`PklProject`. For Moonwell 0.12.6 the file is this, as `moonwell init` writes it:
+`PklProject`. For Moonwell 0.12.7 the file is this, as `moonwell init` writes it:
 
 ```pkl
 amends "pkl:Project"
 
 dependencies {
-  ["moonwell"] { uri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.6" }
+  ["moonwell"] { uri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.7" }
 }
 ```
 

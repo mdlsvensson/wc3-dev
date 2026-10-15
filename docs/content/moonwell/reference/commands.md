@@ -472,7 +472,9 @@ Converts a `.mdx` or `.mdl` model to glTF 2.0 (`.glb` or `.gltf`), with its mesh
 sequence animations and materials ([Assets](../assets#converting-a-model-to-gltf)). Without `[output]`, it writes
 `<stem>.glb` beside `<model>`. With `[output]` ending in `.glb`, it writes that file; with `[output]` ending in
 `.gltf`, it writes `<stem>.gltf`, `<stem>.bin` (when the model has binary buffer data) and each texture as
-`<name>.png` in the output file's folder, and prints `Wrote <output>.`
+`<name>.png` in the output file's folder, and prints `Wrote <output>.` A replaceable slot other than
+`ReplaceableId 1` (team colour) or `ReplaceableId 2` (team glow) is written as a grey placeholder,
+`replaceable_<id>.png`, with a warning line before that.
 
 **Reads:** the model file and the texture files that its exported materials use (in a project, from the assets of
 the project and of its libraries first, then beside the model, below the folder the command runs in and below
@@ -485,11 +487,12 @@ collects the assets, the libraries under `.moonwell/` and `moonwell.lock`, and `
 **Fails when:**
 
 - `<model>` does not end in `.mdx` or `.mdl`, is not there, is a folder, or cannot be read as a model.
-- `[output]` is a folder, does not end in `.glb` or `.gltf`, has a link on the way to it inside the folder the
-  command runs in, or cannot be written.
+- `[output]` is a folder, does not end in `.glb` or `.gltf`, or cannot be written; or a file it would write has a
+  link on the way to it inside the folder the command runs in.
+- The `.bin` or a `.png` of a `.gltf` would replace the model or a texture the model was converted from. Nothing
+  is written then.
 - A texture that an exported material uses by path is not found or cannot be decoded as a `.blp`, `.dds`, `.tga`
-  or `.png` texture, or an exported material uses a replaceable slot other than `ReplaceableId 1` (team colour) or
-  `ReplaceableId 2` (team glow).
+  or `.png` texture.
 - In a project: a settings file is refused, another build is running, a library cannot be fetched, or the assets
   cannot be collected.
 

@@ -326,21 +326,38 @@ moonwell assets:gltf assets/Models/Knight.mdx out/Knight.gltf
 Wrote out/Knight.gltf.
 ```
 
+Before it writes anything, Moonwell checks every file it is about to write. If the `.bin` or a `.png` would replace
+the model or a texture the model was converted from, as `Knight.png` would beside a `Knight.png` texture, the
+command stops with an error that names that file. Choose an output in another folder, or a `.glb`. Writing again
+over the files of an earlier conversion is allowed.
+
 Both Classic SD (version 800) and Reforged HD (versions 900 to 1800) models are converted:
 
 - **Meshes and coordinates.** Geosets are converted from Warcraft III's right-handed Z-up coordinates to glTF's
   right-handed Y-up coordinates via `(x, y, z) -> (y, z, x)`. In a Reforged HD model with level-of-detail
   geosets, only the base level (`LOD` 0, or the lowest `LOD` present) is exported.
 - **Skeletons, weights and animations.** Bones, helpers and other scene nodes keep their hierarchy and pivot
-  offsets, with up to four joint weights per vertex (from Classic matrix groups or Reforged HD skin data). Sequence
-  animations and global sequences export translation, rotation and scaling tracks, sampling Hermite, Bezier and
-  Squad curves and step-animating geoset visibility.
+  offsets under one `Root` node, the skin's `skeleton`, with up to four joint weights per vertex (from Classic
+  matrix groups or Reforged HD skin data). Each sequence becomes one animation, with translation, rotation and
+  scaling tracks sampled from the keys inside that sequence alone, Hermite, Bezier and Squad curves included. The
+  first and last of those keys hold to the animation's start and end, and a track with no key in the sequence
+  holds its rest value: no offset, no rotation, a scale of 1. A track of a global sequence is sampled over the
+  global sequence's length.
+- **Geoset visibility.** A geoset that a sequence shows and hides is written with the glTF extension
+  `KHR_node_visibility` and animated, step by step, through `KHR_animation_pointer`. A geoset with no key in a
+  sequence keeps its geoset animation's own alpha. A viewer without those extensions shows every geoset at once.
 - **Textures and materials.** Every texture that a material of an exported geoset uses must be found or the command
   stops with an error (textures only referenced by particle or ribbon emitters, environment slots or unexported
   materials, and the placeholder emissive texture `Textures/Black32.blp`, are skipped):
   - A replaceable slot with no path is synthesized in memory for Player 1 Red (`#FF0303`): `ReplaceableId 1` (team
     colour) as a solid 8×8 PNG and `ReplaceableId 2` (team glow) as a 64×64 radial PNG. Any other replaceable
-    slot is refused.
+    slot, such as a cliff's or a tree's, becomes a grey 8×8 PNG named `replaceable_<id>.png`, and the command
+    prints a warning before the line `Wrote`:
+
+    ```text
+    warning: assets/Models/Tree.mdx: ReplaceableId 31 has no texture file to convert, so a grey placeholder stands in for it.
+    ```
+
   - A texture with a path is searched first in the assets of the project and of its libraries (when the command
     runs in a project), then at that path below the model's folder, then by its file name in the model's folder,
     then below the folder the command runs in, and last below `assets/` there. At each place Moonwell matches
@@ -349,11 +366,15 @@ Both Classic SD (version 800) and Reforged HD (versions 900 to 1800) models are 
     `ATI2`/BC5 normal maps and uncompressed 24-bit and 32-bit), `TGA` (24-bit and 32-bit, plain and RLE) and `PNG`
     to PNG.
   - Classic SD materials map their diffuse layer and filter mode (`None` to `OPAQUE`, `Transparent` to `MASK` with
-    cutoff `0.5`, `Blend` to `BLEND`), composite a `ReplaceableId 1` team-colour layer under a `Blend` diffuse
+    cutoff `0.75`, `Blend` to `BLEND`), composite a `ReplaceableId 1` team-colour layer under a `Blend` diffuse
     layer onto one PNG, and map additive or `ReplaceableId 2` team-glow layers to `emissiveTexture`. Reforged HD
     materials map diffuse, normal (with reconstructed `+Z` for two-channel BC5 normal maps), ORM (occlusion,
     roughness and metallic, after compositing the team-colour alpha mask into the diffuse texture) and emissive
-    slots to glTF's metallic-roughness PBR textures.
+    slots to glTF's metallic-roughness PBR textures. An emissive gain above 1 is written as the extension
+    `KHR_materials_emissive_strength`.
+
+The extensions are listed in the file's `extensionsUsed` and none is required, so a viewer that lacks one still
+opens the model.
 
 ## What is refused
 
