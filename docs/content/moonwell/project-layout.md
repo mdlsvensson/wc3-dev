@@ -49,6 +49,9 @@ project, and [Files and caches](./reference/files#in-the-project) has every file
 - **`src/generated/objects.yue`** is the ids module. `build`, `test` and `dev` write it when your objects change,
   and `check` compares it with them. Your code imports it, and you never edit it
   ([Files and caches](./reference/files#src-generated)).
+- **`src/generated/declared-ids.json`** is the file of declared ids, there when your code declares objects with
+  `moonwell.declare`. `build`, `test` and `dev` write it, and `check` compares it with the declarations
+  ([Objects](./objects#ids-of-declared-objects)).
 - **`moonwell.lock`** holds a record of each library that is fetched from GitHub, with the commit of its tag, so
   that everyone who builds the project gets the same code. When no record is left in it, the file is removed
   ([Files and caches](./reference/files#moonwell.lock)).
@@ -62,10 +65,13 @@ the source map, and it is the one command that changes it ([Assets](./assets#see
 
 ## What to commit
 
-Commit everything that `init` made, and three of the things Moonwell writes:
+Commit everything that `init` made, and four of the things Moonwell writes:
 
 - `src/generated/objects.yue`. In a project with objects, `moonwell check` fails when the file is missing or does
   not match the objects, and it does not write the file itself ([Objects](./objects#the-generated-ids)).
+- `src/generated/declared-ids.json`, where the code declares objects. It keeps the id of each declared object from
+  one build to the next, and `moonwell check` fails when it is missing or does not match the declarations
+  ([Objects](./objects#ids-of-declared-objects)).
 - `moonwell.lock`. A fresh clone then gets the same code of each library. When a tag is moved on GitHub, the
   command that fetches the library fails, and does not take the other code.
 - `.asset-state/`. It goes with the source map: it says which of the map's files `assets:sync` wrote.

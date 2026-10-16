@@ -35,6 +35,11 @@ Code at the top level of a module is in no hook. It runs while the map's script 
 `config` or `main`. So keep the top level for imports, for functions and for the lines that add hooks, and make game
 objects, such as units, timers and triggers, inside a hook.
 
+In a project that declares objects in its code, with `moonwell.declare`, a build also runs the top-level code of
+the modules once, where the game's natives do not exist, and there `moonwell.declare` returns `nil`. A native that
+is called at the top level then fails the build: [How a build reads the
+declarations](./objects#how-a-build-reads-the-declarations) describes that run.
+
 A hook that fails does not stop the others. The runtime reports the error, with the hook's name and with the source
 file and the line the error was raised at, and runs the next function. For an `on_main` hook it prints the report
 at once:
@@ -227,6 +232,37 @@ Code's YueScript extension find it. `build`, `test`, `check`, `dev` and `setup` 
 
 Your own `.yue` files can define macros as well. A macro runs on your machine, during a build: see
 [Build only a project you trust](./project-layout#build-only-a-project-you-trust).
+
+### Build modes
+
+A build is a release build or a development build. `moonwell build` makes a release build, and
+`moonwell build --dev`, `test`, `check` and `dev` make a development build. Moonwell writes the mode into the
+project, as `.moonwell/yue/moonwell/build.lua`, which holds `return { mode = "release" }` or
+`return { mode = "dev" }`. `setup` writes it with `"dev"`.
+
+A macro reads the mode with `require "moonwell.build"` while the code compiles. This one keeps a check in a
+development build and writes nothing in a release build:
+
+```yue skip
+import "moonwell" as mw
+
+macro check = (condition) ->
+  if (require "moonwell.build").mode == "dev"
+    "assert #{condition}"
+  else
+    ""
+
+mw.on_main ->
+  $check GetPlayerId(Player(0)) == 0
+  print "The hook ran."
+```
+
+A macro that writes nothing must stand where a statement goes. As the last line of a function, where YueScript
+returns the value of the line, it is refused with `failed to expand empty macro as expr`.
+
+The mode is read during the compile only: the map holds no module `moonwell.build`. The two modes differ in what
+your macros write, and in nothing else. Changing from one mode to the other compiles every YueScript module again
+([Files and caches](./reference/files#dist)).
 
 ## Unknown globals
 
@@ -506,11 +542,13 @@ the file and the line. World Editor's part of the script and the runtime stay as
 
 ## See also
 
-- [Commands](./reference/commands): [`build`](./reference/commands#build), with `--entry` and `--minify`,
+- [Commands](./reference/commands): [`build`](./reference/commands#build), with `--entry`, `--minify` and `--dev`,
   [`check`](./reference/commands#check) and [`dev`](./reference/commands#dev), and when each fails.
 - [Settings](./reference/settings): the tables [`map`](./reference/settings#map),
   [`build`](./reference/settings#build) and [`lint`](./reference/settings#lint) of `moonwell.toml`.
-- [Files and caches](./reference/files): the macro module, the Lua that your code compiles to and the staged map.
-- [Troubleshooting](./reference/troubleshooting#building): a global that is unknown, a bitwise operator and a
-  module that is not found, and [errors in the game](./reference/troubleshooting#in-the-game).
-- [Objects](./objects): the next page. It describes the object files and the ids module that your code imports.
+- [Files and caches](./reference/files): the macro module, the build mode, the Lua that your code compiles to and
+  the staged map.
+- [Troubleshooting](./reference/troubleshooting#building): a global that is unknown, a bitwise operator, a module
+  that is not found and code that fails at build, and [errors in the game](./reference/troubleshooting#in-the-game).
+- [Objects](./objects): the next page. It describes the object files, the objects declared in code and the ids
+  module that your code imports.

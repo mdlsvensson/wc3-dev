@@ -2,7 +2,7 @@
 
 Moonwell is one program, `moonwell`, that builds a Warcraft III map from a project folder. A project holds a map that
 World Editor saved as a folder, gameplay code in YueScript and plain Lua, settings in a TOML file, custom objects
-written in Pkl, and files to import into the map.
+written in Pkl or declared in the gameplay code, and files to import into the map.
 
 ## What a build does
 
@@ -18,12 +18,14 @@ written in Pkl, and files to import into the map.
 6. It brings the libraries that the project names up to date, under `.moonwell/`.
 7. It compiles the YueScript files to Lua, follows the imports from the entry, which is `src/main.yue` in a new
    project, and checks the modules it reaches for unknown globals.
-8. It plans every file of the map that changes, each on the map as the one before leaves it: the object data, the map
+8. Where the code declares objects, it runs the top-level code of those modules once, without the game, to read the
+   declarations, and checks the declared objects with the others.
+9. It plans every file of the map that changes, each on the map as the one before leaves it: the object data, the map
    settings, the imported files, and last the map's script, with your code added at its end.
-9. It replaces `dist/stage/<map.folder>` with a copy of the source map and writes the planned files into the copy.
-10. It packs that map into one archive, `<build.folder>/<map.folder>`.
+10. It replaces `dist/stage/<map.folder>` with a copy of the source map and writes the planned files into the copy.
+11. It packs that map into one archive, `<build.folder>/<map.folder>`.
 
-Nothing of the map is written before step 9: the first step that fails ends the build with its error. The archive
+Nothing of the map is written before step 10: the first step that fails ends the build with its error. The archive
 of the build before is another matter. `build` removes it before step 3, once it has the
 [build lock](./reference/commands#one-build-at-a-time). So the old archive stays when step 1 or step 2 fails and
 when the lock is held, and it is gone when a later step fails ([Commands](./reference/commands#build)).
@@ -54,7 +56,7 @@ own section of these pages.
 
 ## The version these pages describe
 
-These pages describe Moonwell 0.12.8. The releases of the two libraries that go with it are moonwell-wrappers v0.10.1
+These pages describe Moonwell 0.12.9. The releases of the two libraries that go with it are moonwell-wrappers v0.10.1
 and moonwell-systems v0.6.1. Where a page says what the game does, that was measured on Warcraft III Reforged
 3.0.0.24268, unless the page names another version.
 

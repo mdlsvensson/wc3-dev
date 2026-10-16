@@ -58,9 +58,10 @@ written and which flags it takes: `moonwell build --help`, or `moonwell help bui
 Build <build.folder>/<map.folder>
 
 Usage:
-  moonwell build [--entry f] [--minify]
+  moonwell build [--entry f] [--minify] [--dev]
 
 Flags:
+      --dev            Build for development: keep the checks that macros add
       --entry string   Compile from this .yue file under src/ in place of map.entry
   -h, --help           help for build
       --minify         Shrink the script; runtime errors lose their line numbers
@@ -145,7 +146,8 @@ It compiles nothing and builds no map. [Editor setup](../editor-setup#run-moonwe
    `workspace.ignoreDir`, and changes no other setting. One that is not plain JSON it leaves alone, with a warning
    that lists the entries.
 4. It opens the source map, checks the objects, and writes the declarations for your editor into `.moonwell/types/`
-   and the macro module into `.moonwell/yue/`.
+   and the macro module into `.moonwell/yue/`, beside the build mode of a development build
+   ([Gameplay code](../gameplay-code#build-modes)).
 5. It takes the [build lock](#one-build-at-a-time), brings the libraries up to date under `.moonwell/`, keeps
    `moonwell.lock` current as a build does, and refreshes `.moonwell/lua/`, where your editor reads the libraries'
    modules.
@@ -157,7 +159,8 @@ does, and never writes it: the install script makes that file (see
 
 **Writes:** the `bin` folder of the cache; the editor's files and `.gitignore` in the project; `.moonwell/`;
 `moonwell.lock`; `dist/.lock` while it works on the libraries; `dist/moonwell.log`. It does not write the ids
-module, `src/generated/objects.yue`. [Files and caches](./files#the-cache-folder) says where the cache folder is.
+module, `src/generated/objects.yue`, or the file of declared ids, and it does not run the code to read the objects
+it declares. [Files and caches](./files#the-cache-folder) says where the cache folder is.
 
 **Fails when:**
 
@@ -176,37 +179,44 @@ module, `src/generated/objects.yue`. [Files and caches](./files#the-cache-folder
 
 ## Building
 
-`build`, `test`, `check` and `dev` plan the same build. They work out the whole map before any file of the map is
-written, in this order:
+`build`, `test`, `check` and `dev` plan the same build. `build` makes a release build, and `build --dev`, `test`,
+`check` and `dev` make a development build, which differ in what your macros write
+([Gameplay code](../gameplay-code#build-modes)). The four commands work out the whole map before any file of the
+map is written, in this order:
 
 1. Read the settings: `moonwell.toml`, then your `config.toml`. Where the project has a `.pkl` file under
    `objects/`, find Pkl and evaluate the object files.
 2. Take the [build lock](#one-build-at-a-time), `dist/.lock`.
 3. Open the source map, `maps/<map.folder>`, and read which globals its `war3map.lua` defines.
-4. Check the objects against the game's data and against the objects the map has.
+4. Check the objects of the object files against the game's data and against the objects the map has.
 5. Write what your code and your editor read beside the sources: the ids module `src/generated/objects.yue`, the
-   declarations in `.moonwell/types/` and the macro module in `.moonwell/yue/`. `check` writes no ids module: it
-   compares the one that is there.
+   declarations in `.moonwell/types/`, and the macro module and the build mode in `.moonwell/yue/`. `check` writes
+   no ids module: it compares the one that is there.
 6. Bring the libraries up to date under `.moonwell/`, and keep [`moonwell.lock`](../libraries#moonwell.lock)
    current. The file holds a record of each library that is fetched from GitHub. When no record is left in it, the
    file is removed.
 7. Find the compiler, which is downloaded into the cache folder when it is not there, and compile the `.yue` files
    of `src/` and of the libraries into the compile's cache, `dist/stage/lua/`. Then follow the imports from the
    entry, and check the modules they reach for [unknown globals](../gameplay-code#unknown-globals).
-8. Plan the rest of the map on top of the objects' files, each part on the map as the one before leaves it: the map
+8. Where the code declares objects, run the modules the entry reaches once, from `dist/stage/declare/`, to read the
+   declarations ([Objects](../objects#how-a-build-reads-the-declarations)). Check the declared objects with the
+   objects of the object files, and write their ids into `src/generated/declared-ids.json`. Where the code declares
+   nothing, the file is removed. `check` neither writes nor removes it: it compares the one that is there.
+9. Plan the rest of the map on top of the objects' files, each part on the map as the one before leaves it: the map
    settings, then the assets with `war3map.imp`, and last the script, `war3map.lua`, with your code added to it.
 
 The first step that fails ends the plan, and the command prints its error. Some steps write beside the map, so a
 plan that fails after them leaves those files: step 1 writes `.moonwell/objects.pkl`, the module that gathers the
-object files, where the project has object files, and steps 5 to 7 write what they name. None of the four commands
+object files, where the project has object files, and steps 5 to 8 write what they name. None of the four commands
 changes the source map. [Files and caches](./files#in-the-project) describes each of these files.
 
 ### build {#build}
 
-`moonwell build [--entry f] [--minify]`
+`moonwell build [--entry f] [--minify] [--dev]`
 
-Builds the map. `build` plans the map as above. Then it stages it: it replaces `dist/stage/<map.folder>` with a copy
-of the source map and writes the planned files into the copy. Last it packs the staged map into the archive
+Builds the map, as a release build, or with `--dev` as a development build. `build` plans the map as above. Then
+it stages it: it replaces `dist/stage/<map.folder>` with a copy of the source map and writes the planned files into
+the copy. Last it packs the staged map into the archive
 `<build.folder>/<map.folder>`, which is `dist/bin/map.w3x` in a new project.
 
 `build` writes the staged map only when the whole plan stands. A refused setting, an invalid object or a compile
@@ -216,7 +226,7 @@ The archive of the build before is another matter: `build` removes it once it ha
 old archive stays when step 1 fails (the folder is no project, a settings file is refused, Pkl is not found and
 cannot be downloaded, Pkl refuses an object file, the `moonwell` package does not go with the program) and when the
 lock is held. It is gone when a later step fails: an object Moonwell refuses, a map setting the map cannot take, a
-compile error.
+compile error, an error in code that runs at build.
 
 **Reads:** `moonwell.toml` and your `config.toml`; the object files under `objects/`, through Pkl, with
 `PklProject.deps.json`; the source map; `src/` and `lua/`; the libraries; `assets/`; the file under `.asset-state/`
@@ -224,7 +234,8 @@ that says which files of the source map `assets:sync` owns; the picture
 [`settings.info.preview`](./settings#settings.info) names.
 
 **Writes:** `dist/.lock` while it runs; what the plan writes beside the map (`src/generated/objects.yue`,
-`.moonwell/`, `moonwell.lock`, `dist/stage/lua/`); the staged map; the archive, which is written beside its place as
+`src/generated/declared-ids.json`, `.moonwell/`, `moonwell.lock`, `dist/stage/lua/`, and `dist/stage/declare/`
+where the code declares objects); the staged map; the archive, which is written beside its place as
 `<map.folder>.tmp` and moved there when it is whole; `dist/moonwell.log`.
 
 **Fails when:**
@@ -238,7 +249,8 @@ that says which files of the source map `assets:sync` owns; the picture
   the program; Pkl or Moonwell refuses an object; the source map is missing or holds something Moonwell refuses; a
   library cannot be fetched; the compiler cannot be downloaded; a source file does not compile; the entry file is
   not there; a global is unknown (with [`lint.unknownGlobals = "warning"`](./settings#lint) it is a warning); the
-  map cannot take a map setting; an asset cannot be imported; the map's `war3map.lua` is missing or defines no
+  top-level code of a module fails in the run that reads the declarations, or Moonwell refuses a declared object;
+  the map cannot take a map setting; an asset cannot be imported; the map's `war3map.lua` is missing or defines no
   `main` or no `config` function.
 - The staged map cannot be replaced, as when the game or World Editor has `dist/stage` open.
 - The map cannot be packed: it has no `war3map.w3i`, or it is too large for an archive. The staged map is written by
@@ -251,14 +263,16 @@ that says which files of the source map `assets:sync` owns; the picture
 - `--minify` shrinks the script; runtime errors lose their line numbers. [`build.minify = true`](./settings#build)
   in `moonwell.toml` does the same without the flag, and the flag cannot turn that off. See
   [Gameplay code](../gameplay-code#minified-builds).
+- `--dev` makes a development build: Moonwell writes the mode `"dev"` for your macros to read, in place of
+  `"release"`. See [Gameplay code](../gameplay-code#build-modes).
 
 ### test {#test}
 
 `moonwell test [--entry f] [--minify]`
 
-Stages the map as `build` does, then starts Warcraft III on the staged map. `test` starts the game with the
-arguments of [`launch.args`](./settings#config-launch), then `-loadfile` and the full path of the staged map. It
-does not wait for the game: it ends when the game is started.
+Stages the map as `build` does, as a development build, then starts Warcraft III on the staged map. `test` starts
+the game with the arguments of [`launch.args`](./settings#config-launch), then `-loadfile` and the full path of the
+staged map. It does not wait for the game: it ends when the game is started.
 
 `test` needs [`launch.gameExecutable`](./settings#config-launch) in your `config.toml`, the path of the game's
 program. It looks for the game last, so a `test` without that setting has planned and staged the map before it
@@ -298,9 +312,9 @@ watches:
 Watching src/, assets/, objects/, lua/ and the project's settings. Press Ctrl+C to stop.
 ```
 
-Each check is what [`check`](#check) does, with one difference: `dev` writes the ids module as `build` does. An
-error of a check is printed, and `dev` watches on. It looks at the files four times a second, and checks once they
-have stayed unchanged for 150 milliseconds. Stop it with Ctrl+C.
+Each check is what [`check`](#check) does, with one difference: `dev` writes the ids module and the file of
+declared ids as `build` does. An error of a check is printed, and `dev` watches on. It looks at the files four
+times a second, and checks once they have stayed unchanged for 150 milliseconds. Stop it with Ctrl+C.
 
 `dev` picks what it watches when it starts:
 
@@ -318,8 +332,9 @@ give a library a folder or name a picture, stop `dev` and start it again. `dev` 
 
 **Reads:** what `check` reads, at every check.
 
-**Writes:** what `check` writes, `dist/moonwell.log` among it, and the ids module `src/generated/objects.yue`. It
-holds `dist/.lock` during a check and not between two checks.
+**Writes:** what `check` writes, `dist/moonwell.log` among it, the ids module `src/generated/objects.yue` and the
+file of declared ids, `src/generated/declared-ids.json`. It holds `dist/.lock` during a check and not between two
+checks.
 
 **Fails when:** the folder has no `src/` folder. `dev` then ends at once. Nothing else ends it but Ctrl+C, after
 which the check that is under way finishes and `dev` ends with the exit code 130.
@@ -330,8 +345,8 @@ which the check that is under way finishes and `dev` ends with the exit code 130
 
 `moonwell check`
 
-Compiles and validates the project, and builds no map: `check` runs the plan of a build, steps 1 to 8 above, and
-stops there. It stages nothing and packs nothing. When the plan stands it says so:
+Compiles and validates the project, and builds no map: `check` runs the plan of a development build, steps 1 to 9
+above, and stops there. It stages nothing and packs nothing. When the plan stands it says so:
 
 ```text
 Check passed: 2 module(s) reachable from main, 0 asset(s).
@@ -342,9 +357,10 @@ objects, settings, assets and code that `build` plans without an error.
 
 **Reads:** what [`build`](#build) reads.
 
-**Writes:** `dist/.lock` while it runs; what the plan writes beside the map but for one file: `.moonwell/`,
-`moonwell.lock` and the compile's cache `dist/stage/lua/`; `dist/moonwell.log`. It does not write the ids module,
-`src/generated/objects.yue`: it compares the file with the project's objects.
+**Writes:** `dist/.lock` while it runs; what the plan writes beside the map but for two files: `.moonwell/`,
+`moonwell.lock`, the compile's cache `dist/stage/lua/` and, where the code declares objects, `dist/stage/declare/`;
+`dist/moonwell.log`. It does not write the ids module, `src/generated/objects.yue`, or the file of declared ids,
+`src/generated/declared-ids.json`: it compares each with the project's objects.
 
 **Fails when:**
 
@@ -354,6 +370,9 @@ objects, settings, assets and code that `build` plans without an error.
 - `src/generated/objects.yue` does not match the project's objects, or is missing where the project has objects.
   `build`, `test` and `dev` write the file; `check` leaves it and fails. In a project without objects, a file that
   is not there is no failure.
+- `src/generated/declared-ids.json` does not match the objects that the code declares, is missing where the code
+  declares objects, or is there where it declares none
+  ([Objects](../objects#ids-of-declared-objects)).
 
 `check` does not find what `build` finds only when it writes: an archive that cannot go to its place, a staged map
 that cannot be replaced, a map too large for an archive. It finds a source map without `war3map.w3i` only when a map
@@ -542,6 +561,10 @@ Object data valid: 1 object(s), 2 internal file(s) would change during build.
 
 In a project without objects, an ids module that is not there counts as `current`.
 
+`objects:check` reads the object files alone. It runs no code, so the objects that the code declares are not in its
+list or its count, and it does not look at the file of declared ids
+([Objects](../objects#what-the-object-commands-do-not-show)).
+
 [Objects](../objects) describes the object files and [the ids module](../objects#the-generated-ids).
 
 **Reads:** `moonwell.toml` and your `config.toml`; the object files under `objects/`, through Pkl, with
@@ -569,7 +592,8 @@ In a project without objects, an ids module that is not there counts as `current
 Prints the objects as JSON on standard output, after the same checks as `objects:check` but for the ids module,
 which it does not look at. The JSON has one member for each kind of object: `heroes`, `units`, `buildings`, `items`,
 `abilities`, `buffs` and `upgrades`. Each holds the objects of that kind by their key, with the `id`, the `base`,
-the `source` file and the `fields` of each.
+the `source` file and the `fields` of each. Like `objects:check`, it reads the object files alone: an object that
+the code declares is not in the JSON.
 
 **Reads:** what [`objects:check`](#objects-check) reads, but for the ids module.
 

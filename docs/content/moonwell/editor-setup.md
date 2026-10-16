@@ -126,9 +126,11 @@ In a `.yue` file you get completion, hover and signature help for:
 - **The game's functions and globals.** Every function and global of the `common.j` and the `Blizzard.j` of
   Warcraft III Reforged 3.0.0.24268: a native such as `CreateUnit`, a constant such as `PLAYER_NEUTRAL_AGGRESSIVE`,
   a global of `Blizzard.j` such as `bj_MAX_PLAYERS`.
-- **The `moonwell` module.** After `import "moonwell"`: the four hooks and `format_error`, each with a description.
-- **Your objects.** After `import "generated.objects"`: every object under its key, such as `captain` among the
-  `units`, with its rawcode.
+- **The `moonwell` module.** After `import "moonwell"`: the four hooks, `format_error`, `declare` and `declaring`,
+  each with a description, and the entries that a declaration takes.
+- **Your objects.** After `import "generated.objects"`: every object of your object files under its key, such as
+  `captain` among the `units`, with its rawcode. An object declared in code is not there: its id is what
+  `moonwell.declare` returns ([Objects](./objects#objects-declared-in-code)).
 - **The map's own globals.** The `gg_` and `udg_` globals and the functions that the source map's script defines:
   see [Using your own map](./own-map#the-maps-own-globals).
 

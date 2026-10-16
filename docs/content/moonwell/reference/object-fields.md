@@ -3,7 +3,9 @@
 This page describes the fields of a custom object: how a field gets its name, where to look a field up, which
 fields have a typed name and which go into `properties`, how a field with levels is set, and which values a field
 takes. It lists no fields. The game has more than a thousand of them, and the modules that hold them are linked
-under [Finding a field](#finding-a-field). [Objects](../objects) is the guide to the object files themselves.
+under [Finding a field](#finding-a-field). [Objects](../objects) is the guide to the object files themselves. An
+object [declared in code](../objects#fields-of-a-declaration) names its fields as `properties` does, and what this
+page says of `properties` holds for it too.
 
 ## How a field gets its name
 
@@ -42,18 +44,18 @@ the label, the rawcode and the notes that are described below. [Editor setup](..
 covers editors for Pkl.
 
 **In the package.** The typed fields of each kind are one module of the `moonwell` Pkl package, in the folder
-[`schema/generated`](https://github.com/mdlsvensson/moonwell/tree/moonwell@0.12.8/schema/generated) of Moonwell's
+[`schema/generated`](https://github.com/mdlsvensson/moonwell/tree/moonwell@0.12.9/schema/generated) of Moonwell's
 repository:
 
 | Kind | Module |
 | --- | --- |
-| Heroes | [`HeroProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.8/schema/generated/HeroProps.pkl) |
-| Units | [`UnitProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.8/schema/generated/UnitProps.pkl) |
-| Buildings | [`BuildingProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.8/schema/generated/BuildingProps.pkl) |
-| Items | [`ItemProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.8/schema/generated/ItemProps.pkl) |
-| Abilities | [`AbilityProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.8/schema/generated/AbilityProps.pkl) |
-| Buffs | [`BuffProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.8/schema/generated/BuffProps.pkl) |
-| Upgrades | [`UpgradeProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.8/schema/generated/UpgradeProps.pkl) |
+| Heroes | [`HeroProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.9/schema/generated/HeroProps.pkl) |
+| Units | [`UnitProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.9/schema/generated/UnitProps.pkl) |
+| Buildings | [`BuildingProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.9/schema/generated/BuildingProps.pkl) |
+| Items | [`ItemProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.9/schema/generated/ItemProps.pkl) |
+| Abilities | [`AbilityProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.9/schema/generated/AbilityProps.pkl) |
+| Buffs | [`BuffProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.9/schema/generated/BuffProps.pkl) |
+| Upgrades | [`UpgradeProps.pkl`](https://github.com/mdlsvensson/moonwell/blob/moonwell@0.12.9/schema/generated/UpgradeProps.pkl) |
 
 A module holds its fields in the order of their names. These are two entries, one of `UnitProps.pkl` and one of
 `AbilityProps.pkl`:

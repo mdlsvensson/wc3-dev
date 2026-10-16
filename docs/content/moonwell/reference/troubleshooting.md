@@ -89,6 +89,36 @@ module. It says `The file does not match the project's objects.` or, in a projec
 do not write it. Run `moonwell build`, `moonwell test` or `moonwell dev`, which write it, and commit the file
 ([Objects](../objects#the-generated-ids)).
 
+### The declared ids are stale
+
+`moonwell check` fails with `The file does not match the declared objects.` and names
+`src/generated/declared-ids.json`, the file of declared ids. The file is missing, or holds other kinds, keys or ids
+than the objects that the code declares, or it is there in a project whose code declares nothing. `check` compares
+the file and does not write it. Run `moonwell build`, `moonwell test` or `moonwell dev`, which write it or remove it,
+and commit the change ([Objects](../objects#ids-of-declared-objects)).
+
+An error that says `The declared object ids cannot be used:` names the same file, which is not a mapping of kinds to
+keys and ids, or holds an id of the wrong form. Put it right, or delete it: the next build then chooses new ids for
+every declared object.
+
+### A build fails in code that runs at build
+
+In a project that declares objects with `moonwell.declare`, a build runs the top-level code of the modules that the
+entry reaches once, to read the declarations, and the game's natives do not exist there
+([Objects](../objects#how-a-build-reads-the-declarations)). An error in that run fails `build`, `test`, `check` and
+`dev` at its file and line, and the hint says which of three cases it is:
+
+- **It says `with no natives: call natives inside functions.`** The top-level code calls a native, or another
+  global that is `nil` in that run. Move the call into a function, such as an `on_main` hook.
+- **It says `Fix this call of moonwell.declare`.** A declaration is wrong. The message says what is wrong, such as
+  a `category` that is not a kind of object, a function of the level without `levels`, or a key declared twice.
+  [What a declaration takes](../objects#what-a-declaration-takes) has the rules.
+- **It says `and this error ended that run.`** Another error was raised at the top level, such as one that uses a
+  global of the source map's `war3map.lua`, which does not exist in that run either. Put it right, or move the code
+  into a function.
+
+In a minified build the error names the file without a line: build without minifying to find the line.
+
 ### The program and the project's Pkl package differ in version
 
 A command that reads the object files stops with an error that names `PklProject`. It says that the Pkl package
@@ -208,6 +238,16 @@ An error that your own code catches, with `pcall` or `xpcall`, does not reach Mo
 a line of `war3map.lua`, the one script that holds every module of the map. Give the message to `format_error` of
 the `moonwell` module, which turns that place into the source file and the line, or look the line up in
 `dist/stage/<map.folder>/war3map.lua` ([Gameplay code](../gameplay-code#an-error-you-catch-yourself)).
+
+### `moonwell.declare` fails in the game
+
+The runtime reports an error, such as `[moonwell] on_main failed:`, whose message says `moonwell.declare:`, a kind
+and a key, and `was not declared at build: call moonwell.declare at the top level of a module the entry reaches.`
+The build reads
+a declaration only when the top-level code of a module that the entry reaches runs it, and in the game `declare`
+returns the id that the build gave. A call inside a function that only the game runs, such as a hook, has no id.
+Move the declaration to the top level of a module, and use the id it returns inside the function
+([Objects](../objects#declared-objects-in-the-game)).
 
 ### An error in a callback is not printed
 
