@@ -12,7 +12,7 @@ them you commit. The page goes through the project that `moonwell init` makes, t
 | --- | --- |
 | `moonwell.toml` | The settings of the project and of its map ([Settings](./reference/settings#the-project-moonwell.toml)). A folder is a project because it holds this file |
 | `src/main.yue` | The entry: the file a build compiles from. Every `.yue` file under `src/` is a module of your gameplay code |
-| `src/generated/objects.yue` | The ids module: the ids of your objects, for your code to import. Moonwell writes it |
+| `src/generated/objects.yue` | The ids module: the ids of the objects of your object files, for your code to import. Moonwell writes it |
 | `lua/` | Plain Lua modules, beside `src/`. Empty in a new project |
 | `objects/units.pkl` | An object file, with the template's one custom unit. Every `.pkl` file under `objects/` is an object file |
 | `PklProject` | Names the `moonwell` Pkl package that the object files are written for, and its version |
@@ -46,8 +46,8 @@ project, and [Files and caches](./reference/files#in-the-project) has every file
 - **`dist/`** holds what a build makes: the staged map in `dist/stage/`, the archive, which is `dist/bin/map.w3x`
   in a new project, the compile's cache, which holds the Lua that your code compiles to, the log
   `dist/moonwell.log` and the build lock ([Files and caches](./reference/files#dist)).
-- **`src/generated/objects.yue`** is the ids module. `build`, `test` and `dev` write it when your objects change,
-  and `check` compares it with them. Your code imports it, and you never edit it
+- **`src/generated/objects.yue`** is the ids module. `build`, `test` and `dev` write it when the objects of your
+  object files change, and `check` compares it with them. Your code imports it, and you never edit it
   ([Files and caches](./reference/files#src-generated)).
 - **`src/generated/declared-ids.json`** is the file of declared ids, there when your code declares objects with
   `moonwell.declare`. `build`, `test` and `dev` write it, and `check` compares it with the declarations

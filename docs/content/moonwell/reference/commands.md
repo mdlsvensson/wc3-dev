@@ -198,8 +198,9 @@ map is written, in this order:
 7. Find the compiler, which is downloaded into the cache folder when it is not there, and compile the `.yue` files
    of `src/` and of the libraries into the compile's cache, `dist/stage/lua/`. Then follow the imports from the
    entry, and check the modules they reach for [unknown globals](../gameplay-code#unknown-globals).
-8. Where the code declares objects, run the modules the entry reaches once, from `dist/stage/declare/`, to read the
-   declarations ([Objects](../objects#how-a-build-reads-the-declarations)). Check the declared objects with the
+8. Where the code declares objects, run the entry once, with every module it requires while it loads, from
+   `dist/stage/declare/`: the run that reads the declarations
+   ([Objects](../objects#how-a-build-reads-the-declarations)). Check the declared objects with the
    objects of the object files, and write their ids into `src/generated/declared-ids.json`. Where the code declares
    nothing, the file is removed. `check` neither writes nor removes it: it compares the one that is there.
 9. Plan the rest of the map on top of the objects' files, each part on the map as the one before leaves it: the map
@@ -250,7 +251,8 @@ where the code declares objects); the staged map; the archive, which is written 
   library cannot be fetched; the compiler cannot be downloaded; a source file does not compile; the entry file is
   not there; a global is unknown (with [`lint.unknownGlobals = "warning"`](./settings#lint) it is a warning); the
   top-level code of a module fails in the run that reads the declarations, or Moonwell refuses a declared object;
-  the map cannot take a map setting; an asset cannot be imported; the map's `war3map.lua` is missing or defines no
+  `src/generated/declared-ids.json` cannot be used, or no id of a declared object's kind is left free; the map
+  cannot take a map setting; an asset cannot be imported; the map's `war3map.lua` is missing or defines no
   `main` or no `config` function.
 - The staged map cannot be replaced, as when the game or World Editor has `dist/stage` open.
 - The map cannot be packed: it has no `war3map.w3i`, or it is too large for an archive. The staged map is written by

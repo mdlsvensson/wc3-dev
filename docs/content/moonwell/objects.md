@@ -443,10 +443,10 @@ that the Paladin can learn.
 
 ### What a declaration takes
 
-`declare` takes a table with these entries, and a second argument, `level`, which
+`declare` takes a table with these settings, and a second argument, `level`, which
 [The place of a declaration](#the-place-of-a-declaration) describes:
 
-| Entry | What it is |
+| Setting | What it is |
 | --- | --- |
 | `category` | The kind of the object: `"heroes"`, `"units"`, `"buildings"`, `"items"`, `"abilities"`, `"buffs"` or `"upgrades"` |
 | `key` | A text that is not empty, and is used once in its kind, over the object files and the code. It may hold any characters, such as `spells.bolt` |
@@ -455,7 +455,7 @@ that the Paladin can learn.
 | `heroes` | Optional, and for an ability only: the standard heroes that can learn it ([Heroes that learn a declared ability](#heroes-that-learn-a-declared-ability)) |
 | `fields` | A table of field names and their values. Write `fields: {}` for an object that sets none |
 
-An entry that is not one of these six is an error, and so is a `category`, a `key`, a `base`, an `id` or a `fields`
+A setting that is not one of these six is an error, and so is a `category`, a `key`, a `base`, an `id` or a `fields`
 of the wrong form.
 
 ### Fields of a declaration
@@ -467,7 +467,7 @@ a field is set once, and a value must fit its field and the object's level count
 
 - **`true`, `false`, a number or a text.** It sets the field, as in an object file. A number must be finite.
 - **A list,** such as `{8, 7, 6}`. On a field with levels it sets the levels 1, 2 and so on, and on a list field it
-  sets the list, as a `List` does in an object file. An entry of the list may be a list itself: on a list field with
+  sets the list, as a `List` does in an object file. The list may hold lists in its turn: on a list field with
   levels, such as the `buffs` of an ability, `{{"B000"}, {"B000", "B001"}}` sets one list for each level, as a `List`
   of lists does in Pkl.
 - **A function of the level.** The build calls it for each level from 1 to the `levels` of the same `fields`, and
@@ -509,7 +509,8 @@ hint: Run moonwell build to update it.
 ```
 
 A file that is no mapping of kinds to keys and ids, or that holds an id of the wrong form, is an error too. Its hint
-is to fix the file or delete it: the next build then chooses new ids for every declaration.
+is to fix the file or delete it: the next build then chooses new ids for every declaration without an `id` of its
+own.
 
 ### Heroes that learn a declared ability
 
@@ -523,13 +524,15 @@ one. An object file has no `heroes`.
 
 ### How a build reads the declarations
 
-A build compiles the code first. Then it runs the code once to read what it declares: the modules that the entry
-reaches, from the entry, with `yue -e` of the YueScript compiler that compiled them. It runs them only when one of
-those modules requires `moonwell` and the Lua of one of them names `declare`, as `.declare`, `:declare` or the text
-`"declare"`. For another project it runs nothing more. In that run:
+A build compiles the code first. Then it runs the code once, in the run that reads the declarations, with `yue -e`
+of the YueScript compiler that compiled it. It does so only when one of the modules that the entry reaches requires
+`moonwell` and the Lua of one of them names `declare`, as `.declare`, `:declare` or the text `"declare"`. In any
+other project there is no such run. In that run:
 
-- **The top-level code runs.** The top-level code of every module that the entry reaches runs, as it does while the
-  map's script loads. No hook is called.
+- **The entry runs.** The entry runs, and every module that it requires while it loads, as when the map's script
+  loads. No hook is called. A module that only a function requires, such as a hook, does not run: its declarations
+  are not read, and in the game its `declare` raises the error that
+  [Declared objects in the game](#declared-objects-in-the-game) shows.
 - **The game is not there.** None of its natives exists, and neither do the globals of the source map's
   `war3map.lua`. A native that is called at the top level of a module fails the build.
 - **`declare` returns `nil`.** `moonwell.declaring` is `true` during the run, and `false` in the game. Top-level
@@ -549,13 +552,14 @@ The hint is one of three:
 
 - **A global that is `nil` is called,** as a native is in the run: the hint above. Move the call into a function,
   such as a hook.
-- **A declaration is wrong,** as with an entry that `declare` does not take, a function of the level without
+- **A declaration is wrong,** as with a setting that `declare` does not take, a function of the level without
   `levels`, or a key that the code declares twice: the hint says
   `Fix this call of moonwell.declare: "Objects declared in code" in Moonwell's README says what it takes.` The
   message says what is wrong, such as `The base "AHt" is not a four-character id.`
 - **Another error:** the hint says that the top-level code runs at build, `and this error ended that run.`
 
-In a minified build the error names the file without a line.
+In a minified build an error in a YueScript module names the file without a line. An error in a Lua module keeps
+its line.
 
 After the run, Moonwell checks each declared object as it checks the objects of the object files: its base, its
 id, its fields and their values. A problem names the file and the line of the declaration, and the object as
@@ -567,7 +571,9 @@ object file. An id that two objects have names both.
 The line that calls `declare` is the place of the declaration, which its errors name. A function that declares for
 its caller gives `declare` a second argument, `level`: a whole number of 1 or more, which counts the levels of the
 call stack as `error` does. 1, the default, is the line that calls `declare`, and 2 the line that called the
-function that calls it. Unlike `error`, `declare` counts a tail call as a level.
+function that calls it. Unlike `error`, `declare` counts a tail call as a level. A call over several lines, such
+as `declare {` with its settings on the lines below, is at the line that YueScript gives the call: the one after
+`declare {`.
 
 ```yue
 import "moonwell" as mw
@@ -587,8 +593,9 @@ An error in the declaration of `frost_bolt` names the line `frost = declareBolt 
 ### Declared objects in the game
 
 In the map, `declare` returns the id that the build gave the object of that kind and key. A call with a kind and a
-key that the build did not read, such as a call inside a function that runs only in the game, raises an error at
-the line that called `declare`. Its message names the kind and the key:
+key that the build did not read, such as a call inside a function that runs only in the game, or in a module that
+only such a function requires, raises an error at the line that called `declare`. Its message names the kind and
+the key:
 
 ```text
 moonwell.declare: abilities "bolt" was not declared at build: call moonwell.declare at the top level of a module the entry reaches.

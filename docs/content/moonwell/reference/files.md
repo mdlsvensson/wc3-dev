@@ -93,10 +93,11 @@ changed or its Lua file is gone. It compiles every file again when the compiler 
 is switched on or off, when the build changes between a release and a development build, when a file that holds the
 word `macro` changed, and when Moonwell's own macro module is another. A Lua file whose source is gone is removed.
 
-**The declaration run.** Where the code declares objects, a build writes `dist/stage/declare/war3map.lua` and runs
-it once with the compiler: Moonwell's runtime and the modules that the entry reaches, without World Editor's part
-of the map's script ([Objects](../objects#how-a-build-reads-the-declarations)). The file is written again at every
-build that runs it, and the map does not get it.
+**The run that reads the declarations.** Where the code declares objects, a build writes
+`dist/stage/declare/war3map.lua` and runs it once with the compiler: Moonwell's runtime and the modules that the
+entry reaches, without World Editor's part of the map's script. The run starts the entry, which runs every module
+that it requires while it loads ([Objects](../objects#how-a-build-reads-the-declarations)). The file is written again
+at every build that runs it, and the map does not get it.
 
 **The archive.** `build` writes the archive beside its place first, as `<map.folder>.tmp`, and moves it there when
 it is whole. So the place holds a whole archive or none. A build that is ended midway can leave the `.tmp` file,
@@ -122,8 +123,8 @@ behind.
 
 ### `src/generated/` {#src-generated}
 
-`src/generated/objects.yue` is the ids module: the ids of your objects, for your code to import as
-`generated.objects`. Its first line says that Moonwell wrote it and that it is not to be edited.
+`src/generated/objects.yue` is the ids module: the ids of the objects of your object files, for your code to import
+as `generated.objects`. Its first line says that Moonwell wrote it and that it is not to be edited.
 
 - `init` writes the file as the template has it, with the id of the template's one object.
 - `build`, `test` and `dev` write the file when it does not match the objects.

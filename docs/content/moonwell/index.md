@@ -12,14 +12,15 @@ written in Pkl or declared in the gameplay code, and files to import into the ma
 2. Where the project has a `.pkl` file under `objects/`, it runs Pkl to evaluate the object files.
 3. It opens the source map, `maps/<map.folder>`, which is the map as World Editor saved it, and reads which globals
    its script defines.
-4. It checks your objects against the game's data and against the objects the map already has.
-5. It writes the ids of your objects as a module for your code to import, `src/generated/objects.yue`, and the files
-   your editor reads, under `.moonwell/`.
+4. It checks the objects of your object files against the game's data and against the objects the map already has.
+5. It writes the ids of the objects of your object files as a module for your code to import,
+   `src/generated/objects.yue`, and the files your editor reads, under `.moonwell/`.
 6. It brings the libraries that the project names up to date, under `.moonwell/`.
 7. It compiles the YueScript files to Lua, follows the imports from the entry, which is `src/main.yue` in a new
    project, and checks the modules it reaches for unknown globals.
-8. Where the code declares objects, it runs the top-level code of those modules once, without the game, to read the
-   declarations, and checks the declared objects with the others.
+8. Where the code declares objects, it runs the entry once, without the game, in the run that reads the
+   declarations, checks the declared objects with the others, and writes their ids into
+   `src/generated/declared-ids.json`.
 9. It plans every file of the map that changes, each on the map as the one before leaves it: the object data, the map
    settings, the imported files, and last the map's script, with your code added at its end.
 10. It replaces `dist/stage/<map.folder>` with a copy of the source map and writes the planned files into the copy.

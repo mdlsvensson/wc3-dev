@@ -99,12 +99,12 @@ and commit the change ([Objects](../objects#ids-of-declared-objects)).
 
 An error that says `The declared object ids cannot be used:` names the same file, which is not a mapping of kinds to
 keys and ids, or holds an id of the wrong form. Put it right, or delete it: the next build then chooses new ids for
-every declared object.
+every declared object without an `id` of its own.
 
 ### A build fails in code that runs at build
 
-In a project that declares objects with `moonwell.declare`, a build runs the top-level code of the modules that the
-entry reaches once, to read the declarations, and the game's natives do not exist there
+In a project that declares objects with `moonwell.declare`, a build runs the entry once, with every module that it
+requires while it loads, in the run that reads the declarations, and the game's natives do not exist there
 ([Objects](../objects#how-a-build-reads-the-declarations)). An error in that run fails `build`, `test`, `check` and
 `dev` at its file and line, and the hint says which of three cases it is:
 
@@ -117,7 +117,8 @@ entry reaches once, to read the declarations, and the game's natives do not exis
   global of the source map's `war3map.lua`, which does not exist in that run either. Put it right, or move the code
   into a function.
 
-In a minified build the error names the file without a line: build without minifying to find the line.
+In a minified build an error in a YueScript module names the file without a line: build without minifying to find
+the line. An error in a Lua module keeps its line.
 
 ### The program and the project's Pkl package differ in version
 
@@ -243,11 +244,11 @@ the `moonwell` module, which turns that place into the source file and the line,
 
 The runtime reports an error, such as `[moonwell] on_main failed:`, whose message says `moonwell.declare:`, a kind
 and a key, and `was not declared at build: call moonwell.declare at the top level of a module the entry reaches.`
-The build reads
-a declaration only when the top-level code of a module that the entry reaches runs it, and in the game `declare`
-returns the id that the build gave. A call inside a function that only the game runs, such as a hook, has no id.
-Move the declaration to the top level of a module, and use the id it returns inside the function
-([Objects](../objects#declared-objects-in-the-game)).
+The build reads a declaration only when it runs while the entry loads: at the top level of the entry, or of a module
+that is required while the entry loads. In the game `declare` returns the id that the build gave. A call inside a
+function that only the game runs, such as a hook, or in a module that only such a function requires, has no id.
+Move the declaration to the top level of a module that the entry requires as it loads, and use the id it returns
+inside the function ([Objects](../objects#declared-objects-in-the-game)).
 
 ### An error in a callback is not printed
 

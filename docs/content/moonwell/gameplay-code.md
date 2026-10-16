@@ -35,9 +35,10 @@ Code at the top level of a module is in no hook. It runs while the map's script 
 `config` or `main`. So keep the top level for imports, for functions and for the lines that add hooks, and make game
 objects, such as units, timers and triggers, inside a hook.
 
-In a project that declares objects in its code, with `moonwell.declare`, a build also runs the top-level code of
-the modules once, where the game's natives do not exist, and there `moonwell.declare` returns `nil`. A native that
-is called at the top level then fails the build: [How a build reads the
+In a project that declares objects in its code, with `moonwell.declare`, a build also runs the entry once, with
+every module that it requires while it loads, where the game's natives do not exist and `moonwell.declare` returns
+`nil`. A native that is called at the top level then fails the build. A module that only a function requires does
+not run there, so a declaration in it is not read: [How a build reads the
 declarations](./objects#how-a-build-reads-the-declarations) describes that run.
 
 A hook that fails does not stop the others. The runtime reports the error, with the hook's name and with the source
