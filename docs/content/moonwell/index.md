@@ -57,7 +57,7 @@ own section of these pages.
 
 ## The version these pages describe
 
-These pages describe Moonwell 0.12.9. The releases of the two libraries that go with it are moonwell-wrappers v0.10.1
+These pages describe Moonwell 0.12.10. The releases of the two libraries that go with it are moonwell-wrappers v0.10.1
 and moonwell-systems v0.6.1. Where a page says what the game does, that was measured on Warcraft III Reforged
 3.0.0.24268, unless the page names another version.
 

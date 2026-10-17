@@ -46,7 +46,7 @@ Moonwell runs Pkl on it to evaluate them together.
 `types/` holds four files of declarations for lua-language-server:
 
 - `natives.d.lua`: the game's types, functions and globals, from its `common.j` and `blizzard.j`.
-- `moonwell.d.lua`: the `moonwell` module, with its hooks, `format_error`, `declare` and `declaring`.
+- `moonwell.d.lua`: the `moonwell` module, with its hooks, `format_error`, `declare`, `id_of` and `declaring`.
 - `objects.d.lua`: the ids module, `generated.objects`, with a field for each object of your object files.
 - `map.d.lua`: the globals and the functions that the source map's `war3map.lua` defines.
 

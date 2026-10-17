@@ -91,7 +91,7 @@ package that the object files are written for, and its version. This is the file
 amends "pkl:Project"
 
 dependencies {
-  ["moonwell"] { uri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.9" }
+  ["moonwell"] { uri = "package://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.10" }
 }
 ```
 
@@ -308,7 +308,8 @@ mw.on_main ->
 ```
 
 The module holds the objects of the object files. An object declared in code is not in it: its id is what
-`moonwell.declare` returns ([Objects declared in code](#objects-declared-in-code)).
+`moonwell.declare` returns, and in the game what `moonwell.id_of` returns
+([Objects declared in code](#objects-declared-in-code)).
 
 `build`, `test` and `dev` write the module again whenever it does not match the objects, so you never edit it.
 `check` and `objects:check` do not write the module. They compare it with the objects, and fail when it does not
@@ -344,7 +345,7 @@ Value: "600"
 
 556 | hitPointsMaximumBase: Int?
                             ^^^
-at moonwell.generated.UnitProps#hitPointsMaximumBase (projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.9#/generated/UnitProps.pkl)
+at moonwell.generated.UnitProps#hitPointsMaximumBase (projectpackage://pkg.pkl-lang.org/github.com/mdlsvensson/moonwell/moonwell@0.12.10#/generated/UnitProps.pkl)
 
 8 | hitPointsMaximumBase = "600"
                            ^^^^^
@@ -474,6 +475,9 @@ a field is set once, and a value must fit its field and the object's level count
   the field takes at each level what the function returns there: `true`, `false`, a number, a text, or a list of
   those. On a list field with levels, what it returns is that level's list, also when it is one text:
   `buffs: (level) -> "B000"` gives every level the list `B000`.
+- **`moonwell.id_of(category, key)`,** another declared object. The build writes that object's id in its place. It
+  may be the value, an entry of a list or of a list of lists, and what a function of the level returns
+  ([Naming another declared object](#naming-another-declared-object)).
 
 A function of the level needs the field `levels` in the same `fields`, under that name, as a whole number of 1 or
 more: without it the declaration is an error. `levels` also sets the object's level count, as it does in an object
@@ -512,6 +516,43 @@ A file that is no mapping of kinds to keys and ids, or that holds an id of the w
 is to fix the file or delete it: the next build then chooses new ids for every declaration without an `id` of its
 own.
 
+### Naming another declared object
+
+`id_of`, a function of the `moonwell` module, names a declared object by its kind and its key:
+`moonwell.id_of(category, key)`, with a `category` of the seven kinds and a `key` that is a text that is not empty.
+In the fields of a declaration it stands for that object's id. The build gives every declared object its id, and
+then writes the id in the place of each `id_of`, as the rawcode a field takes, such as `B000`. The object that
+`id_of` names may be declared after the one that names it. This ability, a copy of Slow Aura (Tornado), carries a
+buff that is declared on the next line:
+
+```yue
+import "moonwell" as mw
+
+mw.declare category: "abilities", key: "burning.carrier", base: "Aasl", fields: {buffs: mw.id_of("buffs", "burning")}
+mw.declare category: "buffs", key: "burning", base: "Basl", fields: {tooltip: "Burning"}
+```
+
+`id_of` names the objects that the code declares. An object of the object files is not one of them: a field names
+it by its rawcode. A key that no declaration of the kind has fails the build at the line of the declaration that
+names it. With the buff's key written `burnin` in the line of the ability:
+
+```text
+error: src/main.yue:3 › abilities["burning.carrier"]: the field "buffs" names buffs["burnin"] with moonwell.id_of, and no declaration has that key.
+hint: Declare that object with moonwell.declare at the top level of a module the entry reaches, or name a key that is declared.
+```
+
+A `category` that is not one of the seven kinds, or a `key` that is not a text or is empty, fails the run that reads
+the declarations at the line that calls `id_of` ([How a build reads the
+declarations](#how-a-build-reads-the-declarations)). In the game, `id_of` returns the object's id
+([Declared objects in the game](#declared-objects-in-the-game)).
+
+::: note
+On Warcraft III Reforged 3.0.0.24268, on one machine and in a single-player game, a copy of Slow Aura (Tornado) of
+one level, whose `buffs` named a declared buff with `id_of`, was given to a footman and hidden: the buff's level on
+the footman read 1, and 0 after the aura and then the buff were removed. In the game `id_of` returned the id that the
+buff's `declare` returned. A game that other machines join was not checked.
+:::
+
 ### Heroes that learn a declared ability
 
 `heroes` lists standard heroes by their rawcode, such as `Hpal` for the Paladin. A build adds the ability to the
@@ -537,7 +578,8 @@ other project there is no such run. In that run:
   `war3map.lua`. A native that is called at the top level of a module fails the build.
 - **`declare` returns `nil`.** `moonwell.declaring` is `true` during the run, and `false` in the game. Top-level
   code must not depend on an id: use it inside functions, such as hooks, which run in the game. The example above
-  prints `bolt` in an `on_main` hook.
+  prints `bolt` in an `on_main` hook. `id_of` returns a value that only the fields of a declaration take, and not
+  the id: top-level code must not use it as a number.
 - **Output goes nowhere.** What the code prints during the run is not shown.
 
 An error that ends the run fails the build, and names the file and the line of the error. A native at the top level
@@ -599,6 +641,17 @@ the key:
 
 ```text
 moonwell.declare: abilities "bolt" was not declared at build: call moonwell.declare at the top level of a module the entry reaches.
+```
+
+`id_of` returns the same id as `declare`, the integer that the game's functions take, for a kind and a key that the
+build read. For any other kind and key it raises at the line that called `id_of`, with the message above, which then
+begins `moonwell.id_of:`. So a hook can name a declared object by its key:
+
+```yue
+import "moonwell" as mw
+
+mw.on_main ->
+  print "Bolt is", mw.id_of("abilities", "bolt")
 ```
 
 ::: note
