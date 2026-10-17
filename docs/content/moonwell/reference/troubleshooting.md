@@ -249,8 +249,8 @@ that is required while the entry loads. In the game `declare` returns the id tha
 function that only the game runs, such as a hook, or in a module that only such a function requires, has no id.
 Move the declaration to the top level of a module that the entry requires as it loads, and use the id it returns
 inside the function ([Objects](../objects#declared-objects-in-the-game)). A message that says `moonwell.id_of:`
-names a kind and a key that no declaration the build read has: declare the object in that way, or name a key that
-is declared.
+names a kind and a key that no declaration the build read has: declare that object at the top level of a module
+that the entry requires as it loads, or name a key that is declared.
 
 ### An error in a callback is not printed
 

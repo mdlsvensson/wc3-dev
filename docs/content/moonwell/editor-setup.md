@@ -130,7 +130,8 @@ In a `.yue` file you get completion, hover and signature help for:
   `declaring`, each with a description, and the settings that a declaration takes.
 - **Your objects.** After `import "generated.objects"`: every object of your object files under its key, such as
   `captain` among the `units`, with its rawcode. An object declared in code is not there: its id is what
-  `moonwell.declare` returns ([Objects](./objects#objects-declared-in-code)).
+  `moonwell.declare` returns, and in the game what `moonwell.id_of` returns
+  ([Objects](./objects#objects-declared-in-code)).
 - **The map's own globals.** The `gg_` and `udg_` globals and the functions that the source map's script defines:
   see [Using your own map](./own-map#the-maps-own-globals).
 

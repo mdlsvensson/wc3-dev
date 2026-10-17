@@ -542,8 +542,10 @@ hint: Declare that object with moonwell.declare at the top level of a module the
 ```
 
 A `category` that is not one of the seven kinds, or a `key` that is not a text or is empty, fails the run that reads
-the declarations at the line that calls `id_of` ([How a build reads the
-declarations](#how-a-build-reads-the-declarations)). In the game, `id_of` returns the object's id
+the declarations at the line that calls `id_of`, with the hint `Fix this call of moonwell.declare`, as a wrong
+declaration does ([How a build reads the declarations](#how-a-build-reads-the-declarations)). Its message begins
+`moonwell.id_of:`, such as `moonwell.id_of: the category "spells" is not one of heroes, units, buildings, items,
+abilities, buffs, upgrades.` In the game, `id_of` returns the object's id
 ([Declared objects in the game](#declared-objects-in-the-game)).
 
 ::: note
