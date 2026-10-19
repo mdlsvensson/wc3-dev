@@ -48,6 +48,15 @@ export default defineConfig({
           items: [
             { label: "Project & World Editor", slug: "guides/project-and-editor" },
             { label: "Objects", slug: "guides/objects" },
+            {
+              label: "Actors, Components & Reactions",
+              slug: "guides/components-and-reactions",
+            },
+            {
+              label: "Abilities, Buffs & Timers",
+              slug: "guides/abilities-buffs-and-timers",
+            },
+            { label: "Multiplayer", slug: "guides/multiplayer" },
           ],
         },
       ],

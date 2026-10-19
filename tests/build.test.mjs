@@ -20,6 +20,21 @@ test("astro build emits landing page, getting-started guide, 404 page, and pagef
     true,
     "dist/guides/objects/index.html should exist",
   );
+  assert.equal(
+    existsSync("dist/guides/components-and-reactions/index.html"),
+    true,
+    "dist/guides/components-and-reactions/index.html should exist",
+  );
+  assert.equal(
+    existsSync("dist/guides/abilities-buffs-and-timers/index.html"),
+    true,
+    "dist/guides/abilities-buffs-and-timers/index.html should exist",
+  );
+  assert.equal(
+    existsSync("dist/guides/multiplayer/index.html"),
+    true,
+    "dist/guides/multiplayer/index.html should exist",
+  );
   assert.equal(existsSync("dist/404.html"), true, "dist/404.html should exist");
   assert.equal(
     existsSync("dist/pagefind/pagefind.js"),
