@@ -59,6 +59,15 @@ export default defineConfig({
             { label: "Multiplayer", slug: "guides/multiplayer" },
           ],
         },
+        {
+          label: "Reference",
+          items: [
+            { label: "CLI & Build", slug: "reference/cli-and-build" },
+            { label: "Runtime API", slug: "reference/runtime-api" },
+            { label: "Objects & Natives API", slug: "reference/objects-and-natives" },
+            { label: "Diagnostics & Errors", slug: "reference/diagnostics" },
+          ],
+        },
       ],
     }),
   ],

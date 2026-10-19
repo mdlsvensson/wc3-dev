@@ -3,38 +3,24 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-test("astro build emits landing page, getting-started guide, 404 page, and pagefind bundle", () => {
-  assert.equal(existsSync("dist/index.html"), true, "dist/index.html should exist");
-  assert.equal(
-    existsSync("dist/guides/getting-started/index.html"),
-    true,
-    "dist/guides/getting-started/index.html should exist",
-  );
-  assert.equal(
-    existsSync("dist/guides/project-and-editor/index.html"),
-    true,
-    "dist/guides/project-and-editor/index.html should exist",
-  );
-  assert.equal(
-    existsSync("dist/guides/objects/index.html"),
-    true,
-    "dist/guides/objects/index.html should exist",
-  );
-  assert.equal(
-    existsSync("dist/guides/components-and-reactions/index.html"),
-    true,
-    "dist/guides/components-and-reactions/index.html should exist",
-  );
-  assert.equal(
-    existsSync("dist/guides/abilities-buffs-and-timers/index.html"),
-    true,
-    "dist/guides/abilities-buffs-and-timers/index.html should exist",
-  );
-  assert.equal(
-    existsSync("dist/guides/multiplayer/index.html"),
-    true,
-    "dist/guides/multiplayer/index.html should exist",
-  );
+const expectedPages = [
+  "dist/index.html",
+  "dist/guides/getting-started/index.html",
+  "dist/guides/project-and-editor/index.html",
+  "dist/guides/objects/index.html",
+  "dist/guides/components-and-reactions/index.html",
+  "dist/guides/abilities-buffs-and-timers/index.html",
+  "dist/guides/multiplayer/index.html",
+  "dist/reference/cli-and-build/index.html",
+  "dist/reference/runtime-api/index.html",
+  "dist/reference/objects-and-natives/index.html",
+  "dist/reference/diagnostics/index.html",
+];
+
+test("astro build emits all 11 documentation pages, 404 page, pagefind bundle, and valid internal links", () => {
+  for (const page of expectedPages) {
+    assert.equal(existsSync(page), true, `${page} should exist`);
+  }
   assert.equal(existsSync("dist/404.html"), true, "dist/404.html should exist");
   assert.equal(
     existsSync("dist/pagefind/pagefind.js"),
@@ -53,6 +39,27 @@ test("astro build emits landing page, getting-started guide, 404 page, and pagef
 
   const gettingStartedHtml = readFileSync("dist/guides/getting-started/index.html", "utf8");
   assert.match(gettingStartedHtml, /Moonwell\.Templates/);
+
+  for (const page of expectedPages) {
+    const html = readFileSync(page, "utf8");
+    const hrefMatches = html.matchAll(/href="(\/[^"#?]*)"/g);
+    for (const match of hrefMatches) {
+      const href = match[1];
+      if (href.startsWith("/_astro/") || href.startsWith("/pagefind/")) {
+        continue;
+      }
+      const targetPath = href.endsWith("/")
+        ? `dist${href}index.html`
+        : existsSync(`dist${href}`)
+          ? `dist${href}`
+          : `dist${href}/index.html`;
+      assert.equal(
+        existsSync(targetPath),
+        true,
+        `internal link ${href} in ${page} should resolve to ${targetPath}`,
+      );
+    }
+  }
 });
 
 test("biome.json is configured and biome check passes cleanly", () => {
