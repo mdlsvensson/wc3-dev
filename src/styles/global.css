@@ -1,0 +1,86 @@
+@layer base, starlight, theme, components, utilities;
+
+@import "@astrojs/starlight-tailwind";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme {
+  /* Vitesse Dark accent scale (#4d9375 primary sage green) */
+  --color-accent-50: #f0fff4;
+  --color-accent-100: #dcffe4;
+  --color-accent-200: #a8dec2;
+  --color-accent-300: #80a665;
+  --color-accent-400: #5da994;
+  --color-accent-500: #4d9375;
+  --color-accent-600: #3b7a5f;
+  --color-accent-700: #2b5f49;
+  --color-accent-800: #1c6b48;
+  --color-accent-900: #144620;
+  --color-accent-950: #0d2e15;
+
+  /* Vitesse Dark neutral/surface scale (#121212 background, #dbd7ca foreground) */
+  --color-gray-50: #dbd7ca;
+  --color-gray-100: #d1d5da;
+  --color-gray-200: #bfbaaa;
+  --color-gray-300: #959da5;
+  --color-gray-400: #758575;
+  --color-gray-500: #586069;
+  --color-gray-600: #2f363d;
+  --color-gray-700: #222222;
+  --color-gray-800: #191919;
+  --color-gray-900: #181818;
+  --color-gray-950: #121212;
+}
+
+:root,
+::backdrop {
+  /* Vitesse Dark core surfaces & foregrounds */
+  --sl-color-white: #dbd7ca;
+  --sl-color-gray-1: #dbd7ca;
+  --sl-color-gray-2: #bfbaaa;
+  --sl-color-gray-3: #959da5;
+  --sl-color-gray-4: #2f363d;
+  --sl-color-gray-5: #191919;
+  --sl-color-gray-6: #181818;
+  --sl-color-black: #121212;
+
+  /* Vitesse Dark primary accent */
+  --sl-color-accent-low: #144620;
+  --sl-color-accent: #4d9375;
+  --sl-color-accent-high: #80a665;
+
+  /* Vitesse Dark semantic colors */
+  --sl-color-green-low: #144620;
+  --sl-color-green: #4d9375;
+  --sl-color-green-high: #80a665;
+
+  --sl-color-blue-low: #05264c;
+  --sl-color-blue: #6394bf;
+  --sl-color-blue-high: #5eaab5;
+
+  --sl-color-orange-low: #49443c;
+  --sl-color-orange: #d4976c;
+  --sl-color-orange-high: #e6cc77;
+
+  --sl-color-red-low: #43242b;
+  --sl-color-red: #cb7676;
+  --sl-color-red-high: #fdaeb7;
+
+  --sl-color-purple-low: #29134e;
+  --sl-color-purple: #6872ab;
+  --sl-color-purple-high: #d9739f;
+
+  /* Starlight UI bindings */
+  --sl-color-text: #bfbaaa;
+  --sl-color-text-accent: #4d9375;
+  --sl-color-text-invert: #121212;
+  --sl-color-bg: #121212;
+  --sl-color-bg-nav: #121212;
+  --sl-color-bg-sidebar: #121212;
+  --sl-color-bg-inline-code: #181818;
+  --sl-color-bg-accent: #4d9375;
+  --sl-color-hairline-light: #222222;
+  --sl-color-hairline: #191919;
+  --sl-color-hairline-shade: #121212;
+  --sl-color-backdrop-overlay: rgba(18, 18, 18, 0.78);
+}
