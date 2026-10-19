@@ -25,7 +25,6 @@ When you declare a unit, hero, item, or destructable class in C#, every instance
 ```csharp
 using Moonwell;
 using Moonwell.Objects.Units.Human;
-using static Moonwell.Natives;
 
 namespace MyMap;
 
@@ -42,7 +41,7 @@ public class Champion : Paladin
     public override void OnKill(Unit victim)
     {
         Kills++;
-        DisplayTextToPlayer(Player.Handle, 0, 0, $"Champion kills: {Kills}");
+        Natives.DisplayTextToPlayer(Player.Handle, 0, 0, $"Champion kills: {Kills}");
     }
 }
 ```
@@ -67,10 +66,10 @@ Item potion = Item.Create(ObjectTypes.IdOf<PotionOfGreaterHealing>(), 128, 0);
 When a native returns a raw `unit`, `item`, or `destructable` handle, wrap (or look up) its Moonwell actor with `Of`:
 
 ```csharp
-Unit? unit = Unit.Of(GetTriggerUnit());
-Item? item = Item.Of(GetManipulatedItem());
-Destructable? tree = Destructable.Of(GetEnumDestructable());
-Player? owner = Player.Of(GetOwningPlayer(GetTriggerUnit()));
+Unit? unit = Unit.Of(Natives.GetTriggerUnit());
+Item? item = Item.Of(Natives.GetManipulatedItem());
+Destructable? tree = Destructable.Of(Natives.GetEnumDestructable());
+Player? owner = Player.Of(Natives.GetOwningPlayer(Natives.GetTriggerUnit()));
 ```
 
 Calling `Unit.Of`, `Item.Of`, `Destructable.Of`, or `Player.Of` with the same live handle always returns the same Moonwell instance.
@@ -106,7 +105,7 @@ You can also attach components at run time with `Add`:
 ```csharp
 Game.Instance.Add(new WaveSpawner());
 Player.Get(0).Add(new BountyTracker());
-hero.Add(newThornsComponent);
+hero.Add(new Thorns());
 potion.Add(new ExpireOnDrop());
 ```
 
@@ -114,7 +113,7 @@ Multiple instances of the same component class can be attached to the same actor
 
 ### Querying and removing components
 
-Every `Actor` supports querying and removing its attached components by type (including base classes and interfaces):
+Every `Actor` supports querying and removing its attached components by type (`where T : Component`, including base classes):
 
 ```csharp
 bool hasFury = hero.Has<Fury>();
@@ -139,7 +138,7 @@ public class RegenerationAura : UnitComponent
     {
         Timer.Every(1f, () =>
         {
-            SetWidgetLife(Unit.Handle, GetWidgetLife(Unit.Handle) + 10f);
+            Natives.SetWidgetLife(Unit.Handle, Natives.GetWidgetLife(Unit.Handle) + 10f);
         });
     }
 
@@ -203,7 +202,7 @@ Every event dispatches in a fixed, deterministic order. Within an actor, its own
    - `Game.Instance` components (`OnGameStart()`)
    - `Player` components across slots `0`..`27` (`OnGameStart()`)
 2. **Unit enters map:**
-   - `unit.OnEnter()` (and its starting components' `OnAdded()`)
+   - The unit's starting components are added (`OnAdded()`), and then `unit.OnEnter()`
    - `Game.Instance` components (`OnUnitEnter(unit)`)
    - `unit.Player` components (`OnUnitEnter(unit)`)
 3. **Unit damaged (`Damage`):**

@@ -47,7 +47,7 @@ Every standard class carries the game's values for the map's selected balance se
 Moonwell provides three ways to set object fields in a constructor:
 
 1. **Hand-picked property names** for the 98 most common fields across the seven kinds (`Name`, `HitPoints`, `Mana`, `Armor`, `Speed`, `Damage`, `Cooldown`, `ManaCost`, `Range`, `Area`, `Duration`, `Tooltip`, `Icon`, `Model`, and so on — see [Objects & Natives API](/reference/objects-and-natives/#hand-picked-field-names)).
-2. **Generated property names** from World Editor's English field labels for every other field in the game's metadata (such as `AnimationWalkSpeed`, `Attack1ProjectileArt`, or `DataStunDuration`).
+2. **Generated property names** from World Editor's English field labels for every other field in the game's metadata (such as `AnimationWalkSpeed` or `Attack1ProjectileArt`).
 3. **Raw four-character field ids** via `Set(fieldId, value)` or `Set(fieldId, level, value)`:
 
 ```csharp
@@ -82,7 +82,7 @@ namespace MyMap
             Damage = Levels(75f, 150f, 225f);
             Tooltip = PerLevel(level => $"Smite - [|cffffcc00Level {level}|r]");
             ExtendedTooltip = PerLevel(level =>
-                $"Hurls a magical hammer that deals {Damage[level]} damage and stuns for {DataStunDuration[level]} seconds.");
+                $"Hurls a magical hammer that deals {Damage[level]} damage and stuns for {Duration[level]} seconds.");
         }
     }
 }
@@ -146,7 +146,7 @@ On the first build that sees a class, `moonwell build` assigns it a four-charact
 | Items | `I001`, `I002`, ... |
 | Abilities | `A001`, `A002`, ... |
 | Buffs | `B001`, `B002`, ... (plus `<ClassName>#carrier` with an `A` id for its hidden carrier ability) |
-| Destructables | `B001`, `B002`, ... (shares the `B` prefix space without colliding with buffs or standard ids) |
+| Destructables | `B001`, `B002`, ... (separate `B` id space from buffs) |
 | Doodads | `D001`, `D002`, ... |
 | Upgrades | `R001`, `R002`, ... |
 

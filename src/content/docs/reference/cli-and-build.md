@@ -42,15 +42,15 @@ When launching Warcraft III, `moonwell run` passes:
 
 ### `moonwell --version`
 
-Prints the installed `Moonwell.Cli` version (for example, `0.1.1`) and exits.
+Prints the installed `Moonwell.Cli` version (for example, `0.1.2`) and exits.
 
 ## Exit codes
 
 | Exit code | Meaning |
 | --- | --- |
-| `0` | Success (`build` completed, `run` launched Warcraft III, or `--version` / `--help` printed). |
+| `0` | Build done, `run` launched Warcraft III, or `--version` printed. |
 | `1` | Build error, analyzer error (`MW0001`–`MW0006`), object declaration failure, or missing game executable. |
-| `2` | Invalid command-line arguments or unknown option. |
+| `2` | Anything not understood on the command line (prints the usage and exits `2`). |
 
 ## Build pipeline
 
@@ -59,7 +59,6 @@ When you run `moonwell build` or `moonwell run`, `Moonwell.Build` executes the f
 1. **Locate project and base map:**
    - Finds the single `.csproj` in the target folder and verifies that `map\war3map.w3i` exists.
 2. **Compile C# (`dotnet build`):**
-   - Deletes any stale `build\generated\ObjectStubs.g.cs` from a previous build so new object overrides compile cleanly.
    - Runs `dotnet build -c Debug` (or `-c Release` with `--release`), which also runs `Moonwell.Analyzers` (`MW0001`–`MW0006`).
 3. **Verify NuGet package sources (`PackageSources.Check`):**
    - Verifies that every referenced `Moonwell*` package exists in `~/.nuget/packages` alongside its bundled `contentFiles/cs/any/` source files (which CSharp.lua compiles into the map script).
@@ -69,26 +68,26 @@ When you run `moonwell build` or `moonwell run`, `Moonwell.Build` executes the f
    - Rejects any constructor that calls a `Moonwell.Natives` function, naming the exact C# file and line.
 5. **Assign and validate object ids (`ids.json`):**
    - Reads and updates `ids.json` in the project root.
-   - Assigns deterministic four-character ids (`H001`, `h001`, `I001`, `A001`, `B001`, `D001`, `R001`...) to newly declared classes, validates `[ObjectId("...")]` attributes, checks for duplicate `[Replaces]` declarations, and stops if a class appears to have been renamed without updating `ids.json`.
+   - Assigns deterministic four-character ids (`H001`, `h001`, `I001`, `A001`, `B001`, `D001`, `R001`...) to newly declared classes, validates `[ObjectId("...")]` attributes, and checks for duplicate `[Replaces]` declarations. If a class appears to have been renamed, stops the build when the old id is placed in the map (`war3mapUnits.doo` or `war3map.doo`), or prints a warning suggesting `[ObjectId("...")]` and gives a new id otherwise.
    - For each declared `StandardBuff`, generates a carrier ability (`Aasl` Slow Aura base with `abuf:1`, `atar:1 = "self"`, and `aare:1 = 1f`, hidden at run time with `BlzUnitHideAbility`) so the buff's icon and art appear in-game.
 6. **Generate C# glue (`build\generated\`):**
    - Writes `build\generated\MapMain.g.cs` (`Moonwell.Generated.MapMain.Main()`), which calls `Runtime.Start(new <MapClass>(), ObjectRegistry.Register)`.
-   - Writes `build\generated\ObjectRegistry.g.cs` (`ObjectRegistry.Register()`), which registers every declared unit, item, destructable, ability, buff carrier, upgrade, and doodad with `ObjectTypes`.
-   - Writes `build\generated\ObjectStubs.g.cs` with `new` read-only property stubs for properties overridden in object constructors so CSharp.lua reads their values from the `MoonwellObjectValues` Lua table at run time.
+   - Writes `build\generated\ObjectRegistry.g.cs` (`ObjectRegistry.Register()`), which registers every declared unit, item, destructable, ability, buff carrier, upgrade, and doodad with `ObjectTypes` (or deletes `ObjectRegistry.g.cs` and `ObjectStubs.g.cs` when the map does not reference `Moonwell.Objects`).
+   - Writes `build\generated\ObjectStubs.g.cs` holding stubs of the `Moonwell.Objects` classes the map uses, with only the members the map's assembly names. CSharp.lua compiles these instead of the library's generated classes, which it skips (they sit inside `#if !MOONWELL_LUA`).
 7. **Check string literals and mark C# lines:**
    - Scans user `.cs` files (`LiteralCheck`) for C# string escapes or literal forms that CSharp.lua miscompiles.
-   - Copies user source files into a temporary shadow project and instruments statements with `Line.Mark("File.cs:line")` calls so runtime error reports point to the exact C# file and line.
+   - Copies user source files into a temporary shadow project and inserts a comment marker `/*[[--@mw <file>:<line>]]*/` before each statement. The build turns these markers into the `MoonwellLines` table so runtime error reports point to the exact C# file and line.
 8. **Compile C# to Lua and write the map (`build\<Name>\` and `build\<Name>.w3x`):**
    - Compiles the shadow project to `war3map.lua` via War3Net / CSharp.lua using `common.j` and `Blizzard.j` from `Documents\Warcraft III\JassHelper`.
-   - Prepends the Lua class definitions for only the `Moonwell.Objects` standard classes referenced by the map, and appends the `MoonwellObjectValues` and `MoonwellLines` tables.
-   - Merges `map\`, generated object data (`war3map.w3u`, `w3t`, `w3b`, `w3d`, `w3a`, `w3h`, `w3q`), updated `war3map.w3i` and `war3map.wts`, and `assets\` into `build\<Name>\`, then packs `build\<Name>.w3x`.
+   - Links the Lua class definitions for only the `Moonwell.Objects` standard classes referenced by the map, and appends the `MoonwellObjectValues` and `MoonwellLines` tables.
+   - Copies `map\` (including `war3map.wts` unchanged), writes the updated `war3map.w3i` and the generated object files (`war3map.w3u`, `.w3t`, `.w3b`, `.w3d`, `.w3a`, `.w3h`, `.w3q` and their `war3mapSkin.*` counterparts), and copies `assets\` into `build\<Name>\`, then packs `build\<Name>.w3x`.
 
 ## Development vs. release builds
 
 | Feature | Development (`moonwell build`) | Release (`moonwell build --release`) |
 | --- | --- | --- |
 | MSBuild configuration | `Debug` (`DEBUG` symbol defined) | `Release` |
-| Runtime argument checks (`Dev.Check`) | Enabled (checks player slot bounds, non-negative timer intervals, valid FourCC lengths, etc.) | Stripped |
+| Runtime argument checks (`Dev.Check`) | Enabled (checks for: a component already on an actor or not on this one; an owned object adopted twice; a buff `Duration`/`Tick` below 0; `Timer.After` seconds below 0 or `Timer.Every` seconds not above 0) | Stripped |
 | Lua comments in `war3map.lua` | Preserved | Stripped |
 | On-screen error message | `\|cffff4040Moonwell: <Class>.<Hook> failed:\|r <message> (<file>:<line>)` | `\|cffff4040Moonwell: <Class>.<Hook> failed\|r (<file>:<line>)` |
 | Log file (`CustomMapData\Moonwell\log.txt`) | Written | Written |
@@ -98,7 +97,7 @@ When you run `moonwell build` or `moonwell run`, `Moonwell.Build` executes the f
 When a reaction method or timer callback throws an exception at run time:
 
 1. Moonwell catches the exception so other reactions and timers continue to run.
-2. In development builds, Moonwell displays the failing class, hook name, C# source file and line, and exception message on screen for 60 seconds; in release builds, the exception message is omitted from the on-screen notice.
+2. In development builds, Moonwell displays the failing class, hook name, C# source file and line, and exception message on screen for 30 seconds; in release builds, the exception message is omitted from the on-screen notice.
 3. Moonwell appends a detailed entry (including the caller C# file and line where a failing timer was scheduled) to:
    ```text
    Documents\Warcraft III\CustomMapData\Moonwell\log.txt

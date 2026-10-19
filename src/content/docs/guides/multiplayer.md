@@ -13,7 +13,6 @@ Sometimes you want to pan the camera, play a sound, show a floating message, or 
 
 ```csharp
 using Moonwell;
-using static Moonwell.Natives;
 
 public class QuestAlert : GameComponent
 {
@@ -21,9 +20,9 @@ public class QuestAlert : GameComponent
     {
         Local.For(player, () =>
         {
-            PanCameraToTimed(x, y, 0.5f);
-            ClearTextMessages();
-            DisplayTimedTextToPlayer(player.Handle, 0, 0, 5f, message);
+            Natives.PanCameraToTimed(x, y, 0.5f);
+            Natives.ClearTextMessages();
+            Natives.DisplayTimedTextToPlayer(player.Handle, 0, 0, 5f, message);
         });
     }
 }
@@ -45,14 +44,13 @@ If a helper method calls machine-local read natives (such as `BlzGetLocalClientW
 
 ```csharp
 using Moonwell;
-using static Moonwell.Natives;
 
 public static class HudLayout
 {
     [MachineLocal]
     public static float AspectRatio()
     {
-        return (float)BlzGetLocalClientWidth() / BlzGetLocalClientHeight();
+        return (float)Natives.BlzGetLocalClientWidth() / Natives.BlzGetLocalClientHeight();
     }
 }
 ```
@@ -66,35 +64,33 @@ A `[MachineLocal]` method is checked by the same rules as `Local.For` and can on
 Creating a handle (`CreateUnit`, `AddSpecialEffect`, `CreateTimer`, `Location`, `Unit.Create`, `Timer.After`) or changing game state (`SetUnitX`, `KillUnit`, `UnitAddAbility`, `unit.Add`, `unit.Apply`, `Owned.End`) on only one machine desyncs the handle table or simulation immediately.
 
 ```csharp
-// Error MW0001: 'AddSpecialEffect' creates a handle or changes game state and cannot be called inside Local.For
+// Error MW0001: 'AddSpecialEffect' creates a handle; inside Local.For it runs on one machine only, which desyncs the game
 Local.For(player, () =>
 {
-    AddSpecialEffect(@"Abilities\Spells\Human\Thunderclap\ThunderClapCaster.mdl", x, y);
+    Natives.AddSpecialEffect(@"Abilities\Spells\Human\Thunderclap\ThunderClapCaster.mdl", x, y);
 });
 ```
-
-To show a special effect to one player only, compute the model string locally (`string model = ""; Local.For(player, () => model = @"...");`) and pass `model` to `AddSpecialEffect(model, x, y)` outside `Local.For` so every machine creates the `effect` handle together.
 
 ### 2. No machine-local reads outside `Local.For` (`MW0002`)
 
 Natives marked `[MachineLocal]` return values that differ from one machine to another — such as `GetLocalPlayer`, `BlzGetLocalClientWidth`, `BlzGetLocalClientHeight`, `BlzGetLocale`, `GetCameraTargetPositionX`, `GetCameraEyePositionX`, and `BlzGetTriggerPlayerMouseX`. Calling them in shared code risks branching or mutating game state on a value that other machines don't share.
 
 ```csharp
-// Error MW0002: 'BlzGetLocalClientWidth' returns a machine-local value and can only be called inside Local.For
-int width = BlzGetLocalClientWidth();
+// Error MW0002: 'BlzGetLocalClientWidth' gives a different answer on each machine; use it only inside Local.For or a [MachineLocal] method
+int width = Natives.BlzGetLocalClientWidth();
 ```
 
 Call them inside `Local.For` or a `[MachineLocal]` method where game state cannot be modified.
 
 ### 3. No `GetHandleId` (`MW0003`)
 
-Handle ids can differ across machines when local visual handles exist. Calling `GetHandleId` or `GetHandleIdBJ` is rejected with `MW0003`.
+Handle ids can differ between machines (the usual explanation is that each machine frees ids on its own). Calling `GetHandleId` or `GetHandleIdBJ` is rejected with `MW0003`.
 
 In C#, handle objects (`unit`, `item`, `player`, `timer`, etc.) and Moonwell actors (`Unit`, `Item`, `Player`, etc.) can be used directly as keys in `OrderedMap<TKey, TValue>` or `Dictionary<TKey, TValue>`, and `Unit.Of(handle)` / `Item.Of(handle)` / `Destructable.Of(handle)` wrap handles directly without `GetHandleId`.
 
 ### 4. Deterministic iteration with `OrderedMap` and `OrderedSet` (`MW0004`)
 
-In Lua, `pairs()` over a table keyed by reference objects visits entries in memory-address order, which differs between machines. Because `Dictionary<TKey, TValue>` and `HashSet<T>` compile to Lua tables, `Dictionary` and `HashSet` point lookups (`dict[key]`, `dict.TryGetValue`, `set.Contains`, `Count`) are safe, **but looping over them (`foreach`), calling `.GetEnumerator()`, or passing them to `IEnumerable<T>` / LINQ is rejected with `MW0004`**.
+In Lua, `pairs()` over a table visits entries in no fixed order, which can differ between machines. Because `Dictionary<TKey, TValue>` and `HashSet<T>` compile to Lua tables, `Dictionary` and `HashSet` point lookups (`dict[key]`, `dict.TryGetValue`, `set.Contains`, `Count`) are safe, **but looping over them (`foreach`), calling `.GetEnumerator()`, or passing them to `IEnumerable<T>` / LINQ is rejected with `MW0004`**.
 
 Use `OrderedMap<TKey, TValue>` and `OrderedSet<T>` whenever you need to iterate over a collection in deterministic insertion order:
 
@@ -149,7 +145,6 @@ If you have verified by hand that a method, constructor, property, lambda, or lo
 
 ```csharp
 using Moonwell;
-using static Moonwell.Natives;
 
 public static class LocalEffects
 {
@@ -157,11 +152,11 @@ public static class LocalEffects
     public static void SpawnLocalModel(Player toPlayer, string modelPath, float x, float y)
     {
         string path = "";
-        if (GetLocalPlayer() == toPlayer.Handle)
+        if (Natives.GetLocalPlayer() == toPlayer.Handle)
         {
             path = modelPath;
         }
-        DestroyEffect(AddSpecialEffect(path, x, y));
+        Natives.DestroyEffect(Natives.AddSpecialEffect(path, x, y));
     }
 }
 ```

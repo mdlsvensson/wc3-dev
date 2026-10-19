@@ -10,7 +10,7 @@ Every generated standard object class in `Moonwell.Objects` inherits from one of
 | Base class | Runtime base | Used for |
 | --- | --- | --- |
 | `StandardUnit` | `Moonwell.Unit` | Standard and custom non-hero units |
-| `StandardHero` | `Moonwell.Hero` (`: Unit`) | Standard and custom heroes (`H*`, `O*`, `U*`, `E*`, `N*` hero ids) |
+| `StandardHero` | `Moonwell.Hero` (`: Unit`) | Standard and custom heroes |
 | `StandardItem` | `Moonwell.Item` | Standard and custom items |
 | `StandardDestructable` | `Moonwell.Destructable` | Standard and custom destructables |
 | `StandardDoodad` | `Moonwell.Doodad` | Standard and custom doodads |
@@ -88,8 +88,8 @@ Represents a single typed object reference field.
 ### Class naming rules
 
 1. Each standard object class is named in PascalCase after its English in-game name (`Footman`, `Archmage`, `StormBolt`, `ClawsOfAttack15`, `SummerTreeWall`).
-2. When a campaign or special hero has a single `Propernames` entry (`Hjai` → `"Jaina"`, `Uear` → `"Arthas"`), that proper name is used as the class name (`Jaina`, `Arthas`).
-3. When multiple standard objects in the same namespace share an English name (or collide with a C# reserved name), the first non-campaign object keeps the plain name and colliding objects append their capitalized 4-character raw id (`FootmanHfoo`).
+2. When a campaign or special hero has a single `Propernames` entry (`Hjai` → `"Jaina"`), that proper name is used as the class name (`Jaina`). When several campaign heroes share a proper name, all of them keep their id (`ArthasHart`, `ArthasUear`).
+3. Among objects in one namespace that share a name, each gets its id appended, except the one with the first id when it isn't a campaign object (for example, `WaterElemental` for `hwat`, `WaterElementalHwt2` for `hwt2`, and `WaterElementalHwt3` for `hwt3`). A name that is a C# keyword, the namespace's last part, or a reserved type name also gets its id appended.
 
 ## Hand-picked property names (98 fields)
 
@@ -232,26 +232,31 @@ Plus per-ability data fields (such as `Damage` on `StormBolt`), which are named 
 
 ## `Moonwell.Natives`
 
-`Moonwell.Natives` (`Moonwell.Natives.dll`) provides direct C# bindings for Warcraft III's `common.j` and `Blizzard.j` in the `Moonwell` namespace. Import it with:
+`Moonwell.Natives` (`Moonwell.Natives.dll`) provides direct C# bindings for Warcraft III's `common.j` and `Blizzard.j` in the `Moonwell` namespace. Import `Moonwell` and call functions and constants through `Natives`:
 
 ```csharp
 using Moonwell;
-using static Moonwell.Natives;
+
+// ...
+Natives.CreateUnit(player.Handle, id, x, y, facing);
 ```
+
+> [!WARNING]
+> Do not use `using static Moonwell.Natives;`. Using a handle constant (such as `ATTACK_TYPE_MAGIC`, `DAMAGE_TYPE_MAGIC`, `DAMAGE_TYPE_FIRE`, or `WEAPON_TYPE_WHOKNOWS`) through a `using static` import crashes `moonwell build` 0.1.2 with `NullReferenceException`, and the static import also makes `Player.Get(0)` fail with `CS0119` because `Natives.Player(int)` shadows `Moonwell.Player`.
 
 ### `Natives` static class
 
 `public static class Natives` (in the `Moonwell` namespace) contains:
 
-- All **2,739 functions** from `common.j` and `Blizzard.j` with their exact JASS names (`CreateUnit`, `GetTriggerUnit`, `UnitDamageTarget`, `AddSpecialEffect`, `SetUnitPosition`, `BlzGetUnitMaxHp`, etc.).
+- All **2,796 functions** from `common.j` and `Blizzard.j` (Warcraft III `3.0.1.24370`) with their exact JASS names (`CreateUnit`, `GetTriggerUnit`, `UnitDamageTarget`, `AddSpecialEffect`, `SetUnitPosition`, `BlzGetUnitMaxHp`, etc.).
 - All **`common.j` and `Blizzard.j` constants** (`PLAYER_NEUTRAL_AGGRESSIVE`, `ATTACK_TYPE_HERO`, `DAMAGE_TYPE_NORMAL`, `EVENT_PLAYER_UNIT_DEATH`, `bj_RADTODEG`, etc.).
 - All **`bj_*` global variables** exposed as static properties (`bj_lastCreatedUnit`, `bj_mapInitialPlayableArea`, etc.).
-- Sync attributes (`[CreatesHandle]`, `[ChangesState]`, `[MachineLocal]`, `[Desyncs]`) pre-applied to every native and `Blizzard.j` function for `Moonwell.Analyzers`.
+- Sync attributes (`[CreatesHandle]`, `[ChangesState]`, `[MachineLocal]`, `[Desyncs]`) on the natives and `Blizzard.j` functions that create handles, change game state, read machine-local state, or desync (untagged natives also exist).
 
 ### Handle types (`namespace Moonwell`)
 
 All JASS handle types are generated in `namespace Moonwell` (in `Moonwell.Natives.dll`) with their lowercase JASS names and inheritance hierarchy:
 
 - **`handle`** — root handle type.
-  - **`agent : handle`** — reference-counted handle types (`player`, `widget`, `unit`, `item`, `destructable`, `timer`, `trigger`, `group`, `force`, `rect`, `region`, `location`, `effect`, `sound`, `dialog`, `button`, `quest`, `timerdialog`, `leaderboard`, `multiboard`, `hashtable`, `framehandle`, etc.).
-  - **Non-agent handles (`: handle`)** — enum-like and lightweight handles (`alliancetype`, `attacktype`, `damagetype`, `weapontype`, `armortype`, `race`, `playercolor`, `playerslotstate`, `unitevent`, `playerunitevent`, `widgetevent`, `limitop`, `boolexpr`, `conditionfunc`, `filterfunc`, `multiboarditem`, `texttag`, `lightning`, `image`, `ubersplat`, `fogmodifier`, `originframetype`, `framepointtype`, `textaligntype`, `oskeytype`, etc.).
+  - **`agent : handle`** — reference-counted handle types (`player`, `widget`, `unit`, `item`, `destructable`, `timer`, `trigger`, `group`, `force`, `rect`, `region`, `location`, `effect`, `sound`, `dialog`, `button`, `quest`, `timerdialog`, `leaderboard`, `multiboard`, `multiboarditem`, `hashtable`, `framehandle`, `boolexpr`, `conditionfunc : boolexpr`, `filterfunc : boolexpr`, `fogmodifier`, etc.).
+  - **Non-agent handles (`: handle`)** — enum-like and lightweight handles (`alliancetype`, `attacktype`, `damagetype`, `weapontype`, `armortype`, `race`, `playercolor`, `playerslotstate`, `unitevent`, `playerunitevent`, `widgetevent`, `limitop`, `texttag`, `lightning`, `image`, `ubersplat`, `originframetype`, `framepointtype`, `textaligntype`, `oskeytype`, etc.).

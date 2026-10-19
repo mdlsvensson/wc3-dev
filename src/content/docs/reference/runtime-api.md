@@ -29,9 +29,9 @@ Subclass `Map` once in your project to configure `war3map.w3i` metadata, choose 
 
 | Value | Integer | Description |
 | --- | --- | --- |
-| `DataSet.Default` | `0` | Default balance dataset (`EditorDataSet = 0`, default). |
-| `DataSet.Custom` | `1` | Custom balance data (`EditorDataSet = 1`). |
-| `DataSet.Melee` | `2` | Melee patch balance (`EditorDataSet = 2`). |
+| `DataSet.Default` | `0` | Default balance dataset (`GameDataSet = 0`, default). |
+| `DataSet.Custom` | `1` | Custom balance data (`GameDataSet = 1`). |
+| `DataSet.Melee` | `2` | Melee patch balance (`GameDataSet = 2`). |
 
 ### `DataVersion`
 
@@ -88,8 +88,8 @@ Base class for `Game`, `Player`, and `Widget`. Holds attached `Component` instan
 | `public T? Get<T>() where T : Component` | Yes | Returns the first attached component assignable to `T`, or `null`. |
 | `public List<T> GetAll<T>() where T : Component` | Yes | Returns a new list of all attached components assignable to `T` in add order. |
 | `public bool Has<T>() where T : Component` | Yes | Returns `true` if at least one attached component is assignable to `T`. |
-| `public void Remove(Component component)` | No | Removes `component` from this actor (calling its `End()` and `OnRemoved()`). No-op if not attached to this actor. |
-| `public int RemoveAll<T>() where T : Component` | No | Removes all attached components assignable to `T` in reverse order and returns how many were removed. |
+| `public void Remove(Component component)` | No | Ends `component`, which runs its `OnRemoved()` and removes it from this actor. Throws `MoonwellException` in a development build if `component` is not on this actor. |
+| `public int RemoveAll<T>() where T : Component` | No | Removes all attached components assignable to `T` in add order and returns how many were removed. |
 | `protected TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component` | No | Attaches `component` to this actor, sets its `Actor` and ownership, registers lazy event triggers, and calls `OnAdded()`. |
 
 ### `Widget`
@@ -277,7 +277,7 @@ Passed to `OnDealtDamage`, `OnDamaged`, and `OnUnitDamaged`.
 | `public Unit Target { get; }` | Yes | The unit taking damage. |
 | `public Unit? Source { get; }` | Yes | The unit dealing damage, if any. |
 | `public float Amount { get; set; }` | Getter: Yes; Setter: No | Event damage amount. Setting `Amount` updates the final damage via `BlzSetEventDamage`. |
-| `public bool IsAttack { get; }` | Yes | `true` when the event's `attacktype` is non-zero (`GetEventDamage() != 0 && BlzGetEventIsAttack()`). |
+| `public bool IsAttack { get; }` | Yes | `true` when the damage came from a basic attack (`BlzGetEventIsAttack()`). |
 
 ### `Ability`
 
@@ -303,8 +303,8 @@ Represents a single ability cast. Ends on `EVENT_PLAYER_UNIT_SPELL_ENDCAST`, whe
 | `public Ability Ability { get; }` | Yes | The `Ability` instance on `Caster`. |
 | `public Unit Caster { get; }` | Yes | The casting unit. |
 | `public Unit? Target { get; }` | Yes | Target unit (`GetSpellTargetUnit()`), or `null` for point/no-target casts. |
-| `public float X { get; }` | Yes | Target X coordinate (unit X if `Target` is non-null, otherwise `GetSpellTargetX()`). |
-| `public float Y { get; }` | Yes | Target Y coordinate (unit Y if `Target` is non-null, otherwise `GetSpellTargetY()`). |
+| `public float X { get; }` | Yes | Spell target X coordinate (`GetSpellTargetX()`, even when `Target` is set). |
+| `public float Y { get; }` | Yes | Spell target Y coordinate (`GetSpellTargetY()`, even when `Target` is set). |
 | `public int Level { get; }` | Yes | Level of `Ability` when the cast began. |
 
 ### `Buff` and `Stacking`
@@ -404,6 +404,6 @@ Registry mapping C# object classes to four-character Warcraft III object ids and
 
 ### `Doodad`, `Upgrade`, and `MoonwellException`
 
-- **`public class Doodad : GameObject`** — Base class for `StandardDoodad` declarations. Doodads have no runtime handle or wrapper; query their id with `ObjectTypes.IdOf<T>()`.
-- **`public class Upgrade : GameObject`** — Base class for `StandardUpgrade` declarations. Check a player's researched level with `player.LevelOf<T>()`.
+- **`public class Doodad`** — Data-only base class for `StandardDoodad` declarations (no base class). Doodads have no runtime handle or wrapper; query their id with `ObjectTypes.IdOf<T>()`.
+- **`public class Upgrade`** — Data-only base class for `StandardUpgrade` declarations (no base class). Check a player's researched level with `player.LevelOf<T>()`.
 - **`public sealed class MoonwellException : Exception`** — Thrown when a Moonwell precondition or invariant fails (such as calling `Dev.Check` with an invalid argument in a development build or looking up an unregistered type in `ObjectTypes.IdOf<T>()`).

@@ -12,7 +12,6 @@ Declare a spell by inheriting from a generated ability class in `Moonwell.Object
 ```csharp
 using Moonwell;
 using Moonwell.Objects.Abilities.Human;
-using static Moonwell.Natives;
 
 namespace MyMap;
 
@@ -30,7 +29,7 @@ public class Smite : StormBolt
     {
         if (cast.Target is not null)
         {
-            DestroyEffect(AddSpecialEffectTarget(
+            Natives.DestroyEffect(Natives.AddSpecialEffectTarget(
                 @"Abilities\Spells\Human\HolyBolt\HolyBoltSpecialArt.mdl",
                 cast.Target.Handle,
                 "overhead"));
@@ -62,7 +61,7 @@ When a unit triggers a spell effect (`EVENT_PLAYER_UNIT_SPELL_EFFECT`), Moonwell
 - `cast.Ability` (`Ability`) — the `Ability` instance on the caster.
 - `cast.Caster` (`Unit`) — the casting unit.
 - `cast.Target` (`Unit?`) — the targeted unit, or `null` for point or instant spells.
-- `cast.X` and `cast.Y` (`float`) — the target coordinates (the target unit's position when `Target` is non-null, or the spell target point otherwise).
+- `cast.X` and `cast.Y` (`float`) — the spell target coordinates (`GetSpellTargetX()` and `GetSpellTargetY()`, even when `Target` is set).
 - `cast.Level` (`int`) — the ability level at the moment of the cast.
 
 A `Cast` begins at spell effect and ends when any of the following happens:
@@ -82,15 +81,15 @@ public class ArcaneBeam : AerialShackles
         {
             if (cast.Target is not null)
             {
-                UnitDamageTarget(
+                Natives.UnitDamageTarget(
                     cast.Caster.Handle,
                     cast.Target.Handle,
                     15f * cast.Level,
                     true,
                     false,
-                    ATTACK_TYPE_MAGIC,
-                    DAMAGE_TYPE_MAGIC,
-                    WEAPON_TYPE_WHOKNOWS);
+                    Natives.ATTACK_TYPE_MAGIC,
+                    Natives.DAMAGE_TYPE_MAGIC,
+                    Natives.WEAPON_TYPE_WHOKNOWS);
             }
         });
     }
@@ -111,12 +110,11 @@ A `Buff` is a `UnitComponent` with a duration, an optional periodic tick, a stac
 
 ```csharp
 using Moonwell;
-using Moonwell.Objects.Buffs.Other;
-using static Moonwell.Natives;
+using Moonwell.Objects.Buffs.NightElf;
 
 namespace MyMap;
 
-public class Burn : SlowPoisonNonStacking
+public class Burn : SlowPoison
 {
     public Burn()
     {
@@ -139,15 +137,15 @@ public class Burn : SlowPoisonNonStacking
     {
         if (Source is not null)
         {
-            UnitDamageTarget(
+            Natives.UnitDamageTarget(
                 Source.Handle,
                 Unit.Handle,
                 20f,
                 false,
                 false,
-                ATTACK_TYPE_MAGIC,
-                DAMAGE_TYPE_FIRE,
-                WEAPON_TYPE_WHOKNOWS);
+                Natives.ATTACK_TYPE_MAGIC,
+                Natives.DAMAGE_TYPE_FIRE,
+                Natives.WEAPON_TYPE_WHOKNOWS);
         }
     }
 
@@ -185,7 +183,7 @@ The three `Stacking` modes are:
 Because `Buff` inherits `UnitComponent`, a buff can also override `OnDamaged`, `OnDealtDamage`, `OnDeath`, `OnKill`, `OnCast`, `OnItemPickedUp`, and `OnItemDropped`.
 
 > [!IMPORTANT]
-> Moonwell manages buff timers and stacking in C#. When a unit dies, buffs with `EndsOnDeath = true` end **after** all `OnDeath`, `OnKill`, and `OnUnitDied` reactions have run, so death reactions can still inspect the buffs that were on the dying unit. Built-in Warcraft III dispel spells and spell immunity do not remove or block Moonwell buffs.
+> Moonwell manages buff timers and stacking in C#. When a unit dies, buffs with `EndsOnDeath = true` end **after** all `OnDeath`, `OnKill`, and `OnUnitDied` reactions have run, so death reactions can still inspect the buffs that were on the dying unit.
 
 ## Timers
 

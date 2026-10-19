@@ -61,7 +61,7 @@ namespace MyMap
 
 `DataSet` and `DataVersion` match the **Game Data Set** and **Game Data Version** options in World Editor's Map Options dialog. Both the build and the standard classes in `Moonwell.Objects` read the game's balance tables for the pair you choose:
 
-- Any `DataSet` with `DataVersion.ForsakenKingdom` (the default) uses the current base balance tables (`3.0`).
+- Any `DataSet` with `DataVersion.ForsakenKingdom` (the default) uses the current base balance tables from Warcraft III 3.0.1 (`3.0.1.24370`).
 - `DataSet.Default` or `DataSet.Custom` with `DataVersion.FrozenThrone` uses the Frozen Throne custom balance tables (`custom_v1`).
 - `DataSet.Default` or `DataSet.Custom` with `DataVersion.ReignOfChaos` uses the Reign of Chaos custom balance tables (`custom_v0`).
 - `DataSet.Melee` with `DataVersion.ReignOfChaos` uses the Reign of Chaos melee balance tables (`melee_v0`); `DataSet.Melee` with `DataVersion.FrozenThrone` reads field values from the base tables and object existence from `custom_v1`.

@@ -7,14 +7,14 @@ description: Reference for Moonwell.Analyzers diagnostics (MW0001–MW0006), syn
 
 `Moonwell.Analyzers` runs automatically during `dotnet build` and `moonwell build`. All six rules have severity `Error`.
 
-| ID | Summary | Where it triggers |
+| ID | Message | Where it triggers |
 | --- | --- | --- |
-| `MW0001` | `'X' creates a handle or changes game state and cannot be called inside Local.For` | Inside `Local.For` or a `[MachineLocal]` method |
-| `MW0002` | `'X' returns a machine-local value and can only be called inside Local.For` | Outside `Local.For` and `[MachineLocal]` methods |
-| `MW0003` | `'X' returns a handle id that can differ between machines in multiplayer` | Anywhere in map code (`GetHandleId`, `GetHandleIdBJ`) |
-| `MW0004` | `'X' iterates in memory-address order in Lua and desyncs in multiplayer; use OrderedMap or OrderedSet` | Looping over or converting `Dictionary<,>` or `HashSet<>` to `IEnumerable` |
-| `MW0005` | `'X' is not supported in Warcraft III's 32-bit Lua; use int or float` | Variables, parameters, return types, or uncast calls returning `long`, `ulong`, `uint`, or `double` |
-| `MW0006` | `'X' desyncs in multiplayer` | Calling a `[Desyncs]` function such as `SelectGroupForPlayerBJ` |
+| `MW0001` | `'X' creates a handle; inside Local.For it runs on one machine only, which desyncs the game` (variants: `'X' changes game state; ...` and, for untagged members, `'X' may change game state (it is not marked ...`) | Inside `Local.For` or a `[MachineLocal]` method |
+| `MW0002` | `'X' gives a different answer on each machine; use it only inside Local.For or a [MachineLocal] method` | Outside `Local.For` and `[MachineLocal]` methods |
+| `MW0003` | `Handle ids differ between machines; key by the handle itself, or by a number the map assigns` | Anywhere in map code (`GetHandleId`, `GetHandleIdBJ`) |
+| `MW0004` | `A Dictionary loops in no fixed order, which can differ between machines; use OrderedMap or OrderedSet` (or `A HashSet ...`) | Looping over or converting `Dictionary<,>` or `HashSet<>` to `IEnumerable` |
+| `MW0005` | `'double' is a single-precision float in the game's Lua; use float` (also `'long' is a 32-bit integer in the game's Lua; use int` and `'uint' arithmetic becomes a float in the game's Lua; use int`) | Variables, parameters, return types, or uncast calls returning `long`, `ulong`, `uint`, or `double` |
+| `MW0006` | `'X' changes the game inside its own GetLocalPlayer() block, so it desyncs wherever it runs` | Calling a `[Desyncs]` function such as `SelectGroupForPlayerBJ` |
 
 ### `MW0001` — State change or handle creation inside `Local.For`
 
@@ -29,7 +29,7 @@ Local.For(player, () =>
 Unit unit = Unit.Create<Footman>(player, 0, 0, 0);
 Local.For(player, () =>
 {
-    PanCameraToTimed(0, 0, 0);
+    Natives.PanCameraToTimed(0, 0, 0);
 });
 ```
 
@@ -37,12 +37,12 @@ Local.For(player, () =>
 
 ```csharp
 // Rejected (MW0002):
-int width = BlzGetLocalClientWidth();
+int width = Natives.BlzGetLocalClientWidth();
 
 // Fix: call inside Local.For or mark the helper method [MachineLocal]
 Local.For(player, () =>
 {
-    int width = BlzGetLocalClientWidth();
+    int width = Natives.BlzGetLocalClientWidth();
 });
 ```
 
@@ -50,7 +50,7 @@ Local.For(player, () =>
 
 ```csharp
 // Rejected (MW0003):
-int id = GetHandleId(unit.Handle);
+int id = Natives.GetHandleId(unit.Handle);
 
 // Fix: key collections by the handle or Moonwell actor directly
 OrderedMap<Unit, int> stacks = new();
@@ -87,13 +87,13 @@ float dist = (float)Math.Sqrt(dx * dx + dy * dy);
 
 ```csharp
 // Rejected (MW0006):
-SelectGroupForPlayerBJ(group, player.Handle);
+Natives.SelectGroupForPlayerBJ(group, player.Handle);
 
-// Fix: run local selection calls inside Local.For
+// Fix: select unit by unit inside Local.For (ForGroup inside Local.For is rejected with MW0001)
 Local.For(player, () =>
 {
-    ClearSelection();
-    ForGroup(group, () => SelectUnit(GetEnumUnit(), true));
+    Natives.ClearSelection();
+    Natives.SelectUnit(unit.Handle, true);
 });
 ```
 
@@ -118,26 +118,29 @@ CSharp.lua translates C# string literals directly into Lua string literals, wher
 
 | Rejected C# string construct | Why it is rejected | What to write instead |
 | --- | --- | --- |
-| `\e` | Lua does not recognize `\e` (`0x1B`). | Use `\u001B`. |
-| `\Uxxxxxxxx` | CSharp.lua does not convert 8-digit `\U` escapes. | Use a surrogate pair of `\uXXXX` escapes or a literal UTF-8 character. |
-| `\x` not followed by 2 hex digits (e.g., `\x9`) | Lua's `\x` requires exactly two hex digits (`\x09`). | Use `\u0009` or a 4-digit `\uXXXX` escape. |
-| `\0` followed by a digit (`0`–`9`) | Lua reads `\0` + digits as a multi-digit decimal byte escape (`\01`). | Use `\u0000` before a digit. |
-| Raw string literals (`"""..."""`) | CSharp.lua strips the outer quotes without unindenting or escaping inner quotes. | Use a regular `"..."` or verbatim `@"..."` string. |
+| `\e` | Lua does not recognize `\e` (`0x1B`). | Write `\u001b`. |
+| `\Uxxxxxxxx` | CSharp.lua does not convert 8-digit `\U` escapes. | Write the character itself. |
+| `\x` not followed by 2 hex digits (e.g., `\x9`) | Lua's `\x` requires exactly two hex digits (`\x09`). | Write a 4-digit `\uXXXX` escape (e.g., `\u0009`). |
+| `\0` followed by a digit (`0`–`9`) | Lua reads `\0` + digits as a multi-digit decimal byte escape (`\01`). | Write `\u0000` before a digit. |
+| Plain raw string literals (`"""..."""`) | CSharp.lua strips the outer quotes without unindenting or escaping inner quotes (raw *interpolated* strings such as `$"""{x}"""` are allowed). | Use a regular `"..."` or verbatim `@"..."` string (or a raw interpolated string `$"""{x}"""`). |
 | UTF-8 string literals (`"..."u8`) | CSharp.lua emits the `u8` suffix into Lua where it is a syntax error. | Use a regular `string` or `byte[]`. |
-| Verbatim string `@"..."` starting with `\r\n` | Lua long strings `[[...]]` strip an immediate leading newline after `[[`. | Start the text on the first line after `@"` or use explicit `\n` escapes in `"..."`. |
+| Verbatim string `@"..."` starting with `\r\n` | Lua long strings `[[...]]` strip an immediate leading newline after `[[`. | Write that line end as `"\r\n" + ...` or start the text on the first line after `@"`. |
 
 ---
 
 ## Common build errors
 
-| Error message | Cause and resolution |
+| Message | Cause and fix |
 | --- | --- |
-| `Object constructor called a game native at <File>:<Line>. Declare fields and components in constructors; move game calls into a reaction method (OnGameStart, OnEnter, OnCast, ...).` | `Moonwell.Build` runs your `Map` and object constructors on .NET during the build to extract object data. Move runtime calls (`Unit.Create`, `CreateUnit`, `DisplayTextToPlayer`, etc.) into a reaction method such as `OnGameStart()` or `OnEnter()`. |
-| `<File>(<Line>,<Col>): error: Setting '<Prop>' on '<Type>' is only allowed inside its constructor.` | Object fields and `ObjectList` / `ObjectRef` mutations (`Add`, `Remove`, `Set`) are build-time object data and are read-only in game code. Mutate them only inside the declaring class's constructor. |
-| `<Type>: unknown field '<id>'` or `field '<id>' is a leveled field; use Set("<id>", level, value)` | The 4-character field id passed to `Set(...)` does not exist on that object kind, has the wrong value type, or requires a 1-based level argument. |
-| `Expected a single class inheriting Moonwell.Map, found none` (or `found N`) | Every map project must have exactly one non-abstract class inheriting `Moonwell.Map`. |
-| `Project defines its own Main entry point (<Type>.Main).` | Remove your custom `Main` method or top-level statements; `Moonwell.Build` generates `Moonwell.Generated.MapMain.Main` in `build\generated\MapMain.g.cs`. |
-| `ids.json has stale class(es) [Old] and new class(es) [New] of the same kind.` | A declared object class was renamed. Update its key in `ids.json` to preserve its 4-character id in placed map data, or delete the old key from `ids.json` to assign a new id. |
-| `Both <A> and <B> have [Replaces] on standard object '<id>'.` | Only one declared class in a map can replace a given standard object id. |
-| `Expected common.j and Blizzard.j in ...\Documents\Warcraft III\JassHelper.` | Launch Warcraft III World Editor and save any map once so it extracts `common.j` and `Blizzard.j` into `Documents\Warcraft III\JassHelper`. |
-| `Moonwell uses the default NuGet cache (~/.nuget/packages); custom NUGET_PACKAGES is not supported.` | Unset the `NUGET_PACKAGES` environment variable so `Moonwell.Build` can locate package source files in `~/.nuget/packages`. |
+| `Map.cs:9: MyMap.BadUnit calls the game while it is declared; game work starts from a reaction or the game's start` | A constructor called the game. Move the call into a reaction such as `OnGameStart`. |
+| `MyMap.Smite.OnCast sets Name; declared fields are set only in the constructor` | A declared field, `ObjectList.Add/Remove`, `ObjectRef.Set` or `Set(...)` was used outside a constructor. |
+| `MyMap.X's constructor threw: StormBolt has no field Hbz1, which other abilities have` | `Set` named another ability's field. |
+| `MyMap.X's constructor threw: StandardUnit field uhpm holds int, not float` | `Set` was given the wrong value type. |
+| `... holds Levels<float>, not float; give the value of one level with Set(field, level, value)` | A per-level field was set without a level. |
+| `no map class: declare one class that derives from Moonwell.Map` / `more than one map class: A, B` | The project needs exactly one class deriving from `Map`. |
+| `MyMap.P.Main: a map declares no Main; the build writes it` | Remove your own `Main`. |
+| `A and B both replace Moonwell.Objects.Units.Human.Footman` | Two `[Replaces]` classes have the same base. |
+| `MyMap.X replaces hfoo and cannot pin an id` | `[Replaces]` together with `[ObjectId]`. |
+| `MyMap.Old was H001, which the map places, and no class declares it now; if it was renamed to MyMap.New, add [ObjectId("H001")] to MyMap.New` | A class was renamed and its id is placed in the map. Add the `[ObjectId]` it names. Don't edit `ids.json`. |
+| `common.j and Blizzard.j are not in <folder>` | Put `common.j` and `Blizzard.j` in `Documents\Warcraft III\JassHelper`. |
+| `<package> <version> has no source in <folder>; CSharp.lua reads packages only from there (is NUGET_PACKAGES set?)` | Unset `NUGET_PACKAGES`. |

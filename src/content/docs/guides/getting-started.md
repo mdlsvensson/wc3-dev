@@ -8,7 +8,7 @@ description: Install Moonwell, create a map from the template, and run it in War
 Moonwell requires:
 
 - The **.NET 10 SDK** (`dotnet --version` 10.0 or later)
-- **Warcraft III: Reforged** 3.0
+- **Warcraft III: Reforged** 3.0.1
 - `common.j` and `Blizzard.j` in `Documents\Warcraft III\JassHelper`
 
 Install the project template and the `moonwell` command once:
@@ -182,6 +182,19 @@ namespace MyMap
     }
 }
 ```
+
+## Upgrading to 0.1.2
+
+Moonwell 0.1.2 updates its generated natives and standard objects to Warcraft III **3.0.1** (`3.0.1.24370`):
+
+- **New 3.0.1 natives:** the `Blz` equipment natives (the old names still exist but are going away), `BlzUnitHeal`, `BlzRemoveEffect`, `BlzUnitIsAlive`, `BlzResetUnitTalents`, the HUD-scale natives, and others. `Moonwell.Analyzers` knows their sync tags.
+- **Changes that can break compiling:**
+  - `BlzSetTerrainFogStyleBJ` takes an `int`.
+  - `bj_destroyEffectAsyncEffect` / `bj_destroyEffectAsyncTime` → `bj_destroyOrRemoveEffectAsyncEffect` / `bj_destroyOrRemoveEffectAsyncTime`.
+  - `AIs2` is now `ItemAttackSpeedBonus`, and `AIsx` is now `ItemAttackSpeedBonusAIsx`.
+  - `ItemBash10252` → `ItemBash10`, `ItemBash15251` → `ItemBash15`, `ItemAuraCommand8` → `ItemAuraCommand5`, `ItemHugeFlailWS` → `ItemHugeFlailTC`.
+  - The doodad properties `IsADecal`, `DecalSortPriority`, and `IsWater` gain `HD` at the end (`IsADecalHD`, `DecalSortPriorityHD`, `IsWaterHD`).
+  - `ArchwayNSra` → `ArchwayNSr0`.
 
 ## Next steps
 
