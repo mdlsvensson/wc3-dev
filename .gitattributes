@@ -1,6 +1,1 @@
 * text=auto eol=lf
-shared/static/** -text
-docs/content/** -text
-tests/fixtures/site/content/** -text
-tools/content/grammars/** -text
-tools/cloudflare-build.sh text eol=lf

@@ -1,9 +1,7 @@
-node_modules/
-home/_fresh/
-docs/_fresh/
-docs/generated/
-home/.wrangler/
-docs/.wrangler/
+dist/
+.astro/
 .wrangler/
-.build-tools/
-.verification/
+node_modules/
+.env
+.env.*
+!.env.example

@@ -1,10 +1,8 @@
-// The home page, wc3.dev. The documentation, docs.wc3.dev, is wrangler.docs.jsonc.
 {
   "name": "wc3-dev",
-  "compatibility_date": "2026-10-06",
-  "main": "./home/server.js",
+  "compatibility_date": "2026-10-19",
   "assets": {
-    "directory": "./home/_fresh/client",
-    "not_found_handling": "none"
+    "directory": "./dist",
+    "not_found_handling": "404-page"
   }
 }
