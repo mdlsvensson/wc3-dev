@@ -12,14 +12,16 @@ export default defineConfig({
       title: "Moonwell",
       customCss: ["./src/styles/global.css"],
       expressiveCode: {
-        themes: ["vitesse-dark"],
+        themes: ["kanagawa-wave", "vitesse-dark"],
+        useStarlightDarkModeSwitch: false,
+        themeCssSelector: (theme) => `[data-palette='${theme.name}']`,
         styleOverrides: {
           borderRadius: "0.75rem",
-          borderColor: "#222222",
-          codeBackground: "#181818",
+          borderColor: "var(--mw-border)",
+          codeBackground: "var(--mw-surface)",
           frames: {
-            editorActiveTabBackground: "#181818",
-            editorTabBarBackground: "#121212",
+            editorActiveTabBackground: "var(--mw-surface)",
+            editorTabBarBackground: "var(--mw-bg)",
             frameBoxShadowCssValue: "none",
           },
         },

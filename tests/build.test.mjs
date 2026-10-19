@@ -92,17 +92,17 @@ test("biome.json is configured and biome check passes cleanly", () => {
   });
 });
 
-test("site is locked to dark mode with Mintlify layout styling and Vitesse Dark palette", () => {
+test("site defaults to Kanagawa Wave and offers Vitesse Dark as a theme option", () => {
   const guideHtml = readFileSync("dist/guides/getting-started/index.html", "utf8");
-  assert.doesNotMatch(
+  assert.match(
     guideHtml,
-    /<starlight-theme-select/,
-    "theme switcher should not be rendered in dark-only mode",
+    /data-palette-select[\s\S]*value="kanagawa-wave"[\s\S]*value="vitesse-dark"/,
+    "header should render a palette selector with Kanagawa Wave and Vitesse Dark options",
   );
   assert.match(
     guideHtml,
-    /<pre data-language="csharp">[\s\S]*#DBD7CAEE[\s\S]*#C98A7D/i,
-    "code blocks should render with vitesse-dark syntax token colors",
+    /<pre data-language="csharp">[\s\S]*--0:#DCD7BA[\s\S]*--1:#DBD7CAEE/i,
+    "code blocks should render dual syntax token colors for kanagawa-wave (--0) and vitesse-dark (--1)",
   );
 
   const astroAssets = readdirSync("dist/_astro");
@@ -110,6 +110,8 @@ test("site is locked to dark mode with Mintlify layout styling and Vitesse Dark 
     .filter((file) => file.endsWith(".css"))
     .map((file) => readFileSync(`dist/_astro/${file}`, "utf8"))
     .join("\n");
+  assert.match(cssContent, /#1f1f28/i, "built CSS should include Kanagawa Wave background #1f1f28");
+  assert.match(cssContent, /#7e9cd8/i, "built CSS should include Kanagawa Wave primary #7e9cd8");
   assert.match(cssContent, /#121212/i, "built CSS should include Vitesse Dark background #121212");
   assert.match(cssContent, /#4d9375/i, "built CSS should include Vitesse Dark primary #4d9375");
   assert.match(
@@ -124,8 +126,8 @@ test("site is locked to dark mode with Mintlify layout styling and Vitesse Dark 
   );
   assert.match(
     cssContent,
-    /aria-current=["']?page["']?[\s\S]*#80a665/i,
-    "built CSS should style active sidebar links as a Vitesse green Mintlify pill",
+    /aria-current=["']?page["']?/i,
+    "built CSS should style active sidebar links as a Mintlify pill",
   );
 });
 
