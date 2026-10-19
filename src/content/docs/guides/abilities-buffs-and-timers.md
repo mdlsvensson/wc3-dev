@@ -106,7 +106,7 @@ A `Buff` is a `UnitComponent` with a duration, an optional periodic tick, a stac
 
 ### With or without a status icon
 
-- **With an in-game icon:** Inherit from a generated standard buff in `Moonwell.Objects.Buffs.*` (which itself inherits `StandardBuff : Buff`). At build time, Moonwell writes the buff object and generates a hidden carrier ability (`Aall` base, `ButtonPositionX = 0`, `ButtonPositionY = -11`) so the buff's icon, tooltip, and special effect art appear on the unit while the buff is active.
+- **With an in-game icon:** Inherit from a generated standard buff in `Moonwell.Objects.Buffs.*` (which itself inherits `StandardBuff : Buff`). At build time, Moonwell writes the buff object and generates a carrier ability (`Aasl` Slow Aura base with `abuf:1`, `atar:1 = "self"`, and `aare:1 = 1f`, hidden on the unit at run time with `BlzUnitHideAbility`) so the buff's icon, tooltip, and special effect art appear on the unit while the buff is active.
 - **Without an icon:** Inherit directly from `Moonwell.Buff`. No carrier ability is added to the unit.
 
 ```csharp
@@ -116,7 +116,7 @@ using static Moonwell.Natives;
 
 namespace MyMap;
 
-public class Burn :SlowPoisonNonStacking
+public class Burn : SlowPoisonNonStacking
 {
     public Burn()
     {
@@ -207,7 +207,7 @@ Timer pulse = Timer.Every(0.5f, () =>
 
 Every `Timer` exposes:
 
-- `Interval` (`float`) — the delay or period in seconds (`>= 0`).
+- `Interval` (`float`) — the period in seconds for `Timer.Every` (`0f` for one-shot `Timer.After` timers).
 - `IsPeriodic` (`bool`) — `false` for `Timer.After`, `true` for `Timer.Every`.
 - `Remaining` (`float`) — seconds until the next firing (`0` if already ended).
 - `End()` — cancels the timer immediately.
@@ -246,10 +246,9 @@ Game.Instance.Run(() =>
 
 Calling `End()` on an `Owned` (or when a `Cast`, `Buff`, `Component`, or `Widget` ends naturally):
 
-1. Ends all children it owns in **newest-first (reverse creation) order**.
-2. Detaches the object from its own `Owner`.
-3. Calls `protected virtual void OnEnd()`.
-4. Marks `HasEnded = true` (calling `End()` a second time is a no-op).
+1. Calls `protected virtual void OnEnd()` while its owned children are still active.
+2. Ends all children it owns in **newest-first (reverse creation) order**.
+3. Marks `HasEnded = true` and unlinks the object from its `Owner`'s active child list (`Owned.Owner` remains set to the owner that adopted it; calling `End()` a second time is a no-op).
 
 ### Units, items, and death
 

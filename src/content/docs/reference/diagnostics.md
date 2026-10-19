@@ -103,11 +103,11 @@ Local.For(player, () =>
 
 | Attribute | Targets | Meaning |
 | --- | --- | --- |
-| `[CreatesHandle]` | Method | Marks a native or method that allocates a Warcraft III handle (forbidden inside `Local.For` — `MW0001`). |
-| `[ChangesState]` | Method | Marks a native or method that mutates synchronized game state (forbidden inside `Local.For` — `MW0001`). |
-| `[MachineLocal]` | Method | Marks a native or helper method that reads machine-local state (must only be called inside `Local.For` or another `[MachineLocal]` method — `MW0002`). |
-| `[Desyncs]` | Method | Marks a `Blizzard.j` helper that desyncs on its own (`MW0006`). |
-| `[LocalSafe]` | Class, Struct, Method, Property, Constructor | Marks a Moonwell runtime type or member as safe to call inside `Local.For`. |
+| `[CreatesHandle]` | Method, Property, Constructor | Marks a native or member that allocates a Warcraft III handle (forbidden inside `Local.For` — `MW0001`). |
+| `[ChangesState]` | Method, Property, Constructor | Marks a native or member that mutates synchronized game state (forbidden inside `Local.For` — `MW0001`). |
+| `[MachineLocal]` | Method, Property, Constructor | Marks a native or helper member that reads machine-local state (must only be called inside `Local.For` or another `[MachineLocal]` method — `MW0002`). |
+| `[Desyncs]` | Method, Property, Constructor | Marks a `Blizzard.j` helper that desyncs on its own (`MW0006`). |
+| `[LocalSafe]` | Class, Method, Property, Constructor | Marks a Moonwell runtime type or member as safe to call inside `Local.For`. |
 | `[SyncUnchecked]` | Method, Constructor, Property | Suppresses `MW0001`–`MW0006` inside the attributed member, or on a lambda/local function. |
 
 ---
@@ -136,7 +136,7 @@ CSharp.lua translates C# string literals directly into Lua string literals, wher
 | `<File>(<Line>,<Col>): error: Setting '<Prop>' on '<Type>' is only allowed inside its constructor.` | Object fields and `ObjectList` / `ObjectRef` mutations (`Add`, `Remove`, `Set`) are build-time object data and are read-only in game code. Mutate them only inside the declaring class's constructor. |
 | `<Type>: unknown field '<id>'` or `field '<id>' is a leveled field; use Set("<id>", level, value)` | The 4-character field id passed to `Set(...)` does not exist on that object kind, has the wrong value type, or requires a 1-based level argument. |
 | `Expected a single class inheriting Moonwell.Map, found none` (or `found N`) | Every map project must have exactly one non-abstract class inheriting `Moonwell.Map`. |
-| `Project defines its own Main entry point (<Type>.Main). Moonwell generates Program.Main; remove your Main method.` | Remove your custom `Main` method or top-level statements; `Moonwell.Build` generates `Program.Main` in `build\generated\MapMain.g.cs`. |
+| `Project defines its own Main entry point (<Type>.Main).` | Remove your custom `Main` method or top-level statements; `Moonwell.Build` generates `Moonwell.Generated.MapMain.Main` in `build\generated\MapMain.g.cs`. |
 | `ids.json has stale class(es) [Old] and new class(es) [New] of the same kind.` | A declared object class was renamed. Update its key in `ids.json` to preserve its 4-character id in placed map data, or delete the old key from `ids.json` to assign a new id. |
 | `Both <A> and <B> have [Replaces] on standard object '<id>'.` | Only one declared class in a map can replace a given standard object id. |
 | `Expected common.j and Blizzard.j in ...\Documents\Warcraft III\JassHelper.` | Launch Warcraft III World Editor and save any map once so it extracts `common.j` and `Blizzard.j` into `Documents\Warcraft III\JassHelper`. |

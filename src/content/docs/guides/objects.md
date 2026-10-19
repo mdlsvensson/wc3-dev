@@ -9,7 +9,7 @@ In Moonwell, every custom or modified game object is a C# class that inherits fr
 
 | Kind | Standard namespaces | Runtime base |
 |---|---|---|
-| Units & Heroes | `Moonwell.Objects.Units.<Race>` (`Human`, `Orc`, `Undead`, `NightElf`, `Naga`, `Demon`, `Creeps`, `Critters`, `Neutral`, `Campaign`, `Other`) | `Unit` / `Hero` |
+| Units & Heroes | `Moonwell.Objects.Units.<Race>` (`Human`, `Orc`, `Undead`, `NightElf`, `Naga`, `Demon`, `Creeps`, `Critters`, `Campaign`, `Other`) | `Unit` / `Hero` |
 | Abilities | `Moonwell.Objects.Abilities.<Race>` (`Human`, `Orc`, `Undead`, `NightElf`, `Naga`, `Creeps`, `Other`) | `Ability` |
 | Buffs | `Moonwell.Objects.Buffs.<Race>` (`Human`, `Orc`, `Undead`, `NightElf`, `Other`) | `Buff` |
 | Upgrades | `Moonwell.Objects.Upgrades.<Race>` (`Human`, `Orc`, `Undead`, `NightElf`, `Naga`, `Demon`, `Other`) | `Upgrade` |

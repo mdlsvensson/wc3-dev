@@ -61,10 +61,10 @@ namespace MyMap
 
 `DataSet` and `DataVersion` match the **Game Data Set** and **Game Data Version** options in World Editor's Map Options dialog. Both the build and the standard classes in `Moonwell.Objects` read the game's balance tables for the pair you choose:
 
-- `DataSet.Default` or `DataSet.Custom` with `DataVersion.ForsakenKingdom` (the default) uses the current custom-game balance tables (`custom_v1`).
-- `DataSet.Default` or `DataSet.Custom` with `DataVersion.FrozenThrone` uses the Frozen Throne custom balance tables (`custom_v0`).
-- `DataSet.Default` or `DataSet.Custom` with `DataVersion.ReignOfChaos` uses the base Reign of Chaos tables.
-- `DataSet.Melee` with any `DataVersion` uses the melee balance tables (`melee_v0`).
+- Any `DataSet` with `DataVersion.ForsakenKingdom` (the default) uses the current base balance tables (`3.0`).
+- `DataSet.Default` or `DataSet.Custom` with `DataVersion.FrozenThrone` uses the Frozen Throne custom balance tables (`custom_v1`).
+- `DataSet.Default` or `DataSet.Custom` with `DataVersion.ReignOfChaos` uses the Reign of Chaos custom balance tables (`custom_v0`).
+- `DataSet.Melee` with `DataVersion.ReignOfChaos` uses the Reign of Chaos melee balance tables (`melee_v0`); `DataSet.Melee` with `DataVersion.FrozenThrone` reads field values from the base tables and object existence from `custom_v1`.
 
 The build writes your `DataSet` and `DataVersion` choices into the staged `war3map.w3i` so the game loads the same tables your C# declarations read at build time.
 

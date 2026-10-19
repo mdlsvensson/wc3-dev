@@ -40,6 +40,18 @@ test("astro build emits all 11 documentation pages, 404 page, pagefind bundle, a
   const gettingStartedHtml = readFileSync("dist/guides/getting-started/index.html", "utf8");
   assert.match(gettingStartedHtml, /Moonwell\.Templates/);
 
+  const objectsNativesHtml = readFileSync("dist/reference/objects-and-natives/index.html", "utf8");
+  assert.doesNotMatch(
+    objectsNativesHtml,
+    /namespace Moonwell\.Natives/,
+    "objects-and-natives should not claim handle types live in 'namespace Moonwell.Natives'",
+  );
+  assert.match(objectsNativesHtml, /ObjectList(?:&lt;|&#x3C;)Buff/);
+
+  const cliBuildHtml = readFileSync("dist/reference/cli-and-build/index.html", "utf8");
+  assert.match(cliBuildHtml, /ObjectRegistry\.g\.cs/);
+  assert.match(cliBuildHtml, /Aasl/);
+
   for (const page of expectedPages) {
     const html = readFileSync(page, "utf8");
     const hrefMatches = html.matchAll(/href="(\/[^"#?]*)"/g);

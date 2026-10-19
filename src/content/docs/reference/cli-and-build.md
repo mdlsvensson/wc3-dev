@@ -42,7 +42,7 @@ When launching Warcraft III, `moonwell run` passes:
 
 ### `moonwell --version`
 
-Prints the installed `Moonwell.Cli` version (for example, `0.1.1`) and exits. (`-v` is also accepted.)
+Prints the installed `Moonwell.Cli` version (for example, `0.1.1`) and exits.
 
 ## Exit codes
 
@@ -69,10 +69,11 @@ When you run `moonwell build` or `moonwell run`, `Moonwell.Build` executes the f
    - Rejects any constructor that calls a `Moonwell.Natives` function, naming the exact C# file and line.
 5. **Assign and validate object ids (`ids.json`):**
    - Reads and updates `ids.json` in the project root.
-   - Assigns deterministic four-character ids (`H000`, `u000`, `I000`, `A000`, `B000`, `B080`, `D000`, `R000`...) to newly declared classes, validates `[ObjectId("...")]` attributes, checks for duplicate `[Replaces]` declarations, and stops if a class appears to have been renamed without updating `ids.json`.
-   - For each declared `StandardBuff`, generates a hidden carrier ability (`Aall` base) so the buff's icon and art appear in-game.
+   - Assigns deterministic four-character ids (`H001`, `h001`, `I001`, `A001`, `B001`, `D001`, `R001`...) to newly declared classes, validates `[ObjectId("...")]` attributes, checks for duplicate `[Replaces]` declarations, and stops if a class appears to have been renamed without updating `ids.json`.
+   - For each declared `StandardBuff`, generates a carrier ability (`Aasl` Slow Aura base with `abuf:1`, `atar:1 = "self"`, and `aare:1 = 1f`, hidden at run time with `BlzUnitHideAbility`) so the buff's icon and art appear in-game.
 6. **Generate C# glue (`build\generated\`):**
-   - Writes `build\generated\MapMain.g.cs` (`public static class Program { public static void Main() { ... } }`), which registers every declared unit, item, destructable, ability, buff carrier, upgrade, and doodad with `ObjectTypes`, adds starting `GameComponent`s from your `Map` class, and calls `Events.Start()`.
+   - Writes `build\generated\MapMain.g.cs` (`Moonwell.Generated.MapMain.Main()`), which calls `Runtime.Start(new <MapClass>(), ObjectRegistry.Register)`.
+   - Writes `build\generated\ObjectRegistry.g.cs` (`ObjectRegistry.Register()`), which registers every declared unit, item, destructable, ability, buff carrier, upgrade, and doodad with `ObjectTypes`.
    - Writes `build\generated\ObjectStubs.g.cs` with `new` read-only property stubs for properties overridden in object constructors so CSharp.lua reads their values from the `MoonwellObjectValues` Lua table at run time.
 7. **Check string literals and mark C# lines:**
    - Scans user `.cs` files (`LiteralCheck`) for C# string escapes or literal forms that CSharp.lua miscompiles.
@@ -89,7 +90,7 @@ When you run `moonwell build` or `moonwell run`, `Moonwell.Build` executes the f
 | MSBuild configuration | `Debug` (`DEBUG` symbol defined) | `Release` |
 | Runtime argument checks (`Dev.Check`) | Enabled (checks player slot bounds, non-negative timer intervals, valid FourCC lengths, etc.) | Stripped |
 | Lua comments in `war3map.lua` | Preserved | Stripped |
-| On-screen error message | `Moonwell: <Class>.<Hook> failed at <file>:<line>: <message>` | `Moonwell: <Class>.<Hook> failed at <file>:<line>` |
+| On-screen error message | `\|cffff4040Moonwell: <Class>.<Hook> failed:\|r <message> (<file>:<line>)` | `\|cffff4040Moonwell: <Class>.<Hook> failed\|r (<file>:<line>)` |
 | Log file (`CustomMapData\Moonwell\log.txt`) | Written | Written |
 
 ### Runtime error reporting and log file

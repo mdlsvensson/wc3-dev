@@ -15,11 +15,11 @@ Subclass `Map` once in your project to configure `war3map.w3i` metadata, choose 
 
 | Member | Local-safe | Description |
 | --- | --- | --- |
-| `public string Name { get; protected set; } = "Moonwell Map"` | No | Map name written to `war3map.w3i`. |
-| `public string Author { get; protected set; } = "Unknown"` | No | Map author written to `war3map.w3i`. |
-| `public string Description { get; protected set; } = ""` | No | Map description written to `war3map.w3i`. |
+| `public string Name { get; protected set; } = ""` | No | Map name written to `war3map.w3i`; when empty (`""`), keeps the value already stored in `map\war3map.w3i`. |
+| `public string Author { get; protected set; } = ""` | No | Map author written to `war3map.w3i`; when empty (`""`), keeps the value already stored in `map\war3map.w3i`. |
+| `public string Description { get; protected set; } = ""` | No | Map description written to `war3map.w3i`; when empty (`""`), keeps the value already stored in `map\war3map.w3i`. |
 | `public string RecommendedPlayers { get; protected set; } = ""` | No | Recommended players text; when empty (`""`), keeps the value already stored in `map\war3map.w3i`. |
-| `public DataSet DataSet { get; protected set; } = DataSet.Melee` | No | Balance dataset (`Default`, `Custom`, or `Melee`). |
+| `public DataSet DataSet { get; protected set; } = DataSet.Default` | No | Balance dataset (`Default`, `Custom`, or `Melee`). |
 | `public DataVersion DataVersion { get; protected set; } = DataVersion.ForsakenKingdom` | No | Game data version (`ReignOfChaos`, `FrozenThrone`, or `ForsakenKingdom`). |
 | `protected List<GameComponent> Components { get; }` | No | Starting `GameComponent` instances attached to `Game.Instance` when the map starts. |
 
@@ -29,9 +29,9 @@ Subclass `Map` once in your project to configure `war3map.w3i` metadata, choose 
 
 | Value | Integer | Description |
 | --- | --- | --- |
-| `DataSet.Default` | `0` | Patch `1.07` Reign of Chaos / Frozen Throne defaults (`EditorDataSet = 0`). |
+| `DataSet.Default` | `0` | Default balance dataset (`EditorDataSet = 0`, default). |
 | `DataSet.Custom` | `1` | Custom balance data (`EditorDataSet = 1`). |
-| `DataSet.Melee` | `2` | Latest melee patch balance (`EditorDataSet = 2`, default). |
+| `DataSet.Melee` | `2` | Melee patch balance (`EditorDataSet = 2`). |
 
 ### `DataVersion`
 
@@ -41,7 +41,7 @@ Subclass `Map` once in your project to configure `war3map.w3i` metadata, choose 
 | --- | --- | --- |
 | `DataVersion.ReignOfChaos` | `0` | Reign of Chaos (`GameDataVersion = 0`). |
 | `DataVersion.FrozenThrone` | `1` | The Frozen Throne (`GameDataVersion = 1`). |
-| `DataVersion.ForsakenKingdom` | `2` | Forsaken Kingdom (`GameDataVersion = 2`, default; requires `DataSet.Melee`). |
+| `DataVersion.ForsakenKingdom` | `2` | Forsaken Kingdom (`GameDataVersion = 2`, default). |
 
 ---
 
@@ -55,10 +55,10 @@ Base class for objects that belong to an `Owner` and end when their owner ends.
 
 | Member | Local-safe | Description |
 | --- | --- | --- |
-| `public Owner? Owner { get; }` | Yes | The `Owner` this object belongs to, or `null` if unowned (`Game.Instance`, `Player`, or unowned `Unit`/`Item`/`Destructable`) or already ended. |
+| `public Owner? Owner { get; }` | Yes | The `Owner` that adopted this object (retained after the object ends), or `null` if unowned (`Game.Instance`, `Player`, or unowned `Unit`/`Item`/`Destructable`). |
 | `public bool HasEnded { get; }` | Yes | `true` once `End()` has completed on this object. |
-| `public void End()` | No | Ends all owned children (newest-first), detaches from `Owner`, calls `OnEnd()`, and sets `HasEnded = true`. Idempotent. |
-| `protected virtual void OnEnd()` | No | Called once by `End()` after owned children have ended. |
+| `public void End()` | No | Calls `OnEnd()`, ends all owned children (newest-first), sets `HasEnded = true`, and unlinks from `Owner`'s active child list. Idempotent. |
+| `protected virtual void OnEnd()` | No | Called once by `End()` before owned children are ended. |
 
 ### `Owner`
 
@@ -70,7 +70,7 @@ An `Owned` object that can also own child `Owned` objects (`Timer`, `Buff`, `Com
 | --- | --- | --- |
 | `public static Owner Current { get; }` | Yes | The currently active `Owner` (the running reaction's `Component`, `Unit`, `Cast`, `Buff`, or `Game.Instance` at the root). |
 | `public int OwnedCount { get; }` | Yes | Number of active `Owned` children currently attached to this owner. |
-| `public void Run(Action action)` | No | Runs `action` with `Owner.Current` temporarily set to this `Owner` (unless `HasEnded` is `true`, in which case `Run` does nothing). |
+| `public void Run(Action action)` | No | Runs `action` with `Owner.Current` temporarily set to this `Owner` (if `HasEnded` is `true`, any `Owned` child created during `action` is ended immediately upon adoption). |
 
 ---
 
@@ -110,7 +110,7 @@ The map-wide actor and root `Owner`.
 
 | Member | Local-safe | Description |
 | --- | --- | --- |
-| `public static Game Instance { get; }` | No | Singleton `Game` instance for the map. |
+| `public static Game Instance { get; }` | Yes | Singleton `Game` instance for the map. |
 | `public T Add<T>(T component) where T : GameComponent` | No | Attaches `component` to `Game.Instance` and returns it. |
 
 ### `Player`
@@ -334,7 +334,7 @@ Schedules delayed or periodic callbacks tied to an `Owner`.
 
 | Member | Local-safe | Description |
 | --- | --- | --- |
-| `public float Interval { get; }` | Yes | Delay or period in seconds. |
+| `public float Interval { get; }` | Yes | Period in seconds for `Timer.Every` (`0f` for one-shot `Timer.After` timers). |
 | `public bool IsPeriodic { get; }` | Yes | `false` for `Timer.After`, `true` for `Timer.Every`. |
 | `public float Remaining { get; }` | Yes | Seconds remaining until the next callback (`0` if ended). |
 | `public static Timer After(float seconds, Action action, Owner? owner = null)` | No | Runs `action` once after `seconds`, owned by `owner ?? Owner.Current`. |
@@ -389,7 +389,7 @@ Deterministic key-value map that preserves key insertion order across all machin
 
 `public static class ObjectTypes`
 
-Registry mapping C# object classes to four-character Warcraft III object ids and factory functions. Generated startup code in `MapMain.g.cs` registers all declared objects automatically.
+Registry mapping C# object classes to four-character Warcraft III object ids and factory functions. Generated startup code in `ObjectRegistry.g.cs` registers all declared objects automatically.
 
 | Member | Local-safe | Description |
 | --- | --- | --- |
@@ -399,11 +399,11 @@ Registry mapping C# object classes to four-character Warcraft III object ids and
 | `public static void Item<T>(int id, Func<T> make) where T : Item` | No | Registers an item constructor factory for `id`. |
 | `public static void Destructable<T>(int id, Func<T> make) where T : Destructable` | No | Registers a destructable constructor factory for `id`. |
 | `public static void Ability<T>(int id, Func<T> make) where T : Ability` | No | Registers an ability constructor factory for `id`. |
-| `public static void Id<T>(int id)` | No | Registers the four-character id for a data-only object (`Doodad`, `Upgrade`, or `Buff`). |
+| `public static void Id<T>(int id) where T : class` | No | Registers the four-character id for a data-only object (`Doodad`, `Upgrade`, or `Buff`). |
 | `public static void BuffDisplay<T>(int buffId, int carrierId) where T : Buff` | No | Registers the buff id and hidden carrier ability id for a `StandardBuff` subclass. |
 
 ### `Doodad`, `Upgrade`, and `MoonwellException`
 
-- **`public abstract class Doodad`** — Base class for `StandardDoodad` declarations. Doodads have no runtime handle or wrapper; query their id with `ObjectTypes.IdOf<T>()`.
-- **`public abstract class Upgrade`** — Base class for `StandardUpgrade` declarations. Check a player's researched level with `player.LevelOf<T>()`.
+- **`public class Doodad : GameObject`** — Base class for `StandardDoodad` declarations. Doodads have no runtime handle or wrapper; query their id with `ObjectTypes.IdOf<T>()`.
+- **`public class Upgrade : GameObject`** — Base class for `StandardUpgrade` declarations. Check a player's researched level with `player.LevelOf<T>()`.
 - **`public sealed class MoonwellException : Exception`** — Thrown when a Moonwell precondition or invariant fails (such as calling `Dev.Check` with an invalid argument in a development build or looking up an unregistered type in `ObjectTypes.IdOf<T>()`).
