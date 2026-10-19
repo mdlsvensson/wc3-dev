@@ -30,6 +30,11 @@ test("astro build emits all 11 documentation pages, 404 page, pagefind bundle, a
 
   const indexHtml = readFileSync("dist/index.html", "utf8");
   assert.match(indexHtml, /Moonwell/);
+  assert.match(
+    indexHtml,
+    /class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
+    "top-left site title should render /mw-text-cropped.png",
+  );
   assert.match(indexHtml, /\/guides\/getting-started\//);
   assert.match(
     indexHtml,
@@ -128,6 +133,22 @@ test("site defaults to Kanagawa Wave and offers Vitesse Dark as a theme option",
     cssContent,
     /aria-current=["']?page["']?/i,
     "built CSS should style active sidebar links as a Mintlify pill",
+  );
+  assert.match(
+    cssContent,
+    /Pixelify Sans Variable/i,
+    "built CSS should configure Pixelify Sans for headings",
+  );
+  assert.match(cssContent, /Jersey 15/i, "built CSS should configure Jersey 15 for small headings");
+  assert.match(
+    cssContent,
+    /IBM Plex Sans Variable/i,
+    "built CSS should configure IBM Plex Sans for body text",
+  );
+  assert.match(
+    cssContent,
+    /JetBrains Mono Variable/i,
+    "built CSS should configure JetBrains Mono for code",
   );
 });
 

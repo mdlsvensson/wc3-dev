@@ -19,6 +19,7 @@ export default defineConfig({
           borderRadius: "0.75rem",
           borderColor: "var(--mw-border)",
           codeBackground: "var(--mw-surface)",
+          codeFontFamily: "var(--font-mono)",
           frames: {
             editorActiveTabBackground: "var(--mw-surface)",
             editorTabBarBackground: "var(--mw-bg)",
@@ -27,6 +28,7 @@ export default defineConfig({
         },
       },
       components: {
+        SiteTitle: "./src/components/SiteTitle.astro",
         ThemeProvider: "./src/components/ThemeProvider.astro",
         ThemeSelect: "./src/components/ThemeSelect.astro",
       },

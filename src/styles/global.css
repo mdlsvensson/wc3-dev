@@ -1,10 +1,20 @@
 @layer base, starlight, theme, components, utilities;
 
+@import "@fontsource-variable/pixelify-sans";
+@import "@fontsource/jersey-15";
+@import "@fontsource-variable/ibm-plex-sans";
+@import "@fontsource-variable/jetbrains-mono";
 @import "@astrojs/starlight-tailwind";
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @theme {
+  --font-sans: "IBM Plex Sans Variable", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Pixelify Sans Variable", "Pixelify Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-subheading:
+    "Jersey 15", "IBM Plex Sans Variable", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
   /* Default Kanagawa Wave accent scale (#7e9cd8 crystalBlue, #7fb4ca springBlue, #223249 waveBlue1) */
   --color-accent-50: #eef4ff;
   --color-accent-100: #d9e6ff;
@@ -35,6 +45,8 @@
 :root,
 ::backdrop {
   /* Mintlify-inspired layout dimensions & typography */
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
   --sl-nav-height: 3.5rem;
   --sl-sidebar-width: 17.5rem;
   --sl-content-width: 46rem;
@@ -186,10 +198,19 @@
   }
 
   .site-title {
+    align-items: center;
     font-size: 1rem;
     font-weight: 600;
     letter-spacing: -0.02em;
     color: var(--mw-fg);
+    text-decoration: none;
+  }
+
+  .site-title img {
+    height: 2.25rem;
+    width: auto;
+    display: block;
+    image-rendering: pixelated;
   }
 
   /* Mintlify pill search trigger */
@@ -263,8 +284,9 @@
   }
 
   starlight-toc h2 {
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-family: var(--font-subheading);
+    font-size: 0.9375rem;
+    font-weight: 400;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--mw-fg);
@@ -311,16 +333,26 @@
 
   .sl-markdown-content h1,
   .content-panel h1 {
-    letter-spacing: -0.025em;
+    font-family: var(--font-heading);
+    letter-spacing: 0.01em;
     font-weight: 700;
     color: var(--mw-fg);
   }
 
   .sl-markdown-content h2,
-  .sl-markdown-content h3,
-  .sl-markdown-content h4 {
-    letter-spacing: -0.02em;
+  .sl-markdown-content h3 {
+    font-family: var(--font-heading);
+    letter-spacing: 0.01em;
     font-weight: 600;
+    color: var(--mw-fg);
+  }
+
+  .sl-markdown-content h4,
+  .sl-markdown-content h5,
+  .sl-markdown-content h6 {
+    font-family: var(--font-subheading);
+    letter-spacing: 0.01em;
+    font-weight: 400;
     color: var(--mw-fg);
   }
 
@@ -352,8 +384,10 @@
   }
 
   .sl-link-card .title {
-    font-size: 1rem;
-    font-weight: 600;
+    font-family: var(--font-subheading);
+    font-size: 1.1875rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
     color: var(--mw-fg);
   }
 
@@ -368,6 +402,13 @@
     border: 1px solid var(--mw-border);
     border-inline-start-width: 1px;
     background-color: var(--mw-surface);
+  }
+
+  .starlight-aside__title {
+    font-family: var(--font-subheading);
+    font-size: 1.125rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
   }
 
   .pagination-links a {
@@ -399,8 +440,9 @@
   }
 
   #starlight__sidebar .group-label .large {
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-family: var(--font-subheading);
+    font-size: 0.9375rem;
+    font-weight: 400;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--mw-fg);
