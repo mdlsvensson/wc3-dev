@@ -34,6 +34,14 @@
 
 :root,
 ::backdrop {
+  /* Mintlify-inspired layout dimensions & typography */
+  --sl-nav-height: 3.5rem;
+  --sl-sidebar-width: 17.5rem;
+  --sl-content-width: 46rem;
+  --sl-text-h1: 2rem;
+  --sl-text-h2: 1.375rem;
+  --sl-text-h3: 1.125rem;
+
   /* Vitesse Dark core surfaces & foregrounds */
   --sl-color-white: #dbd7ca;
   --sl-color-gray-1: #dbd7ca;
@@ -72,15 +80,252 @@
 
   /* Starlight UI bindings */
   --sl-color-text: #bfbaaa;
-  --sl-color-text-accent: #4d9375;
+  --sl-color-text-accent: #80a665;
   --sl-color-text-invert: #121212;
   --sl-color-bg: #121212;
-  --sl-color-bg-nav: #121212;
+  --sl-color-bg-nav: rgba(18, 18, 18, 0.82);
   --sl-color-bg-sidebar: #121212;
   --sl-color-bg-inline-code: #181818;
   --sl-color-bg-accent: #4d9375;
   --sl-color-hairline-light: #222222;
   --sl-color-hairline: #191919;
-  --sl-color-hairline-shade: #121212;
+  --sl-color-hairline-shade: #191919;
   --sl-color-backdrop-overlay: rgba(18, 18, 18, 0.78);
+  --sl-shadow-sm: none;
+  --sl-shadow-md: none;
+  --sl-shadow-lg: none;
+}
+
+@layer components {
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #121212;
+    color: #bfbaaa;
+  }
+
+  /* Mintlify sticky blurred top navbar */
+  header.header {
+    background-color: rgba(18, 18, 18, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #191919;
+  }
+
+  .site-title {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #dbd7ca;
+  }
+
+  /* Mintlify pill search trigger */
+  site-search button[data-open-modal] {
+    border-radius: 9999px;
+    background-color: #181818;
+    border: 1px solid #222222;
+    height: 2.25rem;
+    padding-inline: 0.875rem;
+    color: #959da5;
+    font-size: 0.8125rem;
+    transition:
+      border-color 150ms ease,
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  site-search button[data-open-modal]:hover {
+    border-color: #4d9375;
+    background-color: #191919;
+    color: #dbd7ca;
+  }
+
+  site-search button[data-open-modal] kbd {
+    border-radius: 9999px;
+    background-color: #121212;
+    border: 1px solid #222222;
+    font-size: 0.6875rem;
+    padding-inline: 0.45rem;
+    color: #959da5;
+  }
+
+  /* Mintlify right-hand Table of Contents ("On this page") */
+  .right-sidebar {
+    border-inline-start: none;
+  }
+
+  starlight-toc h2 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #dbd7ca;
+    margin-bottom: 0.5rem;
+  }
+
+  starlight-toc nav ul {
+    border-inline-start: 1px solid #191919;
+  }
+
+  starlight-toc a {
+    font-size: 0.8125rem;
+    color: #959da5;
+    padding-block: 0.25rem;
+    padding-inline-start: 0.875rem;
+    border-inline-start: 1px solid transparent;
+    margin-inline-start: -1px;
+    border-radius: 0;
+    transition:
+      color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  starlight-toc a:hover {
+    color: #dbd7ca;
+  }
+
+  starlight-toc a[aria-current="true"],
+  starlight-toc a[aria-current="true"]:hover {
+    color: #80a665;
+    font-weight: 500;
+    background: transparent;
+    border-inline-start-color: #4d9375;
+  }
+
+  /* Main content & headings */
+  main .content-panel {
+    border-top: none;
+  }
+
+  main .content-panel:first-of-type {
+    padding-bottom: 0.5rem;
+  }
+
+  .sl-markdown-content h1,
+  .content-panel h1 {
+    letter-spacing: -0.025em;
+    font-weight: 700;
+    color: #dbd7ca;
+  }
+
+  .sl-markdown-content h2,
+  .sl-markdown-content h3,
+  .sl-markdown-content h4 {
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    color: #dbd7ca;
+  }
+
+  .sl-markdown-content :not(pre) > code {
+    background-color: #181818;
+    border: 1px solid #222222;
+    border-radius: 0.375rem;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.85em;
+    color: #dbd7ca;
+  }
+
+  /* Mintlify-style interactive link cards & card grids */
+  .card,
+  .sl-link-card {
+    background-color: #181818;
+    border: 1px solid #222222;
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: none;
+    transition:
+      border-color 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .sl-link-card:hover {
+    border-color: #4d9375;
+    background-color: #191919;
+  }
+
+  .sl-link-card .title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #dbd7ca;
+  }
+
+  .sl-link-card .description {
+    font-size: 0.875rem;
+    color: #959da5;
+  }
+
+  /* Callouts & pagination */
+  .starlight-aside {
+    border-radius: 0.75rem;
+    border: 1px solid #222222;
+    border-inline-start-width: 1px;
+    background-color: #181818;
+  }
+
+  .pagination-links a {
+    border-radius: 0.75rem;
+    border: 1px solid #222222;
+    background-color: #181818;
+    box-shadow: none;
+    padding: 0.875rem 1.25rem;
+    transition: border-color 150ms ease;
+  }
+
+  .pagination-links a:hover {
+    border-color: #4d9375;
+  }
+
+  /* Mintlify left sidebar navigation */
+  .sidebar-pane {
+    border-inline-end: 1px solid #191919;
+    background-color: #121212;
+  }
+
+  #starlight__sidebar .top-level > li + li {
+    margin-top: 1.25rem;
+  }
+
+  #starlight__sidebar summary {
+    padding: 0.25rem 0.75rem;
+    margin-bottom: 0.375rem;
+  }
+
+  #starlight__sidebar .group-label .large {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #dbd7ca;
+  }
+
+  #starlight__sidebar ul ul {
+    border-inline-start: none;
+    padding-inline-start: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  #starlight__sidebar a {
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #959da5;
+    transition:
+      color 150ms ease,
+      background-color 150ms ease;
+  }
+
+  #starlight__sidebar a:hover {
+    color: #dbd7ca;
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  #starlight__sidebar a[aria-current="page"],
+  #starlight__sidebar a[aria-current="page"]:hover {
+    background-color: rgba(77, 147, 117, 0.14);
+    color: #80a665;
+    font-weight: 500;
+  }
 }

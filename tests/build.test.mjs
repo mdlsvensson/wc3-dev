@@ -1,7 +1,7 @@
-import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import test from "node:test";
 
 test("astro build emits landing page, getting-started guide, 404 page, and pagefind bundle", () => {
   assert.equal(existsSync("dist/index.html"), true, "dist/index.html should exist");
@@ -20,9 +20,32 @@ test("astro build emits landing page, getting-started guide, 404 page, and pagef
   const indexHtml = readFileSync("dist/index.html", "utf8");
   assert.match(indexHtml, /Moonwell/);
   assert.match(indexHtml, /\/guides\/getting-started\//);
+  assert.match(
+    indexHtml,
+    /id="starlight__sidebar"/,
+    "root docs page should render the full Mintlify-style sidebar layout",
+  );
 });
 
-test("site is locked to dark mode with Vitesse Dark palette and vitesse-dark code highlighting", () => {
+test("biome.json is configured and biome check passes cleanly", () => {
+  assert.equal(existsSync("biome.json"), true, "biome.json should exist");
+  const biomeConfig = JSON.parse(readFileSync("biome.json", "utf8"));
+  assert.equal(
+    biomeConfig.css?.parser?.tailwindDirectives,
+    true,
+    "biome.json should enable css.parser.tailwindDirectives for Tailwind v4",
+  );
+
+  const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+  assert.equal(typeof pkg.scripts?.lint, "string", "package.json should define a lint script");
+  assert.equal(typeof pkg.scripts?.format, "string", "package.json should define a format script");
+
+  execFileSync(process.execPath, ["./node_modules/@biomejs/biome/bin/biome", "check", "."], {
+    encoding: "utf8",
+  });
+});
+
+test("site is locked to dark mode with Mintlify layout styling and Vitesse Dark palette", () => {
   const guideHtml = readFileSync("dist/guides/getting-started/index.html", "utf8");
   assert.doesNotMatch(
     guideHtml,
@@ -42,6 +65,21 @@ test("site is locked to dark mode with Vitesse Dark palette and vitesse-dark cod
     .join("\n");
   assert.match(cssContent, /#121212/i, "built CSS should include Vitesse Dark background #121212");
   assert.match(cssContent, /#4d9375/i, "built CSS should include Vitesse Dark primary #4d9375");
+  assert.match(
+    cssContent,
+    /backdrop-filter:\s*blur\(12px\)/i,
+    "built CSS should include Mintlify translucent blurred header",
+  );
+  assert.match(
+    cssContent,
+    /site-search[\s\S]*9999px/i,
+    "built CSS should style the search trigger as a Mintlify pill",
+  );
+  assert.match(
+    cssContent,
+    /aria-current=["']?page["']?[\s\S]*#80a665/i,
+    "built CSS should style active sidebar links as a Vitesse green Mintlify pill",
+  );
 });
 
 test("wrangler.jsonc configures static assets with 404-page handling for wc3-dev", () => {

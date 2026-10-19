@@ -1,6 +1,6 @@
-import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "astro/config";
 
 export default defineConfig({
   site: "https://wc3.dev",
@@ -13,6 +13,16 @@ export default defineConfig({
       customCss: ["./src/styles/global.css"],
       expressiveCode: {
         themes: ["vitesse-dark"],
+        styleOverrides: {
+          borderRadius: "0.75rem",
+          borderColor: "#222222",
+          codeBackground: "#181818",
+          frames: {
+            editorActiveTabBackground: "#181818",
+            editorTabBarBackground: "#121212",
+            frameBoxShadowCssValue: "none",
+          },
+        },
       },
       components: {
         ThemeProvider: "./src/components/ThemeProvider.astro",
@@ -27,8 +37,11 @@ export default defineConfig({
       ],
       sidebar: [
         {
-          label: "Guides",
-          autogenerate: { directory: "guides" },
+          label: "Get Started",
+          items: [
+            { label: "Introduction", slug: "" },
+            { label: "Getting Started", slug: "guides/getting-started" },
+          ],
         },
       ],
     }),

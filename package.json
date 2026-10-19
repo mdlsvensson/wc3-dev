@@ -9,6 +9,8 @@
     "check": "astro check",
     "preview": "wrangler dev",
     "dry-run": "wrangler deploy --dry-run",
+    "lint": "biome check .",
+    "format": "biome check --write .",
     "test": "node --test tests/build.test.mjs"
   },
   "dependencies": {
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "@biomejs/biome": "^2.5.15",
     "typescript": "^5.9.0",
     "wrangler": "^4.14.0"
   },

@@ -1,15 +1,27 @@
 ---
 title: Moonwell
 description: "C# modding framework for Warcraft III: Reforged."
-template: splash
-hero:
-  tagline: "Build Warcraft III: Reforged maps in C#."
-  actions:
-    - text: Getting Started
-      link: /guides/getting-started/
-      icon: right-arrow
-    - text: GitHub
-      link: https://github.com/mdlsvensson/moonwell
-      icon: external
-      variant: minimal
 ---
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+Build **Warcraft III: Reforged** maps in modern C# with strongly-typed game APIs, deterministic Lua compilation, and fast local map packaging.
+
+## Explore the docs
+
+<CardGrid>
+  <LinkCard
+    title="Getting Started"
+    description="Set up your environment and compile your first C# Warcraft III map."
+    href="/guides/getting-started/"
+  />
+  <LinkCard
+    title="GitHub Repository"
+    description="Browse the Moonwell source code, compiler toolchain, and issue tracker."
+    href="https://github.com/mdlsvensson/moonwell"
+  />
+</CardGrid>
+
+## Architecture at a glance
+
+Moonwell lets you author map logic, abilities, triggers, and object data in standard `.csproj` projects while targeting the Warcraft III Lua runtime.
