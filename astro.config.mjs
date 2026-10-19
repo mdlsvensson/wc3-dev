@@ -43,6 +43,13 @@ export default defineConfig({
             { label: "Getting Started", slug: "guides/getting-started" },
           ],
         },
+        {
+          label: "Guides",
+          items: [
+            { label: "Project & World Editor", slug: "guides/project-and-editor" },
+            { label: "Objects", slug: "guides/objects" },
+          ],
+        },
       ],
     }),
   ],

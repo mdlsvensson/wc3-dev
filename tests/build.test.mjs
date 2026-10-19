@@ -10,6 +10,16 @@ test("astro build emits landing page, getting-started guide, 404 page, and pagef
     true,
     "dist/guides/getting-started/index.html should exist",
   );
+  assert.equal(
+    existsSync("dist/guides/project-and-editor/index.html"),
+    true,
+    "dist/guides/project-and-editor/index.html should exist",
+  );
+  assert.equal(
+    existsSync("dist/guides/objects/index.html"),
+    true,
+    "dist/guides/objects/index.html should exist",
+  );
   assert.equal(existsSync("dist/404.html"), true, "dist/404.html should exist");
   assert.equal(
     existsSync("dist/pagefind/pagefind.js"),
@@ -25,6 +35,9 @@ test("astro build emits landing page, getting-started guide, 404 page, and pagef
     /id="starlight__sidebar"/,
     "root docs page should render the full Mintlify-style sidebar layout",
   );
+
+  const gettingStartedHtml = readFileSync("dist/guides/getting-started/index.html", "utf8");
+  assert.match(gettingStartedHtml, /Moonwell\.Templates/);
 });
 
 test("biome.json is configured and biome check passes cleanly", () => {

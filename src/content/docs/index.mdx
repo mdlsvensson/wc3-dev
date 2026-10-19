@@ -5,23 +5,117 @@ description: "C# modding framework for Warcraft III: Reforged."
 
 import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-Build **Warcraft III: Reforged** maps in modern C# with strongly-typed game APIs, deterministic Lua compilation, and fast local map packaging.
+Moonwell is a C# modding framework and build toolchain for **Warcraft III: Reforged**.
 
-## Explore the docs
+A map is one C# project (`MyMap.csproj`) and one World Editor map folder (`map/`). World Editor is for terrain and placed things — regions, cameras, units, items, and trees. Your C# code declares the map's settings, its units, heroes, items, abilities, buffs, destructables, doodads, and upgrades, and the components and reactions that run in the game. `moonwell build` writes the object data into a staged copy of the map, compiles the C# to Lua, and packs the `.w3x` archive.
+
+```csharp
+using Moonwell;
+using Moonwell.Objects.Abilities.Human;
+using Moonwell.Objects.Units.Human;
+
+namespace MyMap
+{
+    public sealed class Champion : Paladin
+    {
+        public Champion()
+        {
+            Name = "Champion";
+            HitPoints = HitPoints + 200;
+            HeroAbilities.Remove<HolyLight>();
+            HeroAbilities.Add<Smite>();
+            Components.Add(new Fury());
+        }
+    }
+
+    public sealed class Smite : StormBolt
+    {
+        public Smite()
+        {
+            Name = "Smite";
+            Damage = Levels(75f, 150f, 225f);
+            Tooltip = PerLevel(level => $"Deals {Damage[level]} damage and stuns the target.");
+        }
+
+        public override void OnCast(Cast cast)
+        {
+            Local.For(cast.Caster.Player, () =>
+            {
+                var target = cast.Target == null ? "nothing" : Natives.GetUnitName(cast.Target.Handle);
+                Natives.DisplayTextToPlayer(cast.Caster.Player.Handle, 0f, 0f, "Smite, level " + cast.Level + ", at " + target);
+            });
+        }
+    }
+
+    public sealed class Fury : UnitComponent
+    {
+        private int kills;
+
+        public override void OnKill(Unit victim)
+        {
+            kills++;
+            Natives.DisplayTextToPlayer(Unit.Player.Handle, 0f, 0f, "Kills: " + kills);
+        }
+    }
+}
+```
+
+## Guides
 
 <CardGrid>
   <LinkCard
     title="Getting Started"
-    description="Set up your environment and compile your first C# Warcraft III map."
+    description="Install the template and CLI, make a map, and run it in Warcraft III."
     href="/guides/getting-started/"
   />
   <LinkCard
-    title="GitHub Repository"
-    description="Browse the Moonwell source code, compiler toolchain, and issue tracker."
-    href="https://github.com/mdlsvensson/moonwell"
+    title="Project & World Editor"
+    description="Project folders, map settings, custom assets, and saving built objects back to World Editor."
+    href="/guides/project-and-editor/"
+  />
+  <LinkCard
+    title="Objects"
+    description="Declare units, heroes, items, abilities, buffs, destructables, doodads, and upgrades as C# classes."
+    href="/guides/objects/"
+  />
+  <LinkCard
+    title="Actors, Components & Reactions"
+    description="Attach state and reaction hooks to units, items, destructables, players, and the game."
+    href="/guides/components-and-reactions/"
+  />
+  <LinkCard
+    title="Abilities, Buffs & Timers"
+    description="React to casts, apply timed and ticking buffs, schedule timers, and manage ownership."
+    href="/guides/abilities-buffs-and-timers/"
+  />
+  <LinkCard
+    title="Multiplayer"
+    description="Run machine-local code with Local.For and catch desyncs as compile errors."
+    href="/guides/multiplayer/"
   />
 </CardGrid>
 
-## Architecture at a glance
+## Reference
 
-Moonwell lets you author map logic, abilities, triggers, and object data in standard `.csproj` projects while targeting the Warcraft III Lua runtime.
+<CardGrid>
+  <LinkCard
+    title="CLI & Build"
+    description="Commands, flags, build pipeline steps, development vs. release builds, and error logs."
+    href="/reference/cli-and-build/"
+  />
+  <LinkCard
+    title="Runtime API"
+    description="All public types, properties, methods, and reaction hooks in the Moonwell runtime."
+    href="/reference/runtime-api/"
+  />
+  <LinkCard
+    title="Objects & Natives API"
+    description="Moonwell.Objects base classes, attributes, race namespaces, hand-picked fields, and Moonwell.Natives."
+    href="/reference/objects-and-natives/"
+  />
+  <LinkCard
+    title="Diagnostics & Errors"
+    description="Multiplayer analyzer rules MW0001–MW0006, sync attributes, string literal checks, and build errors."
+    href="/reference/diagnostics/"
+  />
+</CardGrid>
