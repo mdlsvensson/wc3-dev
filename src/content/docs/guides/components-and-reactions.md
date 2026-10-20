@@ -155,25 +155,25 @@ Rather than creating and wiring `trigger` handles manually, override `virtual` r
 
 ### Reaction methods by class
 
-| Reaction method | `Unit` / `Hero` | `UnitComponent` (and `Buff`) | `Item` | `ItemComponent` | `Destructable` | `DestructableComponent` | `Ability` | `MapComponent` (`GameComponent`, `PlayerComponent`) |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `OnGameStart()` | — | — | — | — | — | — | — | Yes |
-| `OnEnter()` | `protected` | — | `protected` | — | `protected` | — | — | — |
-| `OnLeave()` | `protected` | — | `protected` | — | `protected` | — | — | — |
-| `OnUnitEnter(Unit unit)` | — | — | — | — | — | — | — | Yes |
-| `OnDamaged(Damage damage)` | Yes | Yes | — | — | — | — | — | — |
-| `OnDealtDamage(Damage damage)` | Yes | Yes | — | — | — | — | — | — |
-| `OnUnitDamaged(Damage damage)` | — | — | — | — | — | — | — | Yes |
-| `OnDeath(Unit? killer)` | Yes | Yes | — | — | — | — | — | — |
-| `OnKill(Unit victim)` | Yes | Yes | — | — | — | — | — | — |
-| `OnUnitDied(Unit dying, Unit? killer)` | — | — | — | — | — | — | — | Yes |
-| `OnDeath()` | — | — | — | — | Yes | Yes | — | — |
-| `OnCast(Cast cast)` | Yes | Yes | — | — | — | — | Yes | — |
-| `OnUnitCast(Cast cast)` | — | — | — | — | — | — | — | Yes |
-| `OnItemPickedUp(Item item)` | Yes | Yes | — | — | — | — | — | — |
-| `OnItemDropped(Item item)` | Yes | Yes | — | — | — | — | — | — |
-| `OnPickedUp(Unit by)` | — | — | Yes | Yes | — | — | — | — |
-| `OnDropped(Unit by)` | — | — | Yes | Yes | — | — | — | — |
+| Reaction method | Actor / Ability | Component |
+| --- | --- | --- |
+| `OnGameStart()` | — | `MapComponent` (`GameComponent`, `PlayerComponent`) |
+| `OnEnter()` | `Unit`, `Hero`, `Item`, `Destructable` (`protected`) | — |
+| `OnLeave()` | `Unit`, `Hero`, `Item`, `Destructable` (`protected`) | — |
+| `OnUnitEnter(Unit unit)` | — | `MapComponent` (`GameComponent`, `PlayerComponent`) |
+| `OnDamaged(Damage damage)` | `Unit`, `Hero` | `UnitComponent`, `Buff` |
+| `OnDealtDamage(Damage damage)` | `Unit`, `Hero` | `UnitComponent`, `Buff` |
+| `OnUnitDamaged(Damage damage)` | — | `MapComponent` (`GameComponent`, `PlayerComponent`) |
+| `OnDeath(Unit? killer)` | `Unit`, `Hero` | `UnitComponent`, `Buff` |
+| `OnKill(Unit victim)` | `Unit`, `Hero` | `UnitComponent`, `Buff` |
+| `OnUnitDied(Unit dying, Unit? killer)` | — | `MapComponent` (`GameComponent`, `PlayerComponent`) |
+| `OnDeath()` | `Destructable` | `DestructableComponent` |
+| `OnCast(Cast cast)` | `Ability`, `Unit`, `Hero` | `UnitComponent`, `Buff` |
+| `OnUnitCast(Cast cast)` | — | `MapComponent` (`GameComponent`, `PlayerComponent`) |
+| `OnItemPickedUp(Item item)` | `Unit`, `Hero` | `UnitComponent`, `Buff` |
+| `OnItemDropped(Item item)` | `Unit`, `Hero` | `UnitComponent`, `Buff` |
+| `OnPickedUp(Unit by)` | `Item` | `ItemComponent` |
+| `OnDropped(Unit by)` | `Item` | `ItemComponent` |
 
 ### Modifying damage
 
