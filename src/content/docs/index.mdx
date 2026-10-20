@@ -9,61 +9,51 @@ Moonwell is a C# modding framework and build toolchain for [Warcraft III: Reforg
 
 With **Moonwell**, a map is a C# project (`MyMap.csproj`) and a Warcraft III map saved as a folder (`map/`).
 
+```text
+MyMap/
+├── MyMap.csproj
+├── Map.cs
+├── Start.cs
+├── Champion/
+│   ├── Champion.cs
+│   ├── Fury.cs
+│   └── Smite.cs
+└── map/
+```
+
 You declare the map's settings, its units, heroes, items, abilities, buffs, destructables, doodads, and upgrades, all in code.
+
+```csharp
+public sealed class Settings : Map
+{
+    public Settings()
+    {
+        Name = "MyMap";
+        Description = "A map made with Moonwell.";
+        RecommendedPlayers = "1";
+        Components.Add(new Start());
+    }
+}
+
+public sealed class Champion : Paladin
+{
+    public Champion()
+    {
+        Name = "Champion";
+        HitPoints = HitPoints + 200;
+        HeroAbilities.Remove<HolyLight>();
+        HeroAbilities.Add<Smite>();
+        Components.Add(new Fury());
+    }
+}
+```
 
 You use the World Editor for terrain and placing things like regions, cameras, units, items, and trees.
 
 `moonwell build` writes declared object data into a staged copy of the map, compiles your C# into Lua, and packs the `.w3x` archive.
 
-```csharp
-using Moonwell;
-using Moonwell.Objects.Abilities.Human;
-using Moonwell.Objects.Units.Human;
-
-namespace MyMap
-{
-    public sealed class Champion : Paladin
-    {
-        public Champion()
-        {
-            Name = "Champion";
-            HitPoints = HitPoints + 200;
-            HeroAbilities.Remove<HolyLight>();
-            HeroAbilities.Add<Smite>();
-            Components.Add(new Fury());
-        }
-    }
-
-    public sealed class Smite : StormBolt
-    {
-        public Smite()
-        {
-            Name = "Smite";
-            Damage = Levels(75f, 150f, 225f);
-            Tooltip = PerLevel(level => $"Deals {Damage[level]} damage and stuns the target.");
-        }
-
-        public override void OnCast(Cast cast)
-        {
-            Local.For(cast.Caster.Player, () =>
-            {
-                var target = cast.Target == null ? "nothing" : Natives.GetUnitName(cast.Target.Handle);
-                Natives.DisplayTextToPlayer(cast.Caster.Player.Handle, 0f, 0f, "Smite, level " + cast.Level + ", at " + target);
-            });
-        }
-    }
-
-    public sealed class Fury : UnitComponent
-    {
-        private int kills;
-
-        public override void OnKill(Unit victim)
-        {
-            kills++;
-            Natives.DisplayTextToPlayer(Unit.Player.Handle, 0f, 0f, "Kills: " + kills);
-        }
-    }
-}
+```sh
+moonwell build
 ```
 
 ## Guides
