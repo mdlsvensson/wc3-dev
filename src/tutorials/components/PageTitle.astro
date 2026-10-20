@@ -1,0 +1,21 @@
+---
+const { entry } = Astro.locals.starlightRoute;
+const { title, description, summary, minutes, goals } = entry.data;
+const lead = summary ?? description;
+---
+
+<h1 id="_top">{title}</h1>
+{lead && <p class="mw-tutorial-summary">{lead}</p>}
+{minutes && <p class="mw-tutorial-meta">About {minutes} minutes</p>}
+{
+  goals && goals.length > 0 && (
+    <div class="mw-tutorial-goals">
+      <p class="mw-tutorial-goals-title">In this lesson you will</p>
+      <ul class="mw-tutorial-goals-list">
+        {goals.map((goal: string) => (
+          <li>{goal}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}

@@ -1,0 +1,171 @@
+---
+title: "Getting started with Warcraft III: Reforged modding"
+description: "Build Defend the Village from an empty World Editor map to a playable game across six chapters and 21 lessons."
+---
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+Build **Defend the Village**, a small map where you hold a village against five waves of gnolls and ogres. You start from an empty map and finish with a playable game using the World Editor that comes with Warcraft III: Reforged — no programming required.
+
+- **6 chapters** · **21 lessons** · **About 5 hours 25 minutes**
+
+<LinkCard
+  title="Start the track: Install and open the World Editor"
+  description="Find the World Editor that comes with Warcraft III, open it, and learn where your maps are saved."
+  href="/tutorials/editor-basics/install-and-open/"
+/>
+
+## 1. Editor Basics
+
+Open the World Editor, find your way around, and create the map you will build throughout the track.
+
+<CardGrid>
+  <LinkCard
+    title="1.1 Install and open the World Editor"
+    description="Find the World Editor that comes with Warcraft III, open it, and learn where your maps are saved."
+    href="/tutorials/editor-basics/install-and-open/"
+  />
+  <LinkCard
+    title="1.2 A tour of the editor"
+    description="Learn the parts of the main window, move the camera, and find the palettes and editors this track uses."
+    href="/tutorials/editor-basics/editor-tour/"
+  />
+  <LinkCard
+    title="1.3 Create and test your map"
+    description="Create the 96 × 96 Lordaeron Summer map you will build throughout the track, save it, and play it for the first time."
+    href="/tutorials/editor-basics/create-your-map/"
+  />
+</CardGrid>
+
+## 2. Terraining
+
+Paint tiles, raise the village onto a plateau, and carve a river with a single ford.
+
+<CardGrid>
+  <LinkCard
+    title="2.1 Painting tiles"
+    description="Use the Terrain Palette to paint grass, dirt and stone, and lay out the village clearing and its path."
+    href="/tutorials/terrain/painting-tiles/"
+  />
+  <LinkCard
+    title="2.2 Height, cliffs and ramps"
+    description="Shape gentle hills, raise the village onto a cliff plateau, and connect it to the path with a ramp."
+    href="/tutorials/terrain/height-and-cliffs/"
+  />
+  <LinkCard
+    title="2.3 Water and the river"
+    description="Carve a river across the map with deep water, and leave a shallow ford as the only crossing."
+    href="/tutorials/terrain/water/"
+  />
+  <LinkCard
+    title="2.4 Finishing touches"
+    description="Break up flat ground with tile variation, and check with the pathing view that units can walk from the spawn to the village."
+    href="/tutorials/terrain/finishing-touches/"
+  />
+</CardGrid>
+
+## 3. Placing Units & Doodads
+
+Build the village, place creep camps, and mark the regions your triggers will use.
+
+<CardGrid>
+  <LinkCard
+    title="3.1 Doodads and the village"
+    description="Place trees, fences, crates and other doodads to turn the plateau into a village and frame the map."
+    href="/tutorials/placement/doodads/"
+  />
+  <LinkCard
+    title="3.2 Units, buildings and start locations"
+    description="Place the town hall, farms and peasants for Player 1, and set the start location the game uses when the map begins."
+    href="/tutorials/placement/units-and-buildings/"
+  />
+  <LinkCard
+    title="3.3 Creep camps and item drops"
+    description="Guard the map with neutral hostile creep camps, and make them drop an item when they die."
+    href="/tutorials/placement/creep-camps/"
+  />
+  <LinkCard
+    title="3.4 Regions"
+    description="Mark the Spawn and Village areas with regions, ready for the triggers in chapter 6."
+    href="/tutorials/placement/regions/"
+  />
+</CardGrid>
+
+## 4. Map Setup
+
+Name and describe your map, give it a loading screen, and set up its players and forces.
+
+<CardGrid>
+  <LinkCard
+    title="4.1 Description, options and loading screen"
+    description="Give the map its name, description and loading screen, and learn what the main map options do."
+    href="/tutorials/map-setup/map-options/"
+  />
+  <LinkCard
+    title="4.2 Players and forces"
+    description="Set up the human defender and the computer invader, put them in forces, and fix the player settings."
+    href="/tutorials/map-setup/players-and-forces/"
+  />
+</CardGrid>
+
+## 5. Object Editor
+
+Create a custom hero, a custom ability, and a tower to defend the village.
+
+<CardGrid>
+  <LinkCard
+    title="5.1 A tour of the Object Editor"
+    description="Find your way around the Object Editor, its tabs, standard and custom objects, and the fields that define them."
+    href="/tutorials/object-editor/object-editor-tour/"
+  />
+  <LinkCard
+    title="5.2 A custom hero"
+    description="Create the Village Captain, a custom hero based on the Paladin, and place it in the village."
+    href="/tutorials/object-editor/custom-hero/"
+  />
+  <LinkCard
+    title="5.3 A custom ability"
+    description="Turn Storm Bolt into Shield Throw, with its own damage, cooldown and tooltips, and give it to the Village Captain."
+    href="/tutorials/object-editor/custom-ability/"
+  />
+  <LinkCard
+    title="5.4 A village tower"
+    description="Create a cheap Village Tower that peasants can build to defend against the waves."
+    href="/tutorials/object-editor/village-tower/"
+  />
+</CardGrid>
+
+## 6. GUI Triggers
+
+Turn the map into a game: waves on a timer, then victory or defeat.
+
+<CardGrid>
+  <LinkCard
+    title="6.1 Events, conditions and actions"
+    description="Open the Trigger Editor, see how triggers work, and show a welcome message when the map starts."
+    href="/tutorials/triggers/trigger-basics/"
+  />
+  <LinkCard
+    title="6.2 Variables and a wave timer"
+    description="Store the wave number and each wave's unit type in variables, and count down to the first wave in a timer window."
+    href="/tutorials/triggers/wave-timer/"
+  />
+  <LinkCard
+    title="6.3 Spawning waves"
+    description="Spawn each wave at the Spawn region when the timer expires, and send it to attack the village."
+    href="/tutorials/triggers/spawning-waves/"
+  />
+  <LinkCard
+    title="6.4 Winning and losing"
+    description="End the game in defeat when the town hall falls, and in victory when the last wave is beaten."
+    href="/tutorials/triggers/win-and-lose/"
+  />
+</CardGrid>
+
+## Where to go next
+
+<LinkCard
+  title="Where to go next"
+  description="You have built a complete map. Here is where to keep learning, find resources and meet other modders."
+  href="/tutorials/next/"
+/>

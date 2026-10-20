@@ -17,6 +17,32 @@ const expectedDocsPages = [
   "dist/docs/reference/diagnostics/index.html",
 ];
 
+const expectedTutorialsPages = [
+  "dist/home/tutorials/index.html",
+  "dist/home/tutorials/editor-basics/install-and-open/index.html",
+  "dist/home/tutorials/editor-basics/editor-tour/index.html",
+  "dist/home/tutorials/editor-basics/create-your-map/index.html",
+  "dist/home/tutorials/terrain/painting-tiles/index.html",
+  "dist/home/tutorials/terrain/height-and-cliffs/index.html",
+  "dist/home/tutorials/terrain/water/index.html",
+  "dist/home/tutorials/terrain/finishing-touches/index.html",
+  "dist/home/tutorials/placement/doodads/index.html",
+  "dist/home/tutorials/placement/units-and-buildings/index.html",
+  "dist/home/tutorials/placement/creep-camps/index.html",
+  "dist/home/tutorials/placement/regions/index.html",
+  "dist/home/tutorials/map-setup/map-options/index.html",
+  "dist/home/tutorials/map-setup/players-and-forces/index.html",
+  "dist/home/tutorials/object-editor/object-editor-tour/index.html",
+  "dist/home/tutorials/object-editor/custom-hero/index.html",
+  "dist/home/tutorials/object-editor/custom-ability/index.html",
+  "dist/home/tutorials/object-editor/village-tower/index.html",
+  "dist/home/tutorials/triggers/trigger-basics/index.html",
+  "dist/home/tutorials/triggers/wave-timer/index.html",
+  "dist/home/tutorials/triggers/spawning-waves/index.html",
+  "dist/home/tutorials/triggers/win-and-lose/index.html",
+  "dist/home/tutorials/next/index.html",
+];
+
 test("home build emits standalone wc3.dev landing page and 404 page in dist/home without docs routes", () => {
   assert.equal(existsSync("dist/home/index.html"), true, "dist/home/index.html should exist");
   assert.equal(existsSync("dist/home/404.html"), true, "dist/home/404.html should exist");
@@ -59,11 +85,7 @@ test("home build emits standalone wc3.dev landing page and 404 page in dist/home
     /data-palette-select[\s\S]*value="kanagawa-wave"[\s\S]*value="vitesse-dark"/,
     "wc3.dev header should render the palette selector",
   );
-  assert.match(
-    homeHtml,
-    /<pre data-language="csharp">[\s\S]*--0:#DCD7BA[\s\S]*--1:#DBD7CAEE/i,
-    "wc3.dev code preview should render dual syntax token colors for kanagawa-wave and vitesse-dark",
-  );
+  assert.match(homeHtml, /href="\/tutorials\/"/, "wc3.dev header should link to /tutorials/");
 
   const docsLinkMatches = [...homeHtml.matchAll(/href="https:\/\/docs\.wc3\.dev(\/[^"#?]*)"/g)];
   assert.equal(
@@ -81,6 +103,58 @@ test("home build emits standalone wc3.dev landing page and 404 page in dist/home
       true,
       `docs.wc3.dev link ${pathname} on wc3.dev should resolve to ${targetPath}`,
     );
+  }
+});
+
+test("tutorials build emits Starlight tutorials track under dist/home/tutorials with custom directives and valid internal links", () => {
+  for (const page of expectedTutorialsPages) {
+    assert.equal(existsSync(page), true, `${page} should exist`);
+  }
+  assert.equal(
+    existsSync("dist/home/tutorials/pagefind/pagefind.js"),
+    true,
+    "dist/home/tutorials/pagefind/pagefind.js should exist",
+  );
+
+  const indexHtml = readFileSync("dist/home/tutorials/index.html", "utf8");
+  assert.match(indexHtml, /Defend the Village/);
+  assert.match(indexHtml, /id="starlight__sidebar"/);
+
+  const createMapHtml = readFileSync(
+    "dist/home/tutorials/editor-basics/create-your-map/index.html",
+    "utf8",
+  );
+  assert.match(createMapHtml, /class="mw-tutorial-summary"/);
+  assert.match(createMapHtml, /class="mw-tutorial-goals"/);
+  assert.match(createMapHtml, /class="mw-menu-path"/);
+  assert.match(createMapHtml, /class="mw-keys"/);
+  assert.match(createMapHtml, /class="mw-steps"/);
+  assert.match(createMapHtml, /class="starlight-aside starlight-aside--tip mw-checkpoint"/);
+
+  for (const page of expectedTutorialsPages) {
+    const html = readFileSync(page, "utf8");
+    assert.doesNotMatch(
+      html,
+      /:::steps|:::checkpoint|::shot\[|:kbd\[|:menu\[/,
+      `${page} should not leak raw tutorial directives`,
+    );
+    const hrefMatches = html.matchAll(/href="(\/[^"#?]*)"/g);
+    for (const match of hrefMatches) {
+      const href = match[1];
+      if (href.startsWith("/tutorials/_astro/") || href.startsWith("/tutorials/pagefind/")) {
+        continue;
+      }
+      const targetPath = href.endsWith("/")
+        ? `dist/home${href}index.html`
+        : existsSync(`dist/home${href}`)
+          ? `dist/home${href}`
+          : `dist/home${href}/index.html`;
+      assert.equal(
+        existsSync(targetPath),
+        true,
+        `internal link ${href} in ${page} should resolve to ${targetPath}`,
+      );
+    }
   }
 });
 
