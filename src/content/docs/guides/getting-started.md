@@ -28,13 +28,9 @@ cd MyMap
 moonwell run
 ```
 
-`moonwell run` compiles the C# project, writes the map's object data and Lua script into `build\MyMap\`, packs `build\MyMap.w3x`, and starts Warcraft III in windowed mode with the built archive loaded.
-
-When the map starts, Player 1 has a **Champion** — a custom Paladin declared in C# — at their start location, with three hostile footmen nearby to fight. Learn **Smite** in the hero skill menu and cast it on a footman: the screen prints the spell's level and the target's name. Each kill prints the Champion's running kill count.
-
 ## What the template contains
 
-A new map project has five C# files and a World Editor map folder (`map/`):
+A new project has five C# files and a World Editor map folder (`map/`):
 
 ```text
 MyMap/
@@ -182,19 +178,6 @@ namespace MyMap
     }
 }
 ```
-
-## Upgrading to 0.1.2
-
-Moonwell 0.1.2 updates its generated natives and standard objects to Warcraft III **3.0.1** (`3.0.1.24370`):
-
-- **New 3.0.1 natives:** the `Blz` equipment natives (the old names still exist but are going away), `BlzUnitHeal`, `BlzRemoveEffect`, `BlzUnitIsAlive`, `BlzResetUnitTalents`, the HUD-scale natives, and others. `Moonwell.Analyzers` knows their sync tags.
-- **Changes that can break compiling:**
-  - `BlzSetTerrainFogStyleBJ` takes an `int`.
-  - `bj_destroyEffectAsyncEffect` / `bj_destroyEffectAsyncTime` → `bj_destroyOrRemoveEffectAsyncEffect` / `bj_destroyOrRemoveEffectAsyncTime`.
-  - `AIs2` is now `ItemAttackSpeedBonus`, and `AIsx` is now `ItemAttackSpeedBonusAIsx`.
-  - `ItemBash10252` → `ItemBash10`, `ItemBash15251` → `ItemBash15`, `ItemAuraCommand8` → `ItemAuraCommand5`, `ItemHugeFlailWS` → `ItemHugeFlailTC`.
-  - The doodad properties `IsADecal`, `DecalSortPriority`, and `IsWater` gain `HD` at the end (`IsADecalHD`, `DecalSortPriorityHD`, `IsWaterHD`).
-  - `ArchwayNSra` → `ArchwayNSr0`.
 
 ## Next steps
 
