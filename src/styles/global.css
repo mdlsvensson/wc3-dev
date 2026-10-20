@@ -70,7 +70,6 @@
   --mw-sidebar-hover-bg: rgba(220, 215, 186, 0.05);
   --mw-sidebar-active-bg: rgba(126, 156, 216, 0.14);
   --mw-table-border: #363646;
-  --mw-table-header-bg: #16161d;
   --mw-table-row-odd: #252530;
   --mw-table-row-even: #1f1f28;
   --mw-table-code-bg: #16161d;
@@ -148,7 +147,6 @@
   --mw-sidebar-hover-bg: rgba(255, 255, 255, 0.03);
   --mw-sidebar-active-bg: rgba(77, 147, 117, 0.14);
   --mw-table-border: #2c2c2c;
-  --mw-table-header-bg: #161616;
   --mw-table-row-odd: #1c1c1c;
   --mw-table-row-even: #141414;
   --mw-table-code-bg: #0d0d0d;
@@ -393,16 +391,13 @@
     line-height: 1.5;
   }
 
-  .sl-markdown-content thead tr:not(:where(.not-content *)) {
-    background-color: var(--mw-table-header-bg);
+  .sl-markdown-content thead tr:not(:where(.not-content *)),
+  .sl-markdown-content tbody tr:nth-child(even):not(:where(.not-content *)) {
+    background-color: var(--mw-table-row-even);
   }
 
   .sl-markdown-content tbody tr:nth-child(odd):not(:where(.not-content *)) {
     background-color: var(--mw-table-row-odd);
-  }
-
-  .sl-markdown-content tbody tr:nth-child(even):not(:where(.not-content *)) {
-    background-color: var(--mw-table-row-even);
   }
 
   .sl-markdown-content :is(th, td):not(:where(.not-content *)),

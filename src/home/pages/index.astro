@@ -2,102 +2,55 @@
 import { Code } from "astro-expressive-code/components";
 import HomeLayout from "../components/HomeLayout.astro";
 
-const exampleCode = `using Moonwell;
-using Moonwell.Objects.Abilities.Human;
-using Moonwell.Objects.Units.Human;
-
-namespace MyMap
-{
-    public sealed class Champion : Paladin
-    {
-        public Champion()
-        {
-            Name = "Champion";
-            HitPoints = HitPoints + 200;
-            HeroAbilities.Remove<HolyLight>();
-            HeroAbilities.Add<Smite>();
-            Components.Add(new Fury());
-        }
-    }
-
-    public sealed class Smite : StormBolt
-    {
-        public Smite()
-        {
-            Name = "Smite";
-            Damage = Levels(75f, 150f, 225f);
-            Tooltip = PerLevel(level => $"Deals {Damage[level]} damage and stuns the target.");
-        }
-
-        public override void OnCast(Cast cast)
-        {
-            Local.For(cast.Caster.Player, () =>
-            {
-                var target = cast.Target == null ? "nothing" : Natives.GetUnitName(cast.Target.Handle);
-                Natives.DisplayTextToPlayer(cast.Caster.Player.Handle, 0f, 0f, "Smite, level " + cast.Level + ", at " + target);
-            });
-        }
-    }
-
-    public sealed class Fury : UnitComponent
-    {
-        private int kills;
-
-        public override void OnKill(Unit victim)
-        {
-            kills++;
-            Natives.DisplayTextToPlayer(Unit.Player.Handle, 0f, 0f, "Kills: " + kills);
-        }
-    }
-}`;
-
 const cards = [
-  {
-    title: "Getting Started",
-    description: "Install the template and CLI, make a map, and run it in Warcraft III.",
-    href: "https://docs.wc3.dev/guides/getting-started/",
-  },
-  {
-    title: "Project & World Editor",
-    description:
-      "Project folders, map settings, custom assets, and saving built objects back to World Editor.",
-    href: "https://docs.wc3.dev/guides/project-and-editor/",
-  },
-  {
-    title: "Objects",
-    description:
-      "Declare units, heroes, items, abilities, buffs, destructables, doodads, and upgrades as C# classes.",
-    href: "https://docs.wc3.dev/guides/objects/",
-  },
-  {
-    title: "Actors, Components & Reactions",
-    description:
-      "Attach state and reaction hooks to units, items, destructables, players, and the game.",
-    href: "https://docs.wc3.dev/guides/components-and-reactions/",
-  },
-  {
-    title: "Abilities, Buffs & Timers",
-    description:
-      "React to casts, apply timed and ticking buffs, schedule timers, and manage ownership.",
-    href: "https://docs.wc3.dev/guides/abilities-buffs-and-timers/",
-  },
-  {
-    title: "Multiplayer",
-    description: "Run machine-local code with Local.For and catch desyncs as compile errors.",
-    href: "https://docs.wc3.dev/guides/multiplayer/",
-  },
-  {
-    title: "CLI & Build",
-    description:
-      "Commands, flags, build pipeline steps, development vs. release builds, and error logs.",
-    href: "https://docs.wc3.dev/reference/cli-and-build/",
-  },
-  {
-    title: "Runtime & Objects Reference",
-    description:
-      "All public types, properties, methods, reaction hooks, standard objects, and diagnostics.",
-    href: "https://docs.wc3.dev/reference/runtime-api/",
-  },
+	{
+		title: "Getting Started",
+		description:
+			"Install the template and CLI, make a map, and run it in Warcraft III.",
+		href: "https://docs.wc3.dev/guides/getting-started/",
+	},
+	{
+		title: "Project & World Editor",
+		description:
+			"Project folders, map settings, custom assets, and saving built objects back to World Editor.",
+		href: "https://docs.wc3.dev/guides/project-and-editor/",
+	},
+	{
+		title: "Objects",
+		description:
+			"Declare units, heroes, items, abilities, buffs, destructables, doodads, and upgrades as C# classes.",
+		href: "https://docs.wc3.dev/guides/objects/",
+	},
+	{
+		title: "Actors, Components & Reactions",
+		description:
+			"Attach state and reaction hooks to units, items, destructables, players, and the game.",
+		href: "https://docs.wc3.dev/guides/components-and-reactions/",
+	},
+	{
+		title: "Abilities, Buffs & Timers",
+		description:
+			"React to casts, apply timed and ticking buffs, schedule timers, and manage ownership.",
+		href: "https://docs.wc3.dev/guides/abilities-buffs-and-timers/",
+	},
+	{
+		title: "Multiplayer",
+		description:
+			"Run machine-local code with Local.For and catch desyncs as compile errors.",
+		href: "https://docs.wc3.dev/guides/multiplayer/",
+	},
+	{
+		title: "CLI & Build",
+		description:
+			"Commands, flags, build pipeline steps, development vs. release builds, and error logs.",
+		href: "https://docs.wc3.dev/reference/cli-and-build/",
+	},
+	{
+		title: "Runtime & Objects Reference",
+		description:
+			"All public types, properties, methods, reaction hooks, standard objects, and diagnostics.",
+		href: "https://docs.wc3.dev/reference/runtime-api/",
+	},
 ];
 ---
 
@@ -136,10 +89,6 @@ const cards = [
           </a>
         </div>
       </div>
-    </section>
-
-    <section class="mw-code-section" aria-label="C# example">
-      <Code code={exampleCode} lang="csharp" title="Champion.cs" />
     </section>
 
     <section class="mw-cards-section" aria-label="Documentation">
