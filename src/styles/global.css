@@ -158,6 +158,9 @@
     height: 2.25rem;
     width: auto;
     display: block;
+  }
+
+  .site-title img[src$=".png"] {
     image-rendering: pixelated;
   }
 
@@ -546,6 +549,13 @@
     display: block;
   }
 
+  .mw-hero-logo {
+    width: 18rem;
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
   .mw-hero-copy {
     display: flex;
     flex-direction: column;
@@ -657,7 +667,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.75rem;
-    align-items: start;
+    align-items: stretch;
   }
 
   @media (min-width: 52rem) {
@@ -669,17 +679,22 @@
   .mw-pillar-card {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
-    padding: 1.5rem;
+    padding: 1.75rem;
     border-radius: 1rem;
     border: 1px solid var(--mw-border);
-    background-color: rgba(22, 22, 29, 0.45);
+    background-color: var(--mw-surface);
   }
 
   .mw-pillar-header {
     display: flex;
     flex-direction: column;
-    gap: 0.625rem;
+    flex: 1;
+    gap: 0.75rem;
+  }
+
+  .mw-pillar-header .mw-hero-actions {
+    margin-top: auto;
+    padding-top: 0.5rem;
   }
 
   .mw-pillar-eyebrow {

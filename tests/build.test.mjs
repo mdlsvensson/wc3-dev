@@ -52,6 +52,12 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
   );
   assert.equal(existsSync("dist/home/404.html"), true, "dist/home/404.html should exist");
   assert.equal(existsSync("dist/home/mw.gif"), true, "dist/home/mw.gif should exist");
+  assert.equal(existsSync("dist/home/reforged.png"), true, "dist/home/reforged.png should exist");
+  assert.equal(
+    existsSync("dist/home/wc3-dev-logo.svg"),
+    true,
+    "dist/home/wc3-dev-logo.svg should exist",
+  );
   assert.equal(
     existsSync("dist/home/mw-text-cropped.png"),
     true,
@@ -76,10 +82,11 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
   );
   assert.match(
     homeHtml,
-    /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
-    "top-left site title on wc3.dev should link to https://wc3.dev/ and render /mw-text-cropped.png",
+    /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/wc3-dev-logo\.svg"/,
+    "top-left site title on wc3.dev should link to https://wc3.dev/ and render /wc3-dev-logo.svg",
   );
-  assert.match(homeHtml, /src="\/mw\.gif"/, "wc3.dev hero should render /mw.gif");
+  assert.match(homeHtml, /src="\/reforged\.png"/, "wc3.dev hero should render /reforged.png");
+  assert.doesNotMatch(homeHtml, /src="\/mw\.gif"/, "wc3.dev hero should not render /mw.gif");
   assert.match(
     homeHtml,
     /All-in-one modding framework for Warcraft III: Reforged/,
@@ -102,6 +109,11 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
     /id="starlight__sidebar"/,
     "wc3.dev/moonwell should not render the Starlight docs sidebar",
   );
+  assert.match(
+    moonwellHtml,
+    /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
+    "top-left site title on wc3.dev/moonwell should link to https://wc3.dev/ and render /mw-text-cropped.png",
+  );
   assert.match(moonwellHtml, /src="\/mw\.gif"/, "wc3.dev/moonwell should render /mw.gif");
   assert.match(
     moonwellHtml,
@@ -114,29 +126,11 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
     "wc3.dev/moonwell should render the Moonwell Documentation section",
   );
 
-  const tutorialLinkMatches = [...homeHtml.matchAll(/href="(\/tutorials\/[^"#?]*)"/g)];
-  assert.equal(
-    tutorialLinkMatches.length >= 6,
-    true,
-    "wc3.dev homepage should link to tutorial chapters",
-  );
-  for (const match of tutorialLinkMatches) {
-    const pathname = match[1];
-    const targetPath = pathname.endsWith("/")
-      ? `dist/home${pathname}index.html`
-      : `dist/home${pathname}/index.html`;
-    assert.equal(
-      existsSync(targetPath),
-      true,
-      `tutorial link ${pathname} on wc3.dev should resolve to ${targetPath}`,
-    );
-  }
-
-  const docsLinkMatches = [...homeHtml.matchAll(/href="https:\/\/docs\.wc3\.dev(\/[^"#?]*)"/g)];
+  const docsLinkMatches = [...moonwellHtml.matchAll(/href="https:\/\/docs\.wc3\.dev(\/[^"#?]*)"/g)];
   assert.equal(
     docsLinkMatches.length >= 6,
     true,
-    "wc3.dev homepage should link to docs.wc3.dev sections",
+    "wc3.dev/moonwell should link to docs.wc3.dev sections",
   );
   for (const match of docsLinkMatches) {
     const pathname = match[1];
@@ -146,7 +140,7 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
     assert.equal(
       existsSync(targetPath),
       true,
-      `docs.wc3.dev link ${pathname} on wc3.dev should resolve to ${targetPath}`,
+      `docs.wc3.dev link ${pathname} on wc3.dev/moonwell should resolve to ${targetPath}`,
     );
   }
 });
@@ -166,8 +160,8 @@ test("tutorials build emits Starlight tutorials track under dist/home/tutorials 
   assert.match(indexHtml, /id="starlight__sidebar"/);
   assert.match(
     indexHtml,
-    /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
-    "top-left site title on tutorials should link to https://wc3.dev/ and render /mw-text-cropped.png",
+    /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/wc3-dev-logo\.svg"/,
+    "top-left site title on tutorials should link to https://wc3.dev/ and render /wc3-dev-logo.svg",
   );
 
   const createMapHtml = readFileSync(

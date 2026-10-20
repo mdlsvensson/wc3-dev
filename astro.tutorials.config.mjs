@@ -33,7 +33,7 @@ export default defineConfig({
       },
       components: {
         PageTitle: "./src/tutorials/components/PageTitle.astro",
-        SiteTitle: "./src/components/SiteTitle.astro",
+        SiteTitle: "./src/tutorials/components/SiteTitle.astro",
         ThemeProvider: "./src/components/ThemeProvider.astro",
         ThemeSelect: "./src/components/ThemeSelect.astro",
       },

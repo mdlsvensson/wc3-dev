@@ -4,10 +4,14 @@ import "../../styles/global.css";
 interface Props {
   title: string;
   description?: string;
+  logo?: "wc3" | "moonwell";
 }
 
-const { title, description = "All-in-one modding framework for Warcraft III: Reforged." } =
-  Astro.props;
+const {
+  title,
+  description = "All-in-one modding framework for Warcraft III: Reforged.",
+  logo = "wc3",
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -23,14 +27,28 @@ const { title, description = "All-in-one modding framework for Warcraft III: Ref
     <header class="header mw-home-header">
       <div class="mw-home-header-inner">
         <a href="https://wc3.dev/" class="site-title">
-          <img
-            src="/mw-text-cropped.png"
-            alt=""
-            width="231"
-            height="56"
-            decoding="async"
-          />
-          <span class="sr-only" translate="no">Moonwell</span>
+          {
+            logo === "moonwell" ? (
+              <img
+                src="/mw-text-cropped.png"
+                alt=""
+                width="231"
+                height="56"
+                decoding="async"
+              />
+            ) : (
+              <img
+                src="/wc3-dev-logo.svg"
+                alt=""
+                width="136"
+                height="32"
+                decoding="async"
+              />
+            )
+          }
+          <span class="sr-only" translate="no">
+            {logo === "moonwell" ? "Moonwell" : "wc3.dev"}
+          </span>
         </a>
         <div class="mw-home-nav">
           <a href="/moonwell/" class="mw-home-nav-link">Moonwell</a>
