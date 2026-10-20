@@ -91,8 +91,13 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
   );
   assert.match(
     homeHtml,
-    /All-in-one modding framework for Warcraft III: Reforged/,
-    "wc3.dev hero should render the tagline",
+    /Warcraft III: Reforged Modding Portal/,
+    "wc3.dev hero should render the portal heading",
+  );
+  assert.match(
+    homeHtml,
+    /Blizzard Entertainment/,
+    "wc3.dev footer should credit Blizzard Entertainment",
   );
   assert.doesNotMatch(
     homeHtml,

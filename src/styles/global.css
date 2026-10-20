@@ -766,6 +766,19 @@
     gap: 1rem;
   }
 
+  .mw-home-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--mw-border-subtle);
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--mw-muted);
+    font-size: 0.8125rem;
+  }
+
+  .mw-home-footer-text {
+    margin: 0;
+  }
+
   /* Tutorials lesson header & Markdown directives */
   .mw-tutorial-summary {
     margin: 0.5rem 0 0;

@@ -12,6 +12,7 @@ const {
   description = "All-in-one modding framework for Warcraft III: Reforged.",
   logo = "wc3",
 } = Astro.props;
+const currentYear = new Date().getFullYear();
 ---
 
 <!doctype html>
@@ -73,5 +74,12 @@ const {
       </div>
     </header>
     <slot />
+    <footer class="mw-home-footer">
+      <div class="mw-home-footer-inner">
+        <p class="mw-home-footer-text">
+          &copy; {currentYear} wc3.dev. Warcraft is &copy; Blizzard Entertainment, Inc.
+        </p>
+      </div>
+    </footer>
   </body>
 </html>
