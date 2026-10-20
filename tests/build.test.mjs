@@ -71,8 +71,8 @@ test("home build emits standalone wc3.dev landing page and 404 page in dist/home
   );
   assert.match(
     homeHtml,
-    /class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
-    "top-left site title on wc3.dev should render /mw-text-cropped.png",
+    /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
+    "top-left site title on wc3.dev should link to https://wc3.dev/ and render /mw-text-cropped.png",
   );
   assert.match(homeHtml, /src="\/mw\.gif"/, "wc3.dev hero should render /mw.gif");
   assert.match(
@@ -119,6 +119,11 @@ test("tutorials build emits Starlight tutorials track under dist/home/tutorials 
   const indexHtml = readFileSync("dist/home/tutorials/index.html", "utf8");
   assert.match(indexHtml, /Defend the Village/);
   assert.match(indexHtml, /id="starlight__sidebar"/);
+  assert.match(
+    indexHtml,
+    /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
+    "top-left site title on tutorials should link to https://wc3.dev/ and render /mw-text-cropped.png",
+  );
 
   const createMapHtml = readFileSync(
     "dist/home/tutorials/editor-basics/create-your-map/index.html",
@@ -173,8 +178,8 @@ test("docs build emits all 11 documentation pages, 404 page, pagefind bundle, an
   assert.match(indexHtml, /Moonwell/);
   assert.match(
     indexHtml,
-    /class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
-    "top-left site title should render /mw-text-cropped.png",
+    /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
+    "top-left site title on docs should link to https://wc3.dev/ and render /mw-text-cropped.png",
   );
   assert.match(indexHtml, /\/guides\/getting-started\//);
   assert.match(
@@ -280,10 +285,14 @@ test("site defaults to Kanagawa Wave and offers Vitesse Dark as a theme option",
   );
   assert.match(
     cssContent,
-    /Pixelify Sans Variable/i,
-    "built CSS should configure Pixelify Sans for headings",
+    /Space Grotesk Variable/i,
+    "built CSS should configure Space Grotesk for headings",
   );
-  assert.match(cssContent, /Jersey 15/i, "built CSS should configure Jersey 15 for small headings");
+  assert.doesNotMatch(
+    cssContent,
+    /Pixelify Sans|Jersey 15/i,
+    "built CSS should not include pixel fonts",
+  );
   assert.match(
     cssContent,
     /IBM Plex Sans Variable/i,
