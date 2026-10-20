@@ -1,0 +1,8 @@
+{
+  "name": "wc3-docs",
+  "compatibility_date": "2026-10-19",
+  "assets": {
+    "directory": "./dist/docs",
+    "not_found_handling": "404-page"
+  }
+}

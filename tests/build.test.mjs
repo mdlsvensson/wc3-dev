@@ -3,32 +3,99 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-const expectedPages = [
-  "dist/index.html",
-  "dist/guides/getting-started/index.html",
-  "dist/guides/project-and-editor/index.html",
-  "dist/guides/objects/index.html",
-  "dist/guides/components-and-reactions/index.html",
-  "dist/guides/abilities-buffs-and-timers/index.html",
-  "dist/guides/multiplayer/index.html",
-  "dist/reference/cli-and-build/index.html",
-  "dist/reference/runtime-api/index.html",
-  "dist/reference/objects-and-natives/index.html",
-  "dist/reference/diagnostics/index.html",
+const expectedDocsPages = [
+  "dist/docs/index.html",
+  "dist/docs/guides/getting-started/index.html",
+  "dist/docs/guides/project-and-editor/index.html",
+  "dist/docs/guides/objects/index.html",
+  "dist/docs/guides/components-and-reactions/index.html",
+  "dist/docs/guides/abilities-buffs-and-timers/index.html",
+  "dist/docs/guides/multiplayer/index.html",
+  "dist/docs/reference/cli-and-build/index.html",
+  "dist/docs/reference/runtime-api/index.html",
+  "dist/docs/reference/objects-and-natives/index.html",
+  "dist/docs/reference/diagnostics/index.html",
 ];
 
-test("astro build emits all 11 documentation pages, 404 page, pagefind bundle, and valid internal links", () => {
-  for (const page of expectedPages) {
-    assert.equal(existsSync(page), true, `${page} should exist`);
-  }
-  assert.equal(existsSync("dist/404.html"), true, "dist/404.html should exist");
+test("home build emits standalone wc3.dev landing page and 404 page in dist/home without docs routes", () => {
+  assert.equal(existsSync("dist/home/index.html"), true, "dist/home/index.html should exist");
+  assert.equal(existsSync("dist/home/404.html"), true, "dist/home/404.html should exist");
+  assert.equal(existsSync("dist/home/mw.gif"), true, "dist/home/mw.gif should exist");
   assert.equal(
-    existsSync("dist/pagefind/pagefind.js"),
+    existsSync("dist/home/mw-text-cropped.png"),
     true,
-    "dist/pagefind/pagefind.js should exist",
+    "dist/home/mw-text-cropped.png should exist",
+  );
+  assert.equal(
+    existsSync("dist/home/guides"),
+    false,
+    "dist/home should not contain Starlight guides routes",
+  );
+  assert.equal(
+    existsSync("dist/home/reference"),
+    false,
+    "dist/home should not contain Starlight reference routes",
   );
 
-  const indexHtml = readFileSync("dist/index.html", "utf8");
+  const homeHtml = readFileSync("dist/home/index.html", "utf8");
+  assert.doesNotMatch(
+    homeHtml,
+    /id="starlight__sidebar"/,
+    "wc3.dev homepage should not render the Starlight docs sidebar",
+  );
+  assert.match(
+    homeHtml,
+    /class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
+    "top-left site title on wc3.dev should render /mw-text-cropped.png",
+  );
+  assert.match(homeHtml, /src="\/mw\.gif"/, "wc3.dev hero should render /mw.gif");
+  assert.match(
+    homeHtml,
+    /All-in-one modding framework for Warcraft III: Reforged/,
+    "wc3.dev hero should render the tagline",
+  );
+  assert.match(
+    homeHtml,
+    /data-palette-select[\s\S]*value="kanagawa-wave"[\s\S]*value="vitesse-dark"/,
+    "wc3.dev header should render the palette selector",
+  );
+  assert.match(
+    homeHtml,
+    /<pre data-language="csharp">[\s\S]*--0:#DCD7BA[\s\S]*--1:#DBD7CAEE/i,
+    "wc3.dev code preview should render dual syntax token colors for kanagawa-wave and vitesse-dark",
+  );
+
+  const docsLinkMatches = [...homeHtml.matchAll(/href="https:\/\/docs\.wc3\.dev(\/[^"#?]*)"/g)];
+  assert.equal(
+    docsLinkMatches.length >= 6,
+    true,
+    "wc3.dev homepage should link to docs.wc3.dev sections",
+  );
+  for (const match of docsLinkMatches) {
+    const pathname = match[1];
+    const targetPath = pathname.endsWith("/")
+      ? `dist/docs${pathname}index.html`
+      : `dist/docs${pathname}/index.html`;
+    assert.equal(
+      existsSync(targetPath),
+      true,
+      `docs.wc3.dev link ${pathname} on wc3.dev should resolve to ${targetPath}`,
+    );
+  }
+});
+
+test("docs build emits all 11 documentation pages, 404 page, pagefind bundle, and valid internal links in dist/docs", () => {
+  for (const page of expectedDocsPages) {
+    assert.equal(existsSync(page), true, `${page} should exist`);
+  }
+  assert.equal(existsSync("dist/docs/404.html"), true, "dist/docs/404.html should exist");
+  assert.equal(
+    existsSync("dist/docs/pagefind/pagefind.js"),
+    true,
+    "dist/docs/pagefind/pagefind.js should exist",
+  );
+
+  const indexHtml = readFileSync("dist/docs/index.html", "utf8");
   assert.match(indexHtml, /Moonwell/);
   assert.match(
     indexHtml,
@@ -42,10 +109,13 @@ test("astro build emits all 11 documentation pages, 404 page, pagefind bundle, a
     "root docs page should render the full Mintlify-style sidebar layout",
   );
 
-  const gettingStartedHtml = readFileSync("dist/guides/getting-started/index.html", "utf8");
+  const gettingStartedHtml = readFileSync("dist/docs/guides/getting-started/index.html", "utf8");
   assert.match(gettingStartedHtml, /Moonwell\.Templates/);
 
-  const objectsNativesHtml = readFileSync("dist/reference/objects-and-natives/index.html", "utf8");
+  const objectsNativesHtml = readFileSync(
+    "dist/docs/reference/objects-and-natives/index.html",
+    "utf8",
+  );
   assert.doesNotMatch(
     objectsNativesHtml,
     /namespace Moonwell\.Natives/,
@@ -53,11 +123,11 @@ test("astro build emits all 11 documentation pages, 404 page, pagefind bundle, a
   );
   assert.match(objectsNativesHtml, /ObjectList(?:&lt;|&#x3C;)Buff/);
 
-  const cliBuildHtml = readFileSync("dist/reference/cli-and-build/index.html", "utf8");
+  const cliBuildHtml = readFileSync("dist/docs/reference/cli-and-build/index.html", "utf8");
   assert.match(cliBuildHtml, /ObjectRegistry\.g\.cs/);
   assert.match(cliBuildHtml, /Aasl/);
 
-  for (const page of expectedPages) {
+  for (const page of expectedDocsPages) {
     const html = readFileSync(page, "utf8");
     const hrefMatches = html.matchAll(/href="(\/[^"#?]*)"/g);
     for (const match of hrefMatches) {
@@ -66,10 +136,10 @@ test("astro build emits all 11 documentation pages, 404 page, pagefind bundle, a
         continue;
       }
       const targetPath = href.endsWith("/")
-        ? `dist${href}index.html`
-        : existsSync(`dist${href}`)
-          ? `dist${href}`
-          : `dist${href}/index.html`;
+        ? `dist/docs${href}index.html`
+        : existsSync(`dist/docs${href}`)
+          ? `dist/docs${href}`
+          : `dist/docs${href}/index.html`;
       assert.equal(
         existsSync(targetPath),
         true,
@@ -98,7 +168,7 @@ test("biome.json is configured and biome check passes cleanly", () => {
 });
 
 test("site defaults to Kanagawa Wave and offers Vitesse Dark as a theme option", () => {
-  const guideHtml = readFileSync("dist/guides/getting-started/index.html", "utf8");
+  const guideHtml = readFileSync("dist/docs/guides/getting-started/index.html", "utf8");
   assert.match(
     guideHtml,
     /data-palette-select[\s\S]*value="kanagawa-wave"[\s\S]*value="vitesse-dark"/,
@@ -110,10 +180,10 @@ test("site defaults to Kanagawa Wave and offers Vitesse Dark as a theme option",
     "code blocks should render dual syntax token colors for kanagawa-wave (--0) and vitesse-dark (--1)",
   );
 
-  const astroAssets = readdirSync("dist/_astro");
+  const astroAssets = readdirSync("dist/docs/_astro");
   const cssContent = astroAssets
     .filter((file) => file.endsWith(".css"))
-    .map((file) => readFileSync(`dist/_astro/${file}`, "utf8"))
+    .map((file) => readFileSync(`dist/docs/_astro/${file}`, "utf8"))
     .join("\n");
   assert.match(cssContent, /#1f1f28/i, "built CSS should include Kanagawa Wave background #1f1f28");
   assert.match(cssContent, /#7e9cd8/i, "built CSS should include Kanagawa Wave primary #7e9cd8");
@@ -152,12 +222,19 @@ test("site defaults to Kanagawa Wave and offers Vitesse Dark as a theme option",
   );
 });
 
-test("wrangler.jsonc configures static assets with 404-page handling for wc3-dev", () => {
-  const raw = readFileSync("wrangler.jsonc", "utf8");
-  const config = JSON.parse(raw);
-  assert.equal(config.name, "wc3-dev");
-  assert.equal(config.assets?.directory, "./dist");
-  assert.equal(config.assets?.not_found_handling, "404-page");
+test("wrangler.jsonc and wrangler.docs.jsonc configure static assets for wc3-dev and wc3-docs", () => {
+  const homeRaw = readFileSync("wrangler.jsonc", "utf8");
+  const homeConfig = JSON.parse(homeRaw);
+  assert.equal(homeConfig.name, "wc3-dev");
+  assert.equal(homeConfig.assets?.directory, "./dist/home");
+  assert.equal(homeConfig.assets?.not_found_handling, "404-page");
+
+  assert.equal(existsSync("wrangler.docs.jsonc"), true, "wrangler.docs.jsonc should exist");
+  const docsRaw = readFileSync("wrangler.docs.jsonc", "utf8");
+  const docsConfig = JSON.parse(docsRaw);
+  assert.equal(docsConfig.name, "wc3-docs");
+  assert.equal(docsConfig.assets?.directory, "./dist/docs");
+  assert.equal(docsConfig.assets?.not_found_handling, "404-page");
 });
 
 test("README.md is untouched in git", () => {
