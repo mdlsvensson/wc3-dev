@@ -52,7 +52,6 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
   );
   assert.equal(existsSync("dist/home/404.html"), true, "dist/home/404.html should exist");
   assert.equal(existsSync("dist/home/mw.gif"), true, "dist/home/mw.gif should exist");
-  assert.equal(existsSync("dist/home/reforged.png"), true, "dist/home/reforged.png should exist");
   assert.equal(
     existsSync("dist/home/wc3-dev-logo.svg"),
     true,
@@ -85,8 +84,11 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
     /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/wc3-dev-logo\.svg"/,
     "top-left site title on wc3.dev should link to https://wc3.dev/ and render /wc3-dev-logo.svg",
   );
-  assert.match(homeHtml, /src="\/reforged\.png"/, "wc3.dev hero should render /reforged.png");
-  assert.doesNotMatch(homeHtml, /src="\/mw\.gif"/, "wc3.dev hero should not render /mw.gif");
+  assert.doesNotMatch(
+    homeHtml,
+    /src="\/(?:mw\.gif|reforged\.png)"/,
+    "wc3.dev hero should only render text and buttons without a hero image",
+  );
   assert.match(
     homeHtml,
     /All-in-one modding framework for Warcraft III: Reforged/,
@@ -115,6 +117,7 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
     "top-left site title on wc3.dev/moonwell should link to https://wc3.dev/ and render /mw-text-cropped.png",
   );
   assert.match(moonwellHtml, /src="\/mw\.gif"/, "wc3.dev/moonwell should render /mw.gif");
+  assert.match(moonwellHtml, /class="lucide\b/, "wc3.dev/moonwell should render Lucide icons");
   assert.match(
     moonwellHtml,
     /All-in-one modding framework for Warcraft III: Reforged/,

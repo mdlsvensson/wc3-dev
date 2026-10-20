@@ -6,15 +6,6 @@ import HomeLayout from "../components/HomeLayout.astro";
 <HomeLayout title="wc3.dev — Warcraft III: Reforged Modding, Moonwell & Tutorials">
   <main id="main-content" class="mw-home-main">
     <section class="mw-hero">
-      <div class="mw-hero-art">
-        <img
-          src="/reforged.png"
-          alt="Warcraft III: Reforged"
-          width="450"
-          height="242"
-          class="mw-hero-logo"
-        />
-      </div>
       <div class="mw-hero-copy">
         <h1 class="mw-hero-title">Warcraft III: Reforged Modding</h1>
         <p class="mw-hero-tagline">
@@ -22,10 +13,12 @@ import HomeLayout from "../components/HomeLayout.astro";
         </p>
         <div class="mw-hero-actions">
           <a href="/moonwell/" class="mw-btn mw-btn-primary">
-            Explore Moonwell
+            <CodeXml size={16} aria-hidden="true" />
+            <span>Explore Moonwell</span>
           </a>
           <a href="/tutorials/" class="mw-btn mw-btn-secondary">
-            World Editor Tutorials
+            <Compass size={16} aria-hidden="true" />
+            <span>World Editor Tutorials</span>
           </a>
         </div>
       </div>
