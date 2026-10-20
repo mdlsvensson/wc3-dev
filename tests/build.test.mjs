@@ -86,6 +86,26 @@ test("home build emits standalone wc3.dev landing page and 404 page in dist/home
     "wc3.dev header should render the palette selector",
   );
   assert.match(homeHtml, /href="\/tutorials\/"/, "wc3.dev header should link to /tutorials/");
+  assert.match(homeHtml, /World Editor Tutorials/, "wc3.dev homepage should highlight Tutorials");
+  assert.match(homeHtml, /Defend the Village/, "wc3.dev homepage should describe the tutorial map");
+
+  const tutorialLinkMatches = [...homeHtml.matchAll(/href="(\/tutorials\/[^"#?]*)"/g)];
+  assert.equal(
+    tutorialLinkMatches.length >= 6,
+    true,
+    "wc3.dev homepage should link to tutorial chapters",
+  );
+  for (const match of tutorialLinkMatches) {
+    const pathname = match[1];
+    const targetPath = pathname.endsWith("/")
+      ? `dist/home${pathname}index.html`
+      : `dist/home${pathname}/index.html`;
+    assert.equal(
+      existsSync(targetPath),
+      true,
+      `tutorial link ${pathname} on wc3.dev should resolve to ${targetPath}`,
+    );
+  }
 
   const docsLinkMatches = [...homeHtml.matchAll(/href="https:\/\/docs\.wc3\.dev(\/[^"#?]*)"/g)];
   assert.equal(
@@ -176,6 +196,16 @@ test("docs build emits all 11 documentation pages, 404 page, pagefind bundle, an
 
   const indexHtml = readFileSync("dist/docs/index.html", "utf8");
   assert.match(indexHtml, /Moonwell/);
+  assert.match(
+    indexHtml,
+    /src="\/mw\.gif"/,
+    "docs.wc3.dev homepage should render the /mw.gif hero",
+  );
+  assert.match(
+    indexHtml,
+    /All-in-one modding framework for Warcraft III: Reforged/,
+    "docs.wc3.dev homepage should render the Moonwell hero tagline",
+  );
   assert.match(
     indexHtml,
     /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
