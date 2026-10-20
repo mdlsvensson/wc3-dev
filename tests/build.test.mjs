@@ -129,6 +129,16 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
     /Blizzard Entertainment/,
     "wc3.dev footer should credit Blizzard Entertainment",
   );
+
+  const homeCssFiles = readdirSync("dist/home/_astro").filter((file) => file.endsWith(".css"));
+  const homeCss = homeCssFiles
+    .map((file) => readFileSync(`dist/home/_astro/${file}`, "utf8"))
+    .join("\n");
+  assert.match(
+    homeCss,
+    /\.mw-dashboard-main\{[^}]*max-width:\s*none/i,
+    "wc3.dev control center should span the full width of the display (max-width: none)",
+  );
   assert.doesNotMatch(
     homeHtml,
     /data-palette-select/,
