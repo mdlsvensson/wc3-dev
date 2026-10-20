@@ -1,22 +1,9 @@
 ---
 ---
 
-{/* Lock dark mode and apply stored palette ("kanagawa-wave" default, "vitesse-dark" option) before paint. */}
 <script is:inline>
-  (() => {
-    const stored =
-      typeof localStorage !== "undefined" && localStorage.getItem("wc3-dev-palette");
-    const palette = stored === "vitesse-dark" ? "vitesse-dark" : "kanagawa-wave";
-    document.documentElement.dataset.theme = "dark";
-    document.documentElement.dataset.palette = palette;
-    window.StarlightThemeProvider = {
-      updatePickers(current = document.documentElement.dataset.palette || "kanagawa-wave") {
-        document.querySelectorAll("select[data-palette-select]").forEach((el) => {
-          if (el instanceof HTMLSelectElement) {
-            el.value = current;
-          }
-        });
-      },
-    };
-  })();
+  document.documentElement.dataset.theme = "dark";
+  window.StarlightThemeProvider = {
+    updatePickers() {},
+  };
 </script>

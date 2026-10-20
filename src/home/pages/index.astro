@@ -1,4 +1,5 @@
 ---
+import { BookOpen, CodeXml, Compass, Rocket } from "@lucide/astro";
 import HomeLayout from "../components/HomeLayout.astro";
 
 const moonwellLinks = [
@@ -106,7 +107,7 @@ const tutorialChapters = [
           All-in-one modding framework for Warcraft III: Reforged — plus a step-by-step World Editor track for beginners
         </p>
         <div class="mw-hero-actions">
-          <a href="https://docs.wc3.dev/" class="mw-btn mw-btn-primary">
+          <a href="/moonwell/" class="mw-btn mw-btn-primary">
             Explore Moonwell
           </a>
           <a href="/tutorials/" class="mw-btn mw-btn-secondary">
@@ -119,7 +120,10 @@ const tutorialChapters = [
     <section class="mw-pillars" aria-label="Modding Tracks">
       <article class="mw-pillar-card">
         <div class="mw-pillar-header">
-          <span class="mw-pillar-eyebrow">C# Framework &amp; Toolchain</span>
+          <span class="mw-pillar-eyebrow">
+            <CodeXml size={15} aria-hidden="true" />
+            <span>C# Framework &amp; Toolchain</span>
+          </span>
           <h2 class="mw-pillar-title">Moonwell</h2>
           <p class="mw-pillar-description">
             Build Warcraft III maps in C#. Declare units, heroes, items, abilities, buffs, and upgrades in code, attach components and reactions to game events, and pack a playable <code>.w3x</code> with <code>moonwell build</code>.
@@ -129,10 +133,12 @@ const tutorialChapters = [
               href="https://docs.wc3.dev/guides/getting-started/"
               class="mw-btn mw-btn-primary"
             >
-              Get Started
+              <Rocket size={16} aria-hidden="true" />
+              <span>Get Started</span>
             </a>
             <a href="https://docs.wc3.dev/" class="mw-btn mw-btn-secondary">
-              Documentation
+              <BookOpen size={16} aria-hidden="true" />
+              <span>Documentation</span>
             </a>
           </div>
         </div>
@@ -150,7 +156,10 @@ const tutorialChapters = [
 
       <article class="mw-pillar-card">
         <div class="mw-pillar-header">
-          <span class="mw-pillar-eyebrow">Beginner Track · 21 Lessons</span>
+          <span class="mw-pillar-eyebrow">
+            <Compass size={15} aria-hidden="true" />
+            <span>Beginner Track · 21 Lessons</span>
+          </span>
           <h2 class="mw-pillar-title">World Editor Tutorials</h2>
           <p class="mw-pillar-description">
             New to Warcraft III map-making? Build a complete custom map, <strong>Defend the Village</strong>, from an empty grass field to a playable five-wave defense game using the World Editor — no programming required.
@@ -160,10 +169,12 @@ const tutorialChapters = [
               href="/tutorials/editor-basics/install-and-open/"
               class="mw-btn mw-btn-primary"
             >
-              Start Lesson 1
+              <Compass size={16} aria-hidden="true" />
+              <span>Start Lesson 1</span>
             </a>
             <a href="/tutorials/" class="mw-btn mw-btn-secondary">
-              All Chapters
+              <BookOpen size={16} aria-hidden="true" />
+              <span>All Chapters</span>
             </a>
           </div>
         </div>

@@ -43,8 +43,13 @@ const expectedTutorialsPages = [
   "dist/home/tutorials/next/index.html",
 ];
 
-test("home build emits standalone wc3.dev landing page and 404 page in dist/home without docs routes", () => {
+test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 page in dist/home without docs routes", () => {
   assert.equal(existsSync("dist/home/index.html"), true, "dist/home/index.html should exist");
+  assert.equal(
+    existsSync("dist/home/moonwell/index.html"),
+    true,
+    "dist/home/moonwell/index.html should exist",
+  );
   assert.equal(existsSync("dist/home/404.html"), true, "dist/home/404.html should exist");
   assert.equal(existsSync("dist/home/mw.gif"), true, "dist/home/mw.gif should exist");
   assert.equal(
@@ -80,14 +85,34 @@ test("home build emits standalone wc3.dev landing page and 404 page in dist/home
     /All-in-one modding framework for Warcraft III: Reforged/,
     "wc3.dev hero should render the tagline",
   );
-  assert.match(
+  assert.doesNotMatch(
     homeHtml,
-    /data-palette-select[\s\S]*value="kanagawa-wave"[\s\S]*value="vitesse-dark"/,
-    "wc3.dev header should render the palette selector",
+    /data-palette-select/,
+    "wc3.dev header should not render a theme selector",
   );
+  assert.match(homeHtml, /class="lucide\b/, "wc3.dev homepage should render Lucide icons");
+  assert.match(homeHtml, /href="\/moonwell\/"/, "wc3.dev header should link to /moonwell/");
   assert.match(homeHtml, /href="\/tutorials\/"/, "wc3.dev header should link to /tutorials/");
   assert.match(homeHtml, /World Editor Tutorials/, "wc3.dev homepage should highlight Tutorials");
   assert.match(homeHtml, /Defend the Village/, "wc3.dev homepage should describe the tutorial map");
+
+  const moonwellHtml = readFileSync("dist/home/moonwell/index.html", "utf8");
+  assert.doesNotMatch(
+    moonwellHtml,
+    /id="starlight__sidebar"/,
+    "wc3.dev/moonwell should not render the Starlight docs sidebar",
+  );
+  assert.match(moonwellHtml, /src="\/mw\.gif"/, "wc3.dev/moonwell should render /mw.gif");
+  assert.match(
+    moonwellHtml,
+    /All-in-one modding framework for Warcraft III: Reforged/,
+    "wc3.dev/moonwell should render the tagline",
+  );
+  assert.match(
+    moonwellHtml,
+    /Moonwell Documentation/,
+    "wc3.dev/moonwell should render the Moonwell Documentation section",
+  );
 
   const tutorialLinkMatches = [...homeHtml.matchAll(/href="(\/tutorials\/[^"#?]*)"/g)];
   assert.equal(
@@ -198,16 +223,6 @@ test("docs build emits all 11 documentation pages, 404 page, pagefind bundle, an
   assert.match(indexHtml, /Moonwell/);
   assert.match(
     indexHtml,
-    /src="\/mw\.gif"/,
-    "docs.wc3.dev homepage should render the /mw.gif hero",
-  );
-  assert.match(
-    indexHtml,
-    /All-in-one modding framework for Warcraft III: Reforged/,
-    "docs.wc3.dev homepage should render the Moonwell hero tagline",
-  );
-  assert.match(
-    indexHtml,
     /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/mw-text-cropped\.png"/,
     "top-left site title on docs should link to https://wc3.dev/ and render /mw-text-cropped.png",
   );
@@ -276,17 +291,17 @@ test("biome.json is configured and biome check passes cleanly", () => {
   });
 });
 
-test("site defaults to Kanagawa Wave and offers Vitesse Dark as a theme option", () => {
+test("site uses Kanagawa Wave as the sole theme without any theme switcher", () => {
   const guideHtml = readFileSync("dist/docs/guides/getting-started/index.html", "utf8");
-  assert.match(
+  assert.doesNotMatch(
     guideHtml,
-    /data-palette-select[\s\S]*value="kanagawa-wave"[\s\S]*value="vitesse-dark"/,
-    "header should render a palette selector with Kanagawa Wave and Vitesse Dark options",
+    /data-palette-select|starlight-theme-select|vitesse-dark/i,
+    "docs pages should not render any theme or palette selector",
   );
   assert.match(
     guideHtml,
-    /<pre data-language="csharp">[\s\S]*--0:#DCD7BA[\s\S]*--1:#DBD7CAEE/i,
-    "code blocks should render dual syntax token colors for kanagawa-wave (--0) and vitesse-dark (--1)",
+    /<pre data-language="csharp">[\s\S]*--0:#DCD7BA/i,
+    "code blocks should render Kanagawa Wave syntax token colors",
   );
 
   const astroAssets = readdirSync("dist/docs/_astro");
@@ -296,8 +311,11 @@ test("site defaults to Kanagawa Wave and offers Vitesse Dark as a theme option",
     .join("\n");
   assert.match(cssContent, /#1f1f28/i, "built CSS should include Kanagawa Wave background #1f1f28");
   assert.match(cssContent, /#7e9cd8/i, "built CSS should include Kanagawa Wave primary #7e9cd8");
-  assert.match(cssContent, /#121212/i, "built CSS should include Vitesse Dark background #121212");
-  assert.match(cssContent, /#4d9375/i, "built CSS should include Vitesse Dark primary #4d9375");
+  assert.doesNotMatch(
+    cssContent,
+    /vitesse-dark|#4d9375/i,
+    "built CSS should not include Vitesse Dark theme rules",
+  );
   assert.match(
     cssContent,
     /backdrop-filter:\s*blur\(12px\)/i,

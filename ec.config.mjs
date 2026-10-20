@@ -1,9 +1,8 @@
 import { defineEcConfig } from "astro-expressive-code";
 
 export default defineEcConfig({
-  themes: ["kanagawa-wave", "vitesse-dark"],
+  themes: ["kanagawa-wave"],
   useStarlightDarkModeSwitch: false,
-  themeCssSelector: (theme) => `[data-palette='${theme.name}']`,
   styleOverrides: {
     borderRadius: "0.75rem",
     borderColor: "var(--mw-border)",
