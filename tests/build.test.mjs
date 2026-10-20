@@ -92,7 +92,37 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
   assert.match(
     homeHtml,
     /Warcraft III: Reforged Modding Portal/,
-    "wc3.dev hero should render the portal heading",
+    "wc3.dev command header should render the portal heading",
+  );
+  assert.match(
+    homeHtml,
+    /class="mw-dashboard"/,
+    "wc3.dev homepage should render the control center dashboard grid",
+  );
+  assert.match(
+    homeHtml,
+    /3\.0\.1/,
+    "wc3.dev dashboard should display Warcraft III 3.0.1 telemetry/patch info",
+  );
+  assert.match(
+    homeHtml,
+    /dotnet new install Moonwell\.Templates/,
+    "wc3.dev dashboard should render the CLI quickstart terminal commands",
+  );
+  assert.match(
+    homeHtml,
+    /War3Net/,
+    "wc3.dev dashboard should link to War3Net in the C# toolchain panel",
+  );
+  assert.match(
+    homeHtml,
+    /CSharp\.lua/,
+    "wc3.dev dashboard should link to CSharp.lua in the C# toolchain panel",
+  );
+  assert.match(
+    homeHtml,
+    /Hive Workshop/,
+    "wc3.dev dashboard should link to Hive Workshop in the modding tools panel",
   );
   assert.match(
     homeHtml,
