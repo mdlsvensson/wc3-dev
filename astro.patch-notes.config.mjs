@@ -49,14 +49,10 @@ export default defineConfig({
       ],
       sidebar: [
         {
-          label: "Overview",
-          items: [{ label: "All Patch Notes", slug: "" }],
-        },
-        {
           label: "Patches",
-          items: patchFiles.map((version) => ({
+          items: patchFiles.map((version, idx) => ({
             label: `Patch ${version}`,
-            slug: version,
+            slug: idx === 0 ? "" : version,
           })),
         },
       ],

@@ -1,9 +1,20 @@
 import { defineCollection } from "astro:content";
+import { readdirSync } from "node:fs";
 import { docsLoader } from "@astrojs/starlight/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";
 
+const patchFiles = readdirSync("./src/patch-notes/content/docs")
+  .filter((file) => file.endsWith(".md") && !file.startsWith("_"))
+  .map((file) => file.replace(/\.md$/i, ""))
+  .sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: "base" }));
+
+const latestVersion = patchFiles[0] ?? "";
+
 const baseLoader = docsLoader({
-  generateId: ({ entry }) => entry.replace(/\.mdx?$/i, "").replace(/\\/g, "/"),
+  generateId: ({ entry }) => {
+    const version = entry.replace(/\.mdx?$/i, "").replace(/\\/g, "/");
+    return version === latestVersion ? "index" : version;
+  },
 });
 
 export const collections = {

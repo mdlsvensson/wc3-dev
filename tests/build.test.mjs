@@ -158,11 +158,6 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
   assert.match(homeHtml, /href="\/moonwell\/"/, "wc3.dev header should link to /moonwell/");
   assert.match(homeHtml, /href="\/tutorials\/"/, "wc3.dev header should link to /tutorials/");
   assert.match(homeHtml, /href="\/patch-notes\/"/, "wc3.dev should link to /patch-notes/");
-  assert.match(
-    homeHtml,
-    /href="\/patch-notes\/3\.0\.1\/"/,
-    "wc3.dev dashboard should link directly to /patch-notes/3.0.1/",
-  );
   assert.match(homeHtml, /World Editor Tutorials/, "wc3.dev homepage should highlight Tutorials");
   assert.match(homeHtml, /Defend the Village/, "wc3.dev homepage should describe the tutorial map");
 
@@ -266,11 +261,12 @@ test("tutorials build emits Starlight tutorials track under dist/home/tutorials 
   }
 });
 
-test("patch-notes build emits Starlight patch notes archive under dist/home/patch-notes with descending version order", () => {
+test("patch-notes build renders latest patch at /patch-notes/ without an overview page and orders versions descending", () => {
   const expectedPatchNotesPages = [
     "dist/home/patch-notes/index.html",
-    "dist/home/patch-notes/3.0.1/index.html",
     "dist/home/patch-notes/3.0.0/index.html",
+    "dist/home/patch-notes/2.0.4/index.html",
+    "dist/home/patch-notes/2.0.3/index.html",
   ];
   for (const page of expectedPatchNotesPages) {
     assert.equal(existsSync(page), true, `${page} should exist`);
@@ -288,17 +284,28 @@ test("patch-notes build emits Starlight patch notes archive under dist/home/patc
     /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/wc3-dev-logo\.svg"/,
     "top-left site title on patch-notes should link to https://wc3.dev/ and render /wc3-dev-logo.svg",
   );
-  const pos301 = indexHtml.indexOf("/patch-notes/3.0.1/");
-  const pos300 = indexHtml.indexOf("/patch-notes/3.0.0/");
+  assert.doesNotMatch(
+    indexHtml,
+    /All Patch Notes/,
+    "/patch-notes/ should not render a separate overview item in the sidebar",
+  );
+  assert.match(
+    indexHtml,
+    /BlzUnitHeal/,
+    "/patch-notes/ root page should render the latest patch (3.0.1) directly",
+  );
+  assert.match(
+    indexHtml,
+    /Silverpine Sprint/,
+    "/patch-notes/ root page should render Patch 3.0.1 content",
+  );
+  const pos301 = indexHtml.indexOf("Patch 3.0.1");
+  const pos300 = indexHtml.indexOf("Patch 3.0.0");
   assert.equal(
     pos301 !== -1 && pos300 !== -1 && pos301 < pos300,
     true,
-    "3.0.1 should appear before 3.0.0",
+    "Patch 3.0.1 should appear before Patch 3.0.0",
   );
-
-  const patch301Html = readFileSync("dist/home/patch-notes/3.0.1/index.html", "utf8");
-  assert.match(patch301Html, /BlzUnitHeal/);
-  assert.match(patch301Html, /Silverpine Sprint/);
 
   const patch300Html = readFileSync("dist/home/patch-notes/3.0.0/index.html", "utf8");
   assert.match(patch300Html, /Forsaken Paladin/);
