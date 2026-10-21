@@ -1,7 +1,7 @@
 import { defineCollection } from "astro:content";
 import { docsLoader } from "@astrojs/starlight/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";
-import { getPatchVersions } from "./versions.mjs";
+import { getPatchVersions, transformPatchNotesMarkdown } from "./versions.mjs";
 
 const latestVersion = getPatchVersions()[0] ?? "";
 
@@ -42,6 +42,8 @@ export const collections = {
                 }
                 data.title = version ? `Patch ${version}` : "Patch Notes";
               }
+
+              body = transformPatchNotesMarkdown(body);
 
               return {
                 ...info,

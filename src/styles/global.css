@@ -1442,4 +1442,25 @@
     color: var(--mw-muted);
     font-size: 0.875rem;
   }
+
+  /* Patch notes balance icons (Buff / Nerf / Neutral) */
+  .mw-patch-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: -0.18em;
+    margin-inline-end: 0.25rem;
+  }
+
+  .mw-patch-buff {
+    color: var(--sl-color-green-high);
+  }
+
+  .mw-patch-nerf {
+    color: var(--sl-color-red-high);
+  }
+
+  .mw-patch-neutral {
+    color: var(--sl-color-orange-high);
+  }
 }

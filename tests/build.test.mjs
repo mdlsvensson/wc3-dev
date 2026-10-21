@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
-import { getPatchVersions, sortPatchVersions } from "../src/patch-notes/versions.mjs";
+import {
+  getPatchVersions,
+  sortPatchVersions,
+  transformPatchNotesMarkdown,
+} from "../src/patch-notes/versions.mjs";
 
 const expectedDocsPages = [
   "dist/docs/index.html",
@@ -310,6 +314,34 @@ test("patch-notes build renders latest patch at /patch-notes/ without an overvie
 
   const patch300Html = readFileSync("dist/home/patch-notes/3.0.0/index.html", "utf8");
   assert.match(patch300Html, /Forsaken Paladin/);
+
+  const patch203Html = readFileSync("dist/home/patch-notes/2.0.3/index.html", "utf8");
+  assert.match(
+    patch203Html,
+    /class="mw-patch-badge mw-patch-buff"[\s\S]*?lucide-circle-arrow-up/,
+    "2.0.3 patch notes should render Lucide buff icons",
+  );
+  assert.match(
+    patch203Html,
+    /class="mw-patch-badge mw-patch-nerf"[\s\S]*?lucide-circle-arrow-down/,
+    "2.0.3 patch notes should render Lucide nerf icons",
+  );
+  assert.match(
+    patch203Html,
+    /class="mw-patch-badge mw-patch-neutral"[\s\S]*?lucide-circle-minus/,
+    "2.0.3 patch notes should render Lucide neutral/adjustment icons",
+  );
+  assert.doesNotMatch(
+    patch203Html,
+    /AAAEm0lEQVR4|AAADX9CSS|AAAE4klEQVR4/,
+    "2.0.3 patch notes should replace Liquipedia buff/nerf/neutral base64 PNGs with Lucide SVGs",
+  );
+
+  const sampleMd = "- :buff: Archer\n- :nerf: Wisp\n- :neutral: Ward";
+  const transformed = transformPatchNotesMarkdown(sampleMd);
+  assert.match(transformed, /mw-patch-buff/);
+  assert.match(transformed, /mw-patch-nerf/);
+  assert.match(transformed, /mw-patch-neutral/);
 
   assert.deepEqual(
     sortPatchVersions(["2.0.3", "3.0.1", "3.0.10", "3.0.0", "2.0.4"]),
