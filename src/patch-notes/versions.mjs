@@ -44,9 +44,10 @@ export function transformPatchNotesMarkdown(markdown) {
   /** @type {Map<string, "buff" | "nerf" | "neutral">} */
   const imageKinds = new Map();
 
-  let output = markdown.replace(
-    /^\[(image\d+)\]:\s*(data:image\/[^\s]+)\s*$/gm,
-    (fullMatch, id, dataUri) => {
+  let output = markdown
+    .replace(/^\s+(#{1,6}\s)/gm, "$1")
+    .replace(/^\s*-\s*$/gm, "")
+    .replace(/^\[(image\d+)\]:\s*(data:image\/[^\s]+)\s*$/gm, (fullMatch, id, dataUri) => {
       if (dataUri.includes("AAAEm0lEQVR4")) {
         imageKinds.set(id, "buff");
         return "";
@@ -60,8 +61,7 @@ export function transformPatchNotesMarkdown(markdown) {
         return "";
       }
       return fullMatch;
-    },
-  );
+    });
 
   output = output.replace(
     /(?:\*\*)?!\[(Buff|Nerf|Neutral)?\]\[(image\d+)\](?:\*\*)?/gi,

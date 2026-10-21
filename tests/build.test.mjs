@@ -314,6 +314,11 @@ test("patch-notes build renders latest patch at /patch-notes/ without an overvie
 
   const patch300Html = readFileSync("dist/home/patch-notes/3.0.0/index.html", "utf8");
   assert.match(patch300Html, /Forsaken Paladin/);
+  assert.match(
+    patch300Html,
+    /<li>Added new UI Theme - Forsaken Kingdom<\/li>/,
+    "3.0.0 patch notes should render tight list items without loose <p> wrappers caused by indented headings",
+  );
 
   const patch203Html = readFileSync("dist/home/patch-notes/2.0.3/index.html", "utf8");
   assert.match(
@@ -336,12 +341,21 @@ test("patch-notes build renders latest patch at /patch-notes/ without an overvie
     /AAAEm0lEQVR4|AAADX9CSS|AAAE4klEQVR4/,
     "2.0.3 patch notes should replace Liquipedia buff/nerf/neutral base64 PNGs with Lucide SVGs",
   );
+  assert.match(
+    patch203Html,
+    /<li>Added a countdown timer to the UI for construction and training<\/li>/,
+    "2.0.3 patch notes should render tight list items after normalizing indented headings",
+  );
 
-  const sampleMd = "- :buff: Archer\n- :nerf: Wisp\n- :neutral: Ward";
+  const sampleMd =
+    "- :buff: Archer\n- :nerf: Wisp\n- :neutral: Ward\n\n  ## **General**\n\n  ### **Human**\n\n-\n";
   const transformed = transformPatchNotesMarkdown(sampleMd);
   assert.match(transformed, /mw-patch-buff/);
   assert.match(transformed, /mw-patch-nerf/);
   assert.match(transformed, /mw-patch-neutral/);
+  assert.match(transformed, /^## \*\*General\*\*$/m);
+  assert.match(transformed, /^### \*\*Human\*\*$/m);
+  assert.doesNotMatch(transformed, /^-\s*$/m);
 
   assert.deepEqual(
     sortPatchVersions(["2.0.3", "3.0.1", "3.0.10", "3.0.0", "2.0.4"]),

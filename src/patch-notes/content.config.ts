@@ -17,6 +17,7 @@ export const collections = {
     loader: {
       name: "patch-notes-loader",
       load: async (context) => {
+        context.store.clear();
         const wrappedEntryTypes = new Map(context.entryTypes);
         const mdType = wrappedEntryTypes.get(".md");
         if (mdType) {
