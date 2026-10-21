@@ -139,6 +139,16 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
     /\.mw-dashboard-main\{[^}]*max-width:\s*none/i,
     "wc3.dev control center should span the full width of the display (max-width: none)",
   );
+  assert.match(
+    homeCss,
+    /box-sizing:\s*border-box/i,
+    "wc3.dev homepage should use border-box sizing to prevent horizontal overflow",
+  );
+  assert.match(
+    homeCss,
+    /100dvh/i,
+    "wc3.dev control center should lock to 100dvh as a one-page app on desktop viewports",
+  );
   assert.doesNotMatch(
     homeHtml,
     /data-palette-select/,
@@ -147,6 +157,12 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
   assert.match(homeHtml, /class="lucide\b/, "wc3.dev homepage should render Lucide icons");
   assert.match(homeHtml, /href="\/moonwell\/"/, "wc3.dev header should link to /moonwell/");
   assert.match(homeHtml, /href="\/tutorials\/"/, "wc3.dev header should link to /tutorials/");
+  assert.match(homeHtml, /href="\/patch-notes\/"/, "wc3.dev should link to /patch-notes/");
+  assert.match(
+    homeHtml,
+    /href="\/patch-notes\/3\.0\.1\/"/,
+    "wc3.dev dashboard should link directly to /patch-notes/3.0.1/",
+  );
   assert.match(homeHtml, /World Editor Tutorials/, "wc3.dev homepage should highlight Tutorials");
   assert.match(homeHtml, /Defend the Village/, "wc3.dev homepage should describe the tutorial map");
 
@@ -248,6 +264,44 @@ test("tutorials build emits Starlight tutorials track under dist/home/tutorials 
       );
     }
   }
+});
+
+test("patch-notes build emits Starlight patch notes archive under dist/home/patch-notes with descending version order", () => {
+  const expectedPatchNotesPages = [
+    "dist/home/patch-notes/index.html",
+    "dist/home/patch-notes/3.0.1/index.html",
+    "dist/home/patch-notes/3.0.0/index.html",
+  ];
+  for (const page of expectedPatchNotesPages) {
+    assert.equal(existsSync(page), true, `${page} should exist`);
+  }
+  assert.equal(
+    existsSync("dist/home/patch-notes/pagefind/pagefind.js"),
+    true,
+    "dist/home/patch-notes/pagefind/pagefind.js should exist",
+  );
+
+  const indexHtml = readFileSync("dist/home/patch-notes/index.html", "utf8");
+  assert.match(indexHtml, /id="starlight__sidebar"/);
+  assert.match(
+    indexHtml,
+    /href="https:\/\/wc3\.dev\/"\s+class="site-title[^"]*"[\s\S]*?src="\/wc3-dev-logo\.svg"/,
+    "top-left site title on patch-notes should link to https://wc3.dev/ and render /wc3-dev-logo.svg",
+  );
+  const pos301 = indexHtml.indexOf("/patch-notes/3.0.1/");
+  const pos300 = indexHtml.indexOf("/patch-notes/3.0.0/");
+  assert.equal(
+    pos301 !== -1 && pos300 !== -1 && pos301 < pos300,
+    true,
+    "3.0.1 should appear before 3.0.0",
+  );
+
+  const patch301Html = readFileSync("dist/home/patch-notes/3.0.1/index.html", "utf8");
+  assert.match(patch301Html, /BlzUnitHeal/);
+  assert.match(patch301Html, /Silverpine Sprint/);
+
+  const patch300Html = readFileSync("dist/home/patch-notes/3.0.0/index.html", "utf8");
+  assert.match(patch300Html, /Forsaken Paladin/);
 });
 
 test("docs build emits all 11 documentation pages, 404 page, pagefind bundle, and valid internal links in dist/docs", () => {
