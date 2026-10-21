@@ -1,12 +1,9 @@
-import { readdirSync } from "node:fs";
 import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
+import { getPatchVersions } from "./src/patch-notes/versions.mjs";
 
-const patchFiles = readdirSync("./src/patch-notes/content/docs")
-  .filter((file) => file.endsWith(".md") && !file.startsWith("_"))
-  .map((file) => file.replace(/\.md$/i, ""))
-  .sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: "base" }));
+const patchFiles = getPatchVersions();
 
 export default defineConfig({
   site: "https://wc3.dev",

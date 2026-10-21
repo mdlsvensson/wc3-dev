@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
+import { getPatchVersions, sortPatchVersions } from "../src/patch-notes/versions.mjs";
 
 const expectedDocsPages = [
   "dist/docs/index.html",
@@ -309,6 +310,20 @@ test("patch-notes build renders latest patch at /patch-notes/ without an overvie
 
   const patch300Html = readFileSync("dist/home/patch-notes/3.0.0/index.html", "utf8");
   assert.match(patch300Html, /Forsaken Paladin/);
+
+  assert.deepEqual(
+    sortPatchVersions(["2.0.3", "3.0.1", "3.0.10", "3.0.0", "2.0.4"]),
+    ["3.0.10", "3.0.1", "3.0.0", "2.0.4", "2.0.3"],
+    "sortPatchVersions should order versions newest-first using numeric segment comparison",
+  );
+  const versions = getPatchVersions();
+  assert.equal(versions[0], "3.0.1");
+  const homeHtml = readFileSync("dist/home/index.html", "utf8");
+  assert.match(
+    homeHtml,
+    new RegExp(`WC3 ${versions[0].replace(/\./g, "\\.")}`),
+    "homepage should dynamically render the latest patch version from src/patch-notes/content/docs",
+  );
 });
 
 test("docs build emits all 11 documentation pages, 404 page, pagefind bundle, and valid internal links in dist/docs", () => {
