@@ -186,6 +186,23 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
     /100dvh/i,
     "wc3.dev control center should lock to 100dvh as a one-page app on desktop viewports",
   );
+  const usedMwClasses = new Set();
+  const notFoundHtml = readFileSync("dist/home/404.html", "utf8");
+  const moonwellPageHtml = readFileSync("dist/home/moonwell/index.html", "utf8");
+  for (const pageHtml of [homeHtml, moonwellPageHtml, notFoundHtml]) {
+    for (const match of pageHtml.matchAll(/class="([^"]+)"/g)) {
+      for (const cls of match[1].split(/\s+/)) {
+        if (cls.startsWith("mw-")) usedMwClasses.add(cls);
+      }
+    }
+  }
+  for (const cls of usedMwClasses) {
+    assert.match(
+      homeCss,
+      new RegExp(`\\.${cls}\\b`),
+      `dist/home CSS should define styles for .${cls}`,
+    );
+  }
   assert.doesNotMatch(
     homeHtml,
     /data-palette-select/,
