@@ -101,42 +101,40 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
   );
   assert.match(
     homeHtml,
-    /class="mw-dashboard"/,
-    "wc3.dev homepage should render the control center dashboard grid",
+    /class="mw-cmd-bar"/,
+    "wc3.dev homepage should render the compact portal header bar",
   );
   assert.match(
     homeHtml,
-    /data-testid="dashboard"/,
-    "wc3.dev homepage should render the steam2fiddy-inspired dashboard container",
+    /class="mw-dashboard"/,
+    "wc3.dev homepage should render the control center dashboard grid",
   );
-  for (const cardId of [
-    "moonwell",
-    "tutorials",
-    "patch-notes",
-    "quickstart",
-    "topics",
-    "ecosystem",
-  ]) {
+  for (const cardId of ["moonwell", "quickstart", "tutorials", "engine", "toolchain", "tools"]) {
     assert.match(
       homeHtml,
       new RegExp(`data-card="${cardId}"`),
-      `wc3.dev dashboard should render the ${cardId} card`,
+      `wc3.dev dashboard should render the ${cardId} panel`,
     );
   }
   assert.match(
     homeHtml,
+    /class="mw-module-grid"/,
+    "wc3.dev Moonwell card should render the 2x3 module icon grid",
+  );
+  assert.match(
+    homeHtml,
+    /class="mw-terminal-window"/,
+    "wc3.dev CLI Quickstart card should render the terminal window",
+  );
+  assert.match(
+    homeHtml,
+    /class="mw-chapter-grid"/,
+    "wc3.dev Tutorials card should render the 01-06 chapter grid",
+  );
+  assert.doesNotMatch(
+    homeHtml,
     /data-testid="topic-search"/,
-    "wc3.dev dashboard should render the filterable topic chips input",
-  );
-  assert.match(
-    homeHtml,
-    /data-testid="figure-lessons"/,
-    "wc3.dev dashboard should render AppCard-style figure counters",
-  );
-  assert.match(
-    homeHtml,
-    /data-testid="status"/,
-    "wc3.dev layout should render the 22px bottom status bar",
+    "wc3.dev dashboard should not render a tag-search input widget",
   );
   assert.match(
     homeHtml,
