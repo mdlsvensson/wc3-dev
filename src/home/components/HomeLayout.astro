@@ -1,18 +1,23 @@
 ---
+import { House } from "@lucide/astro";
+import { getPatchVersions } from "../../patch-notes/versions.mjs";
 import "../../styles/global.css";
 
 interface Props {
   title: string;
   description?: string;
   logo?: "wc3" | "moonwell";
+  activeTab?: "dashboard" | "moonwell" | "none";
 }
 
 const {
   title,
   description = "All-in-one modding framework for Warcraft III: Reforged.",
   logo = "wc3",
+  activeTab = logo === "moonwell" ? "moonwell" : "dashboard",
 } = Astro.props;
 const currentYear = new Date().getFullYear();
+const latestPatch = getPatchVersions()[0] ?? "3.0.1";
 ---
 
 <!doctype html>
@@ -27,44 +32,73 @@ const currentYear = new Date().getFullYear();
   <body class="mw-home-body">
     <header class="header mw-home-header">
       <div class="mw-home-header-inner">
-        <a href="https://wc3.dev/" class="site-title">
-          {
-            logo === "moonwell" ? (
-              <img
-                src="/mw-text-cropped.png"
-                alt=""
-                width="231"
-                height="56"
-                decoding="async"
-              />
-            ) : (
-              <img
-                src="/wc3-dev-logo.svg"
-                alt=""
-                width="136"
-                height="32"
-                decoding="async"
-              />
-            )
-          }
-          <span class="sr-only" translate="no">
-            {logo === "moonwell" ? "Moonwell" : "wc3.dev"}
-          </span>
-        </a>
-        <div class="mw-home-nav">
-          <a href="/moonwell/" class="mw-home-nav-link">Moonwell</a>
-          <a href="/tutorials/" class="mw-home-nav-link">Tutorials</a>
-          <a href="/patch-notes/" class="mw-home-nav-link">Patch Notes</a>
-          <a href="https://docs.wc3.dev/" class="mw-home-nav-link">Docs</a>
-          <a href="https://docs.wc3.dev/reference/runtime-api/" class="mw-home-nav-link">
-            Reference
+        <div class="mw-tabbar-left">
+          <div class="mw-brand-box">
+            <a href="https://wc3.dev/" class="site-title">
+              {
+                logo === "moonwell" ? (
+                  <img
+                    src="/mw-text-cropped.png"
+                    alt=""
+                    width="231"
+                    height="56"
+                    decoding="async"
+                  />
+                ) : (
+                  <img
+                    src="/wc3-dev-logo.svg"
+                    alt=""
+                    width="136"
+                    height="32"
+                    decoding="async"
+                  />
+                )
+              }
+              <span class="sr-only" translate="no">
+                {logo === "moonwell" ? "Moonwell" : "wc3.dev"}
+              </span>
+            </a>
+          </div>
+          <nav class="mw-home-nav" aria-label="Primary">
+            <a
+              href="/"
+              class:list={["mw-home-tab", { active: activeTab === "dashboard" }]}
+              aria-current={activeTab === "dashboard" ? "page" : undefined}
+            >
+              <House size={14} aria-hidden="true" />
+              <span>Dashboard</span>
+            </a>
+            <a
+              href="/moonwell/"
+              class:list={["mw-home-tab", { active: activeTab === "moonwell" }]}
+              aria-current={activeTab === "moonwell" ? "page" : undefined}
+            >
+              <span>Moonwell</span>
+            </a>
+            <a href="/tutorials/" class="mw-home-tab">
+              <span>Tutorials</span>
+            </a>
+            <a href="/patch-notes/" class="mw-home-tab">
+              <span>Patch Notes</span>
+            </a>
+            <a href="https://docs.wc3.dev/" class="mw-home-tab">
+              <span>Docs</span>
+            </a>
+            <a href="https://docs.wc3.dev/reference/runtime-api/" class="mw-home-tab">
+              <span>Reference</span>
+            </a>
+          </nav>
+        </div>
+        <div class="mw-tabbar-right">
+          <a href="/patch-notes/" class="mw-tabbar-data" title="Latest Warcraft III patch">
+            WC3 {latestPatch} · Moonwell 0.1.0
           </a>
           <a
             href="https://github.com/mdlsvensson/moonwell"
             class="mw-home-github"
             aria-label="GitHub"
           >
-            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
               <path
                 fill="currentColor"
                 d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.81 8.21 11.4.6.11.82-.26.82-.58v-2.23c-3.34.73-4.04-1.42-4.04-1.42-.55-1.39-1.33-1.76-1.33-1.76-1.09-.75.08-.73.08-.73 1.21.09 1.85 1.24 1.85 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.6-2.8 5.62-5.48 5.92.43.37.82 1.1.82 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 24 12C24 5.37 18.63 0 12 0Z"
@@ -75,10 +109,13 @@ const currentYear = new Date().getFullYear();
       </div>
     </header>
     <slot />
-    <footer class="mw-home-footer">
+    <footer class="mw-home-footer" data-testid="status">
       <div class="mw-home-footer-inner">
+        <span class="mw-status-left">
+          Warcraft III: Reforged Modding Portal · WC3 {latestPatch} · .NET 10 → Lua 5.3
+        </span>
         <p class="mw-home-footer-text">
-          &copy; {currentYear} wc3.dev. Warcraft is &copy; Blizzard Entertainment, Inc.
+          &copy; {currentYear} wc3.dev · Warcraft is &copy; Blizzard Entertainment, Inc.
         </p>
       </div>
     </footer>

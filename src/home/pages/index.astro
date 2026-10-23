@@ -1,454 +1,563 @@
 ---
-import {
-  ArrowUpRight,
-  BookOpen,
-  Boxes,
-  CodeXml,
-  Compass,
-  Copy,
-  Cpu,
-  FolderOpen,
-  GitBranch,
-  Rocket,
-  Sparkles,
-  Terminal,
-  Users,
-  Workflow,
-  Wrench,
-} from "@lucide/astro";
+import { ArrowRight, ArrowUpRight, Copy } from "@lucide/astro";
 import { getPatchVersions } from "../../patch-notes/versions.mjs";
 import HomeLayout from "../components/HomeLayout.astro";
 
 const patchVersions = getPatchVersions();
 const latestPatch = patchVersions[0] ?? "3.0.1";
-const recentPatchesLabel = patchVersions.slice(0, 2).join(", ");
 
-const moonwellModules = [
+const patchSummaries: Record<string, string> = {
+  "3.0.1": "Latest · Campaign & Editor",
+  "3.0.0": "Forsaken Kingdom & DE",
+  "2.0.4": "Matchmaking & Balance",
+  "2.0.3": "Natives & Balance",
+};
+
+const moonwellGuides = [
   {
     title: "Getting Started",
     meta: "Install & first map",
     href: "https://docs.wc3.dev/guides/getting-started/",
-    icon: Rocket,
   },
   {
     title: "Objects",
     meta: "Units, items, abilities",
     href: "https://docs.wc3.dev/guides/objects/",
-    icon: Boxes,
   },
   {
     title: "Components & Reactions",
     meta: "State & event hooks",
     href: "https://docs.wc3.dev/guides/components-and-reactions/",
-    icon: Workflow,
   },
   {
     title: "Abilities, Buffs & Timers",
     meta: "Casts, ticks & timers",
     href: "https://docs.wc3.dev/guides/abilities-buffs-and-timers/",
-    icon: Sparkles,
   },
   {
     title: "Multiplayer",
     meta: "Local.For & desync safety",
     href: "https://docs.wc3.dev/guides/multiplayer/",
-    icon: Users,
   },
+  {
+    title: "Project & World Editor",
+    meta: "Map sync & assets",
+    href: "https://docs.wc3.dev/guides/project-and-editor/",
+  },
+];
+
+const moonwellReference = [
   {
     title: "Runtime API",
     meta: "Types, hooks & catalog",
     href: "https://docs.wc3.dev/reference/runtime-api/",
-    icon: BookOpen,
+  },
+  {
+    title: "Objects, Handles & Natives",
+    meta: "FourCCs & handle types",
+    href: "https://docs.wc3.dev/reference/objects-and-natives/",
+  },
+  {
+    title: "CLI & Build Pipeline",
+    meta: "Commands & .w3x packing",
+    href: "https://docs.wc3.dev/reference/cli-and-build/",
+  },
+  {
+    title: "Compiler Diagnostics",
+    meta: "Desync & limit analyzers",
+    href: "https://docs.wc3.dev/reference/diagnostics/",
   },
 ];
 
 const tutorialChapters = [
   {
-    num: "01",
     title: "Editor Basics",
     meta: "3 lessons",
     href: "/tutorials/editor-basics/install-and-open/",
   },
   {
-    num: "02",
     title: "Terrain",
     meta: "4 lessons",
     href: "/tutorials/terrain/painting-tiles/",
   },
   {
-    num: "03",
     title: "Placement",
     meta: "4 lessons",
     href: "/tutorials/placement/doodads/",
   },
   {
-    num: "04",
     title: "Map Setup",
     meta: "2 lessons",
     href: "/tutorials/map-setup/map-options/",
   },
   {
-    num: "05",
     title: "Object Editor",
     meta: "4 lessons",
     href: "/tutorials/object-editor/object-editor-tour/",
   },
   {
-    num: "06",
     title: "Triggers",
     meta: "4 lessons",
     href: "/tutorials/triggers/trigger-basics/",
   },
 ];
+
+const topics = [
+  { label: "C# Objects", href: "https://docs.wc3.dev/guides/objects/", fav: true },
+  {
+    label: "Reactions",
+    href: "https://docs.wc3.dev/guides/components-and-reactions/",
+    fav: true,
+  },
+  { label: "Defend the Village", href: "/tutorials/", fav: true },
+  { label: `Patch ${latestPatch}`, href: "/patch-notes/", fav: true },
+  { label: "Units & Heroes", href: "https://docs.wc3.dev/guides/objects/", fav: false },
+  {
+    label: "Abilities & Buffs",
+    href: "https://docs.wc3.dev/guides/abilities-buffs-and-timers/",
+    fav: false,
+  },
+  {
+    label: "Timers",
+    href: "https://docs.wc3.dev/guides/abilities-buffs-and-timers/",
+    fav: false,
+  },
+  { label: "Local.For", href: "https://docs.wc3.dev/guides/multiplayer/", fav: false },
+  {
+    label: "FourCCs & Natives",
+    href: "https://docs.wc3.dev/reference/objects-and-natives/",
+    fav: false,
+  },
+  {
+    label: "Diagnostics",
+    href: "https://docs.wc3.dev/reference/diagnostics/",
+    fav: false,
+  },
+  {
+    label: "World Editor Sync",
+    href: "https://docs.wc3.dev/guides/project-and-editor/",
+    fav: false,
+  },
+  { label: "Terrain Painting", href: "/tutorials/terrain/painting-tiles/", fav: false },
+  {
+    label: "Custom Hero",
+    href: "/tutorials/object-editor/custom-hero/",
+    fav: false,
+  },
+  {
+    label: "Wave Spawner",
+    href: "/tutorials/triggers/spawning-waves/",
+    fav: false,
+  },
+];
+
+const ecosystemItems = [
+  {
+    title: "mdlsvensson/moonwell",
+    kind: "C#",
+    detail: "Framework, CLI & runtime",
+    href: "https://github.com/mdlsvensson/moonwell",
+  },
+  {
+    title: "War3Net",
+    kind: "C#",
+    detail: "MPQ, SLK & .w3x formats",
+    href: "https://github.com/Drake53/War3Net",
+  },
+  {
+    title: "CSharp.lua",
+    kind: "C#",
+    detail: "Roslyn C# → Lua compiler",
+    href: "https://github.com/yanghuan/CSharp.lua",
+  },
+  {
+    title: "Hive Workshop",
+    kind: "Hub",
+    detail: "Models, icons, skins & maps",
+    href: "https://www.hiveworkshop.com/",
+  },
+  {
+    title: "CascView",
+    kind: "Tool",
+    detail: "Extract Warcraft III CASC",
+    href: "http://www.zezula.net/en/casc/main.html",
+  },
+  {
+    title: "Retera's Model Studio",
+    kind: "Tool",
+    detail: "3D MDX/MDL model editor",
+    href: "https://github.com/Retera/ReteraModelStudio",
+  },
+];
+
+const figures = [
+  { id: "lessons", label: "tutorial lessons", value: "21" },
+  { id: "docs", label: "docs pages", value: "11" },
+  { id: "patches", label: "patch notes", value: String(patchVersions.length) },
+  { id: "objects", label: "object kinds", value: "8" },
+];
 ---
 
-<HomeLayout title="wc3.dev — Warcraft III: Reforged Modding & Tutorials">
-  <main id="main-content" class="mw-home-main mw-dashboard-main">
-    <section class="mw-cmd-bar" aria-label="Control Center Header">
-      <div class="mw-cmd-identity">
-        <div class="mw-cmd-eyebrow">
-          <span class="mw-status-dot" aria-hidden="true"></span>
-          <span>WC3.DEV · MODDING CONTROL CENTER</span>
-        </div>
-        <h1 class="mw-cmd-title">Warcraft III: Reforged Modding Portal</h1>
-        <p class="mw-cmd-subtitle">
-          wc3.dev — Warcraft III: Reforged Modding &amp; Tutorials
-        </p>
-      </div>
-      <div class="mw-cmd-telemetry" aria-label="Ecosystem Telemetry">
-        <a href="/patch-notes/" class="mw-telemetry-badge">
-          <span class="mw-status-dot" aria-hidden="true"></span>
-          <span class="mw-telemetry-label">WC3 Patch</span>
-          <strong class="mw-telemetry-value">{latestPatch}</strong>
-        </a>
-        <div class="mw-telemetry-badge">
-          <span class="mw-telemetry-label">Moonwell</span>
-          <strong class="mw-telemetry-value">v0.1.0</strong>
-        </div>
-        <div class="mw-telemetry-badge">
-          <span class="mw-telemetry-label">Target</span>
-          <strong class="mw-telemetry-value">.NET 10 → Lua 5.3</strong>
-        </div>
-      </div>
-    </section>
-
+<HomeLayout
+  title="wc3.dev — Warcraft III: Reforged Modding & Tutorials"
+  activeTab="dashboard"
+>
+  <main id="main-content" class="mw-home-main mw-dashboard-main" data-testid="dashboard">
+    <h1 class="sr-only">Warcraft III: Reforged Modding Portal</h1>
     <div class="mw-dashboard">
+      <!-- Card 1: Moonwell -->
       <section
-        class="mw-panel mw-panel-moonwell"
-        aria-labelledby="panel-moonwell-title"
+        class="mw-s2f-card"
+        data-testid="card"
+        data-card="moonwell"
+        aria-labelledby="card-moonwell-title"
       >
-        <div class="mw-panel-bar">
-          <span class="mw-panel-tag">
-            <CodeXml size={14} aria-hidden="true" />
-            <span>C# Framework &amp; Toolchain</span>
+        <header class="mw-s2f-card-head">
+          <h2 id="card-moonwell-title" class="mw-s2f-card-title">Moonwell</h2>
+          <span class="mw-s2f-corner">
+            <a href="/moonwell/" class="mw-s2f-btn">
+              <span>overview</span>
+            </a>
+            <a
+              href="https://docs.wc3.dev/"
+              class="mw-s2f-btn mw-s2f-btn-primary"
+              data-testid="card-open"
+            >
+              <span>docs</span>
+              <ArrowRight size={13} aria-hidden="true" />
+            </a>
           </span>
-          <span class="mw-panel-meta">NuGet · MIT</span>
+          <small class="mw-s2f-subtitle">
+            C# modding framework for Warcraft III: Reforged · NuGet
+          </small>
+        </header>
+
+        <div class="mw-s2f-tabs" role="group" aria-label="Moonwell views" data-card-tabs="moonwell">
+          <button type="button" class="on" aria-pressed="true" data-tab-btn="guides">
+            Guides
+          </button>
+          <button type="button" aria-pressed="false" data-tab-btn="reference">
+            Reference
+          </button>
         </div>
-        <div class="mw-panel-head">
-          <h2 id="panel-moonwell-title" class="mw-panel-title">Moonwell</h2>
-          <p class="mw-panel-desc">
-            Build Warcraft III maps in C#. Declare units, heroes, items,
-            abilities, buffs, and upgrades in code, attach components and
-            reactions to game events, and pack a playable <code>.w3x</code> with
-            <code>moonwell build</code>.
-          </p>
-        </div>
-        <div class="mw-module-grid">
-          {
-            moonwellModules.map((mod) => {
-              const Icon = mod.icon;
-              return (
-                <a href={mod.href} class="mw-module-card">
-                  <Icon size={16} class="mw-module-icon" aria-hidden="true" />
-                  <span class="mw-module-copy">
-                    <span class="mw-module-title">{mod.title}</span>
-                    <span class="mw-module-meta">{mod.meta}</span>
-                  </span>
-                </a>
-              );
-            })
-          }
-        </div>
-        <div class="mw-panel-actions">
-          <a
-            href="https://docs.wc3.dev/guides/getting-started/"
-            class="mw-btn mw-btn-primary"
-          >
-            <Rocket size={15} aria-hidden="true" />
-            <span>Get Started</span>
-          </a>
-          <a href="/moonwell/" class="mw-btn mw-btn-secondary">
-            <CodeXml size={15} aria-hidden="true" />
-            <span>Explore Moonwell</span>
-          </a>
-          <a href="https://docs.wc3.dev/" class="mw-btn mw-btn-secondary">
-            <BookOpen size={15} aria-hidden="true" />
-            <span>Documentation</span>
-          </a>
+
+        <div class="mw-s2f-content">
+          <ol class="mw-s2f-list" data-tab-panel="guides">
+            {
+              moonwellGuides.map((item, i) => (
+                <li>
+                  <a href={item.href} class="mw-s2f-row" data-testid="card-row">
+                    <span class="mw-s2f-rank">{i + 1}</span>
+                    <span class="mw-s2f-name">{item.title}</span>
+                    <span class="mw-s2f-val mw-s2f-val-score">{item.meta}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+          <ol class="mw-s2f-list" data-tab-panel="reference" hidden>
+            {
+              moonwellReference.map((item, i) => (
+                <li>
+                  <a href={item.href} class="mw-s2f-row" data-testid="card-row">
+                    <span class="mw-s2f-rank">{i + 1}</span>
+                    <span class="mw-s2f-name">{item.title}</span>
+                    <span class="mw-s2f-val mw-s2f-val-info">{item.meta}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
         </div>
       </section>
 
+      <!-- Card 2: World Editor Tutorials -->
       <section
-        class="mw-panel mw-panel-terminal"
-        aria-labelledby="panel-cli-title"
+        class="mw-s2f-card"
+        data-testid="card"
+        data-card="tutorials"
+        aria-labelledby="card-tutorials-title"
       >
-        <div class="mw-panel-bar">
-          <span class="mw-panel-tag">
-            <Terminal size={14} aria-hidden="true" />
-            <span>CLI Quickstart</span>
+        <header class="mw-s2f-card-head">
+          <h2 id="card-tutorials-title" class="mw-s2f-card-title">World Editor Tutorials</h2>
+          <span class="mw-s2f-corner">
+            <a
+              href="/tutorials/editor-basics/install-and-open/"
+              class="mw-s2f-btn mw-s2f-btn-primary"
+            >
+              <span>lesson 1</span>
+            </a>
+            <a href="/tutorials/" class="mw-s2f-btn" data-testid="card-open">
+              <span>open</span>
+              <ArrowRight size={13} aria-hidden="true" />
+            </a>
           </span>
-          <button
-            type="button"
-            class="mw-copy-btn"
-            data-copy-cli
-            aria-label="Copy CLI quickstart commands"
-          >
-            <Copy size={13} aria-hidden="true" />
-            <span data-copy-label>Copy</span>
-          </button>
+          <small class="mw-s2f-subtitle">
+            Build Defend the Village from scratch · 6 chapters, 21 lessons
+          </small>
+        </header>
+
+        <div class="mw-s2f-tabs mw-s2f-tabs-spacer" aria-hidden="true">
+          <span>Chapters</span>
         </div>
-        <div class="mw-panel-head">
-          <h2 id="panel-cli-title" class="mw-panel-title">
-            Scaffold &amp; Build
-          </h2>
-          <p class="mw-panel-desc">
-            Install the CLI and template from NuGet to generate a map project
-            and compile C# + object declarations into a playable map.
+
+        <div class="mw-s2f-content">
+          <ol class="mw-s2f-list">
+            {
+              tutorialChapters.map((ch, i) => (
+                <li>
+                  <a href={ch.href} class="mw-s2f-row" data-testid="card-row">
+                    <span class="mw-s2f-rank">{i + 1}</span>
+                    <span class="mw-s2f-name">{ch.title}</span>
+                    <span class="mw-s2f-val mw-s2f-val-include">{ch.meta}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </section>
+
+      <!-- Card 3: Patch Notes -->
+      <section
+        class="mw-s2f-card"
+        data-testid="card"
+        data-card="patch-notes"
+        aria-labelledby="card-patches-title"
+      >
+        <header class="mw-s2f-card-head">
+          <h2 id="card-patches-title" class="mw-s2f-card-title">Patch Notes</h2>
+          <span class="mw-s2f-corner">
+            <a href="/patch-notes/" class="mw-s2f-btn" data-testid="card-open">
+              <span>open</span>
+              <ArrowRight size={13} aria-hidden="true" />
+            </a>
+          </span>
+          <small class="mw-s2f-subtitle">
+            Warcraft III: Reforged version history · Latest: WC3 {latestPatch}
+          </small>
+        </header>
+
+        <div class="mw-s2f-tabs mw-s2f-tabs-spacer" aria-hidden="true">
+          <span>Patches</span>
+        </div>
+
+        <div class="mw-s2f-content">
+          <ol class="mw-s2f-list">
+            {
+              patchVersions.map((ver, i) => (
+                <li>
+                  <a
+                    href={i === 0 ? "/patch-notes/" : `/patch-notes/${ver}/`}
+                    class="mw-s2f-row"
+                    data-testid="card-row"
+                  >
+                    <span class="mw-s2f-rank">{i + 1}</span>
+                    <span class="mw-s2f-name">Patch {ver}</span>
+                    <span
+                      class:list={[
+                        "mw-s2f-val",
+                        i === 0 ? "mw-s2f-val-include" : "mw-s2f-val-score",
+                      ]}
+                    >
+                      {patchSummaries[ver] ?? (i === 0 ? "Latest" : "Archive")}
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="mw-s2f-fine">
+            Full balance changes, World Editor updates, and native additions.
           </p>
         </div>
-        <div class="mw-terminal-window">
-          <div class="mw-terminal-header" aria-hidden="true">
-            <span class="mw-term-dot mw-term-dot-red"></span>
-            <span class="mw-term-dot mw-term-dot-amber"></span>
-            <span class="mw-term-dot mw-term-dot-green"></span>
-            <span class="mw-term-caption">shell</span>
-          </div>
+      </section>
+
+      <!-- Card 4: CLI Quickstart -->
+      <section
+        class="mw-s2f-card"
+        data-testid="card"
+        data-card="quickstart"
+        aria-labelledby="card-cli-title"
+      >
+        <header class="mw-s2f-card-head">
+          <h2 id="card-cli-title" class="mw-s2f-card-title">CLI Quickstart</h2>
+          <span class="mw-s2f-corner">
+            <button
+              type="button"
+              class="mw-s2f-btn"
+              data-copy-cli
+              aria-label="Copy CLI quickstart commands"
+            >
+              <Copy size={12} aria-hidden="true" />
+              <span data-copy-label>copy</span>
+            </button>
+            <a
+              href="https://docs.wc3.dev/reference/cli-and-build/"
+              class="mw-s2f-btn"
+              data-testid="card-open"
+            >
+              <span>open</span>
+              <ArrowRight size={13} aria-hidden="true" />
+            </a>
+          </span>
+          <small class="mw-s2f-subtitle">
+            Install the CLI &amp; template from NuGet and pack a playable .w3x
+          </small>
+        </header>
+
+        <div class="mw-s2f-content">
           <pre
-            class="mw-terminal-pre"><code><span class="mw-term-comment"># Install CLI tool &amp; project template</span>
+            class="mw-s2f-code"><code><span class="mw-term-comment"># Install CLI tool &amp; project template</span>
 <span class="mw-term-prompt">$</span> dotnet tool install -g Moonwell.Cli
 <span class="mw-term-prompt">$</span> dotnet new install Moonwell.Templates
 
-<span class="mw-term-comment"># Create and pack a playable .w3x map</span>
+<span class="mw-term-comment"># Scaffold &amp; build a playable .w3x map</span>
 <span class="mw-term-prompt">$</span> dotnet new moonwell -n MyMap
 <span class="mw-term-prompt">$</span> cd MyMap &amp;&amp; moonwell build</code></pre>
-        </div>
-        <div class="mw-panel-links-inline">
-          <a
-            href="https://docs.wc3.dev/reference/cli-and-build/"
-            class="mw-inline-link"
-          >
-            <Terminal size={14} aria-hidden="true" />
-            <span>CLI &amp; Build Pipeline</span>
-          </a>
-          <a
-            href="https://docs.wc3.dev/guides/project-and-editor/"
-            class="mw-inline-link"
-          >
-            <FolderOpen size={14} aria-hidden="true" />
-            <span>World Editor Sync</span>
-          </a>
-        </div>
-      </section>
-
-      <section
-        class="mw-panel mw-panel-tutorials"
-        aria-labelledby="panel-tutorials-title"
-      >
-        <div class="mw-panel-bar">
-          <span class="mw-panel-tag">
-            <Compass size={14} aria-hidden="true" />
-            <span>Beginner Track · 21 Lessons</span>
-          </span>
-          <span class="mw-panel-meta">6 Chapters</span>
-        </div>
-        <div class="mw-panel-head">
-          <h2 id="panel-tutorials-title" class="mw-panel-title">
-            World Editor Tutorials
-          </h2>
-          <p class="mw-panel-desc">
-            New to Warcraft III map-making? Build a complete custom map,
-            <strong>Defend the Village</strong>, from an empty grass field to a
-            playable five-wave defense game using the World Editor — no
-            programming required.
+          <p class="mw-s2f-fine">
+            Compiles C# to Lua 5.3, generates object tables, and packs the map archive.
           </p>
         </div>
-        <div class="mw-chapter-grid">
-          {
-            tutorialChapters.map((ch) => (
-              <a href={ch.href} class="mw-chapter-card">
-                <span class="mw-chapter-num">{ch.num}</span>
-                <span class="mw-chapter-copy">
-                  <span class="mw-chapter-title">{ch.title}</span>
-                  <span class="mw-chapter-meta">{ch.meta}</span>
-                </span>
-              </a>
-            ))
-          }
-        </div>
-        <div class="mw-panel-actions">
-          <a
-            href="/tutorials/editor-basics/install-and-open/"
-            class="mw-btn mw-btn-primary"
-          >
-            <Compass size={15} aria-hidden="true" />
-            <span>Start Lesson 1</span>
-          </a>
-          <a href="/tutorials/" class="mw-btn mw-btn-secondary">
-            <BookOpen size={15} aria-hidden="true" />
-            <span>All Chapters</span>
-          </a>
+      </section>
+
+      <!-- Card 5: Topics (TagsCard-inspired) -->
+      <section
+        class="mw-s2f-card"
+        data-testid="card"
+        data-card="topics"
+        aria-labelledby="card-topics-title"
+      >
+        <header class="mw-s2f-card-head">
+          <h2 id="card-topics-title" class="mw-s2f-card-title">Topics</h2>
+          <span class="mw-s2f-corner">
+            <a href="https://docs.wc3.dev/" class="mw-s2f-btn">
+              <span>all docs</span>
+              <ArrowRight size={13} aria-hidden="true" />
+            </a>
+          </span>
+          <small class="mw-s2f-subtitle">
+            Filter and jump directly to a guide, tutorial or reference page
+          </small>
+        </header>
+
+        <div class="mw-s2f-content">
+          <input
+            type="search"
+            class="mw-s2f-search"
+            data-testid="topic-search"
+            placeholder="Filter topics…"
+            aria-label="Filter topics"
+          />
+          <div class="mw-s2f-chips" data-topic-list>
+            {
+              topics.map((topic) => (
+                <a
+                  href={topic.href}
+                  class:list={["mw-s2f-chip", { fav: topic.fav }]}
+                  data-topic-chip={topic.label.toLowerCase()}
+                >
+                  {topic.label}
+                </a>
+              ))
+            }
+          </div>
+          <p class="mw-s2f-empty" data-topic-empty hidden>No matching topics.</p>
         </div>
       </section>
 
-      <div class="mw-panel-stack">
-        <section
-          class="mw-panel mw-panel-compact"
-          aria-labelledby="panel-engine-title"
-        >
-          <div class="mw-panel-bar">
-            <span class="mw-panel-tag">
-              <Cpu size={14} aria-hidden="true" />
-              <span>Patch Notes &amp; Engine Reference</span>
-            </span>
-            <a href="/patch-notes/" class="mw-panel-meta">WC3 {latestPatch}</a>
-          </div>
-          <h2 id="panel-engine-title" class="mw-panel-subtitle">
-            Engine, Natives &amp; Diagnostics
-          </h2>
-          <div class="mw-resource-list">
-            <a href="/patch-notes/" class="mw-resource-row">
-              <span class="mw-resource-name">Warcraft III Patch Notes</span>
-              <span class="mw-resource-detail">Patch {recentPatchesLabel} &amp; version history</span>
-            </a>
-            <a
-              href="https://docs.wc3.dev/reference/objects-and-natives/"
-              class="mw-resource-row"
-            >
-              <span class="mw-resource-name">Objects, Handles &amp; Natives</span>
-              <span class="mw-resource-detail">FourCCs, standard catalog &amp; handle types</span>
-            </a>
-            <a
-              href="https://docs.wc3.dev/reference/diagnostics/"
-              class="mw-resource-row"
-            >
-              <span class="mw-resource-name">Compiler &amp; Build Diagnostics</span>
-              <span class="mw-resource-detail">Desync &amp; World Editor limit analyzers</span>
-            </a>
-          </div>
-        </section>
-
-        <section
-          class="mw-panel mw-panel-compact"
-          aria-labelledby="panel-toolchain-title"
-        >
-          <div class="mw-panel-bar">
-            <span class="mw-panel-tag">
-              <GitBranch size={14} aria-hidden="true" />
-              <span>C# Toolchain &amp; Upstream</span>
-            </span>
-            <span class="mw-panel-meta">Open Source</span>
-          </div>
-          <h2 id="panel-toolchain-title" class="mw-panel-subtitle">
-            Repositories &amp; Packages
-          </h2>
-          <div class="mw-resource-list">
+      <!-- Card 6: Ecosystem & Portal Status (EventsCard + AppCard-inspired) -->
+      <section
+        class="mw-s2f-card"
+        data-testid="card"
+        data-card="ecosystem"
+        aria-labelledby="card-ecosystem-title"
+      >
+        <header class="mw-s2f-card-head">
+          <h2 id="card-ecosystem-title" class="mw-s2f-card-title">Ecosystem &amp; Status</h2>
+          <span class="mw-s2f-corner">
             <a
               href="https://github.com/mdlsvensson/moonwell"
-              class="mw-resource-row"
+              class="mw-s2f-btn"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span class="mw-resource-name">
-                <span>mdlsvensson/moonwell</span>
-                <ArrowUpRight size={13} aria-hidden="true" />
-              </span>
-              <span class="mw-resource-detail">Framework, CLI, source generators &amp; runtime</span>
+              <span>github</span>
+              <ArrowUpRight size={13} aria-hidden="true" />
             </a>
-            <a
-              href="https://github.com/Drake53/War3Net"
-              class="mw-resource-row"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span class="mw-resource-name">
-                <span>War3Net</span>
-                <ArrowUpRight size={13} aria-hidden="true" />
-              </span>
-              <span class="mw-resource-detail">MPQ archives, SLK tables &amp; .w3x map formats</span>
-            </a>
-            <a
-              href="https://github.com/yanghuan/CSharp.lua"
-              class="mw-resource-row"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span class="mw-resource-name">
-                <span>CSharp.lua</span>
-                <ArrowUpRight size={13} aria-hidden="true" />
-              </span>
-              <span class="mw-resource-detail">Roslyn C# to Lua transpiler</span>
-            </a>
-          </div>
-        </section>
+          </span>
+          <small class="mw-s2f-subtitle">
+            C# toolchain, community asset hubs &amp; portal telemetry
+          </small>
+        </header>
 
-        <section
-          class="mw-panel mw-panel-compact"
-          aria-labelledby="panel-tools-title"
-        >
-          <div class="mw-panel-bar">
-            <span class="mw-panel-tag">
-              <Wrench size={14} aria-hidden="true" />
-              <span>Modding Tools &amp; Community</span>
-            </span>
-            <span class="mw-panel-meta">Resources</span>
+        <div class="mw-s2f-tabs" role="group" aria-label="Ecosystem views" data-card-tabs="ecosystem">
+          <button type="button" class="on" aria-pressed="true" data-tab-btn="links">
+            Toolchain &amp; Tools
+          </button>
+          <button type="button" aria-pressed="false" data-tab-btn="portal">
+            This Portal
+          </button>
+        </div>
+
+        <div class="mw-s2f-content">
+          <ol class="mw-s2f-list" data-tab-panel="links">
+            {
+              ecosystemItems.map((item, i) => (
+                <li>
+                  <a
+                    href={item.href}
+                    class="mw-s2f-row"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span class="mw-s2f-rank">{i + 1}</span>
+                    <span class="mw-s2f-name">{item.title}</span>
+                    <span class="mw-s2f-detail">{item.detail}</span>
+                    <span
+                      class:list={[
+                        "mw-s2f-pill",
+                        item.kind === "C#"
+                          ? "mw-s2f-pill-info"
+                          : item.kind === "Hub"
+                            ? "mw-s2f-pill-include"
+                            : "mw-s2f-pill-score",
+                      ]}
+                    >
+                      {item.kind}
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+
+          <div class="mw-s2f-portal-stats" data-tab-panel="portal" hidden>
+            <div class="mw-s2f-status-line">
+              <span class="mw-s2f-dot ok" aria-hidden="true"></span>
+              <span>WC3 Patch {latestPatch} · Moonwell v0.1.0 · .NET 10 → Lua 5.3</span>
+            </div>
+            <div class="mw-s2f-figures">
+              {
+                figures.map((f) => (
+                  <div class="mw-s2f-figure">
+                    <strong data-testid={`figure-${f.id}`}>{f.value}</strong>
+                    <span>{f.label}</span>
+                  </div>
+                ))
+              }
+            </div>
+            <p class="mw-s2f-fine">
+              All tracks online · Starlight search indexed · Kanagawa Wave
+            </p>
           </div>
-          <h2 id="panel-tools-title" class="mw-panel-subtitle">
-            External Tools &amp; Asset Hubs
-          </h2>
-          <div class="mw-resource-list">
-            <a
-              href="https://www.hiveworkshop.com/"
-              class="mw-resource-row"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span class="mw-resource-name">
-                <span>Hive Workshop</span>
-                <ArrowUpRight size={13} aria-hidden="true" />
-              </span>
-              <span class="mw-resource-detail">Models, icons, skins, maps &amp; modding forums</span>
-            </a>
-            <a
-              href="http://www.zezula.net/en/casc/main.html"
-              class="mw-resource-row"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span class="mw-resource-name">
-                <span>CascView</span>
-                <ArrowUpRight size={13} aria-hidden="true" />
-              </span>
-              <span class="mw-resource-detail">Browse &amp; extract Warcraft III CASC storage</span>
-            </a>
-            <a
-              href="https://github.com/Retera/ReteraModelStudio"
-              class="mw-resource-row"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span class="mw-resource-name">
-                <span>Retera&apos;s Model Studio</span>
-                <ArrowUpRight size={13} aria-hidden="true" />
-              </span>
-              <span class="mw-resource-detail">3D MDX/MDL model viewer &amp; animation editor</span>
-            </a>
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   </main>
 
   <script is:inline>
+    // Copy CLI quickstart commands
     const copyBtn = document.querySelector("[data-copy-cli]");
     if (copyBtn) {
       const copyLabel = copyBtn.querySelector("[data-copy-label]");
@@ -461,12 +570,55 @@ const tutorialChapters = [
       copyBtn.addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(commands);
-          if (copyLabel) copyLabel.textContent = "Copied";
+          if (copyLabel) copyLabel.textContent = "copied";
           setTimeout(() => {
-            if (copyLabel) copyLabel.textContent = "Copy";
+            if (copyLabel) copyLabel.textContent = "copy";
           }, 1800);
         } catch {
           // Ignore clipboard permission errors
+        }
+      });
+    }
+
+    // In-card view tabs (modeled on Card.svelte)
+    for (const tabGroup of document.querySelectorAll("[data-card-tabs]")) {
+      const card = tabGroup.closest("[data-card]");
+      if (!card) continue;
+      const buttons = tabGroup.querySelectorAll("[data-tab-btn]");
+      const panels = card.querySelectorAll("[data-tab-panel]");
+      for (const btn of buttons) {
+        btn.addEventListener("click", () => {
+          const target = btn.getAttribute("data-tab-btn");
+          for (const b of buttons) {
+            const active = b === btn;
+            b.classList.toggle("on", active);
+            b.setAttribute("aria-pressed", String(active));
+          }
+          for (const panel of panels) {
+            panel.hidden = panel.getAttribute("data-tab-panel") !== target;
+          }
+        });
+      }
+    }
+
+    // Topic chip search filter (modeled on TagsCard.svelte)
+    const searchInput = document.querySelector("[data-testid='topic-search']");
+    const topicChips = document.querySelectorAll("[data-topic-chip]");
+    const emptyMsg = document.querySelector("[data-topic-empty]");
+    if (searchInput instanceof HTMLInputElement) {
+      searchInput.addEventListener("input", () => {
+        const q = searchInput.value.trim().toLowerCase();
+        let shown = 0;
+        for (const chip of topicChips) {
+          const label = chip.getAttribute("data-topic-chip") || "";
+          const match = q === "" || label.includes(q);
+          if (chip instanceof HTMLElement) {
+            chip.hidden = !match;
+          }
+          if (match) shown++;
+        }
+        if (emptyMsg instanceof HTMLElement) {
+          emptyMsg.hidden = shown > 0;
         }
       });
     }

@@ -106,6 +106,40 @@ test("home build emits standalone wc3.dev landing page, /moonwell page, and 404 
   );
   assert.match(
     homeHtml,
+    /data-testid="dashboard"/,
+    "wc3.dev homepage should render the steam2fiddy-inspired dashboard container",
+  );
+  for (const cardId of [
+    "moonwell",
+    "tutorials",
+    "patch-notes",
+    "quickstart",
+    "topics",
+    "ecosystem",
+  ]) {
+    assert.match(
+      homeHtml,
+      new RegExp(`data-card="${cardId}"`),
+      `wc3.dev dashboard should render the ${cardId} card`,
+    );
+  }
+  assert.match(
+    homeHtml,
+    /data-testid="topic-search"/,
+    "wc3.dev dashboard should render the filterable topic chips input",
+  );
+  assert.match(
+    homeHtml,
+    /data-testid="figure-lessons"/,
+    "wc3.dev dashboard should render AppCard-style figure counters",
+  );
+  assert.match(
+    homeHtml,
+    /data-testid="status"/,
+    "wc3.dev layout should render the 22px bottom status bar",
+  );
+  assert.match(
+    homeHtml,
     /3\.0\.1/,
     "wc3.dev dashboard should display Warcraft III 3.0.1 telemetry/patch info",
   );
