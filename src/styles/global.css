@@ -1,18 +1,19 @@
 @layer base, starlight, theme, components, utilities;
 
-@import "@fontsource-variable/outfit";
-@import "@fontsource-variable/ibm-plex-sans";
+@import "@fontsource-variable/nunito";
+@import "@fontsource/google-sans/400.css";
+@import "@fontsource/google-sans/500.css";
+@import "@fontsource/google-sans/700.css";
 @import "@fontsource-variable/jetbrains-mono";
 @import "@astrojs/starlight-tailwind";
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @theme {
-  --font-sans: "IBM Plex Sans Variable", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Google Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Nunito Variable", "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-subheading:
-    "Outfit Variable", "Outfit", "IBM Plex Sans Variable", "IBM Plex Sans", ui-sans-serif,
-    system-ui, sans-serif;
+    "Nunito Variable", "Nunito", "Google Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* Default Kanagawa Wave accent scale (#7e9cd8 crystalBlue, #7fb4ca springBlue, #223249 waveBlue1) */

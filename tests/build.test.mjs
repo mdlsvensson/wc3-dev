@@ -546,19 +546,15 @@ test("site uses Kanagawa Wave as the sole theme without any theme switcher", () 
   );
   assert.match(
     cssContent,
-    /Outfit Variable/i,
-    "built CSS should configure Outfit Variable for headings",
+    /Nunito Variable/i,
+    "built CSS should configure Nunito Variable for headings",
   );
   assert.doesNotMatch(
     cssContent,
-    /Space Grotesk Variable|Pixelify Sans|Jersey 15/i,
-    "built CSS should not include Space Grotesk or pixel fonts",
+    /Space Grotesk Variable|Outfit Variable|Pixelify Sans|Jersey 15/i,
+    "built CSS should not include Space Grotesk, Outfit, or pixel fonts",
   );
-  assert.match(
-    cssContent,
-    /IBM Plex Sans Variable/i,
-    "built CSS should configure IBM Plex Sans for body text",
-  );
+  assert.match(cssContent, /Google Sans/i, "built CSS should configure Google Sans for body text");
   assert.match(
     cssContent,
     /JetBrains Mono Variable/i,
