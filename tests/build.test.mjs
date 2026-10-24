@@ -546,13 +546,13 @@ test("site uses Kanagawa Wave as the sole theme without any theme switcher", () 
   );
   assert.match(
     cssContent,
-    /Space Grotesk Variable/i,
-    "built CSS should configure Space Grotesk for headings",
+    /Outfit Variable/i,
+    "built CSS should configure Outfit Variable for headings",
   );
   assert.doesNotMatch(
     cssContent,
-    /Pixelify Sans|Jersey 15/i,
-    "built CSS should not include pixel fonts",
+    /Space Grotesk Variable|Pixelify Sans|Jersey 15/i,
+    "built CSS should not include Space Grotesk or pixel fonts",
   );
   assert.match(
     cssContent,

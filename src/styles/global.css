@@ -1,6 +1,6 @@
 @layer base, starlight, theme, components, utilities;
 
-@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/outfit";
 @import "@fontsource-variable/ibm-plex-sans";
 @import "@fontsource-variable/jetbrains-mono";
 @import "@astrojs/starlight-tailwind";
@@ -9,10 +9,10 @@
 
 @theme {
   --font-sans: "IBM Plex Sans Variable", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Space Grotesk Variable", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-subheading:
-    "Space Grotesk Variable", "Space Grotesk", "IBM Plex Sans Variable", "IBM Plex Sans",
-    ui-sans-serif, system-ui, sans-serif;
+    "Outfit Variable", "Outfit", "IBM Plex Sans Variable", "IBM Plex Sans", ui-sans-serif,
+    system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* Default Kanagawa Wave accent scale (#7e9cd8 crystalBlue, #7fb4ca springBlue, #223249 waveBlue1) */
